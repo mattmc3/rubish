@@ -373,6 +373,17 @@ module Rubish
       incomplete_command_error?(e.message) ? :incomplete : :error
     end
 
+    # Public: tokenize a candidate command line for syntax highlighting.
+    # Returns the raw Array of `Rubish::Lexer::Token` (each carries
+    # `:type` and `:value`). Hosts use this to render colored input.
+    # Returns an empty array on lexer failure rather than raising —
+    # highlighting on a half-typed line should never crash the editor.
+    def tokenize(line)
+      @lexer_class.new(line).tokenize
+    rescue
+      []
+    end
+
     private
 
     # Check if a parse error indicates incomplete input (needs more lines)
