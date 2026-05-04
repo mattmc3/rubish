@@ -82,8 +82,18 @@ module Rubish
       @function_caller&.call(name, args)
     end
 
+    # Hook the host can install to run extra setup in the child between
+    # fork() and exec(). Used by in-process embeddings (e.g. Echoes) to
+    # set up a per-command pty controlling-tty (setsid + TIOCSCTTY) so
+    # signals from the line discipline (Ctrl-C → SIGINT) reach the
+    # child. nil = no-op.
+    class << self
+      attr_accessor :child_pre_exec_hook
+    end
+
     # Execute a command with proper error handling for command not found / permission denied
     def self.safe_exec(cmd_name, cmd_path, *args)
+      child_pre_exec_hook&.call
       exec(cmd_path, *args)
     rescue Errno::ENOENT
       $stderr.puts "rubish: #{cmd_name}: command not found"
