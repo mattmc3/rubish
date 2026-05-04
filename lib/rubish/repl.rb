@@ -384,6 +384,19 @@ module Rubish
       []
     end
 
+    # Public: parse a candidate command line and return the AST root
+    # node, or nil if the line is empty / unparseable. Hosts use this
+    # to make execution decisions ahead of time — e.g., Echoes inspects
+    # the AST to decide whether the line is a single-fork command and
+    # whether a per-command controlling tty (for Ctrl-C support) is
+    # safe to set up.
+    def parse_ast(line)
+      tokens = @lexer_class.new(line).tokenize
+      @parser_class.new(tokens).parse
+    rescue
+      nil
+    end
+
     private
 
     # Check if a parse error indicates incomplete input (needs more lines)
