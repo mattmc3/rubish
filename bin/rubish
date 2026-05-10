@@ -41,7 +41,12 @@ if [ -z "$RUBY" ] || [ ! -x "$RUBY" ]; then
   exit 127
 fi
 
-if [ "$(/usr/sbin/sysctl -in hw.optional.arm64 2>/dev/null)" = "1" ]; then
+# Only relaunch via `arch -arm64` if we're actually running translated
+# (this script picked up the x86_64 slice of /bin/bash under Rosetta).
+# When already native — the common case on Apple Silicon — exec ruby
+# directly so we don't pay for an extra arch fork+exec hop.
+# `sysctl.proc_translated` is missing on non-arm64 systems; treat it as 0.
+if [ "$(/usr/sbin/sysctl -in sysctl.proc_translated 2>/dev/null)" = "1" ]; then
   exec /usr/bin/arch -arm64 "$RUBY" "$RUBISH_BIN" "$@"
 else
   exec "$RUBY" "$RUBISH_BIN" "$@"
