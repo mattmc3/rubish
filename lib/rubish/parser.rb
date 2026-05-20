@@ -132,6 +132,16 @@ module Rubish
             cmd = parse_redirections(cmd)
             commands << cmd
             pipe_types << :pipe
+          elsif peek(:WORD) || peek(:SELECT)
+            # Bare method chain: .method (no parens, no block) is
+            # equivalent to | method (e.g. `ls().sort` → `ls | sort`).
+            # The lexer only emits :DOT here in unambiguous chain
+            # contexts (after :FUNC_CALL, :ARRAY, :BLOCK, or another :DOT).
+            method_name = consume.value
+            cmd = AST::Command.new(name: method_name)
+            cmd = parse_redirections(cmd)
+            commands << cmd
+            pipe_types << :pipe
           else
             # Unexpected token after DOT, break
             break

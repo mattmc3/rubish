@@ -55,11 +55,27 @@ module Rubish
       # to allow them as command arguments (e.g., "echo done")
     }.freeze
 
+    # Tokens after which a bare `.method` chain continues. :FUNC_CALL,
+    # :ARRAY, :BLOCK all end with `)`/`]`/`}` so the next `.method`
+    # can't be confused with a filename. :DOT continues an open chain.
+    METHOD_CHAIN_OPENERS = %i[FUNC_CALL ARRAY BLOCK DOT].freeze
+
+    # Tokens that end the current command and reset chain context.
+    METHOD_CHAIN_BREAKERS = %i[
+      PIPE PIPE_BOTH SEMICOLON DOUBLE_SEMI CASE_FALL CASE_CONT
+      AND OR AMPERSAND NEWLINE LPAREN LBRACE
+    ].freeze
+
     def initialize(input)
       @input = input
       @pos = 0
       @last_token_type = nil
       @last_word_value = nil
+      # True when we just emitted a token that starts/continues a Ruby
+      # method-call chain (`ls().sort`, `[1,2,3].sort`, `x.foo.bar`).
+      # Lets `looks_like_method_chain_start?` accept bare `.method` only
+      # in safe contexts — never for filenames or paths.
+      @in_method_chain = false
     end
 
     def tokenize
@@ -74,6 +90,13 @@ module Rubish
           @last_token_type = token.type
           # Track word value for block detection (also SELECT for filtering select)
           @last_word_value = token.value if token.type == :WORD || token.type == :SELECT
+          # Maintain chain context. Note: :WORD does NOT toggle the flag
+          # so chains can continue across method names (ls().sort.reverse).
+          if METHOD_CHAIN_OPENERS.include?(token.type)
+            @in_method_chain = true
+          elsif METHOD_CHAIN_BREAKERS.include?(token.type)
+            @in_method_chain = false
+          end
         end
       end
       tokens
@@ -527,16 +550,26 @@ module Rubish
         return read_array_assignment(value)
       end
 
-      # Check for function call syntax: cmd(arg1, arg2) - but not:
-      # - cmd() which is function def
+      # Check for function call syntax: cmd(arg1, arg2) — but not:
+      # - cmd() { body } which is a bash function definition
       # - extglob patterns like word?(pat), word*(pat), word+(pat), @(pat), !(pat)
       # - after def/function keywords (where the word is a function name being defined)
       # - words that don't look like command names (e.g., regex metacharacters like ^ or $)
       # - Ruby-like code (contains keyword args with :, nested method calls, etc.)
-      if @input[@pos] == '(' && @input[@pos + 1] != ')' &&
+      if @input[@pos] == '(' &&
          !extglob_prefix?(value) && ![:DEF, :FUNCTION].include?(@last_token_type) &&
          valid_func_call_name?(value) && !looks_like_ruby_call?
-        return read_func_call(value)
+        # Empty parens (`name()`) are ambiguous: `name() { body }` is a
+        # function definition (let the parser handle as WORD + :PARENS),
+        # while `name()` followed by anything else is a zero-arg call
+        # (Ruby-style — enables `ls().sort` chaining).
+        if @input[@pos + 1] == ')'
+          peek = @pos + 2
+          peek += 1 while peek < @input.length && @input[peek] =~ /[ \t]/
+          return read_func_call(value) unless @input[peek] == '{'
+        else
+          return read_func_call(value)
+        end
       end
 
       # Check if word is a keyword
@@ -766,11 +799,24 @@ module Rubish
         return true if %w[each map select detect].include?(identifier)
       end
 
-      # Must be followed by ( for method call
-      return false unless lookahead < @input.length && @input[lookahead] == '('
+      # Method call with parens: .method(args)
+      if lookahead < @input.length && @input[lookahead] == '('
+        return !looks_like_ruby_method_chain?(lookahead)
+      end
 
-      # Additional check: not Ruby keyword args inside (to avoid false positives)
-      !looks_like_ruby_method_chain?(lookahead)
+      # Bare .method — no parens, no block. Only accept when we're
+      # demonstrably inside a method chain context: the previous token
+      # was :FUNC_CALL, :ARRAY, :BLOCK, or :DOT (or :WORD in the middle
+      # of an already-open chain). That makes `ls().sort` work while
+      # leaving `cat file.txt` (where the prev token is :WORD outside
+      # any chain) untouched. The next char must be a shell terminator
+      # so a chain can't grab into the next argument.
+      if @in_method_chain
+        trailing = @input[lookahead]
+        return true if trailing.nil? || trailing =~ /[\s|&;()<>\n.]/
+      end
+
+      false
     end
 
     def looks_like_ruby_method_chain?(paren_pos)

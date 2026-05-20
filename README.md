@@ -104,15 +104,23 @@ grep('pattern', file.txt)
 
 ### Method chaining
 
-Commands can be chained with Ruby methods using dot notation, forming a pipeline. The method must take parens (with args) or a block — bare `cmd.method` isn't supported, since the lexer can't safely distinguish it from filenames like `./script.sh`.
+Commands can be chained with Ruby methods using dot notation, forming a pipeline. The chain has to be *opened* by a parenthesized call, an array literal, or a block — once you're in chain context, subsequent methods can be bare:
 
 ```sh
+# Equivalent to `ls | sort`
+ls().sort
+
+# Equivalent to `ls | sort | uniq`
+ls().sort.uniq
+
 # Equivalent to `cat file.txt | grep error`
 cat(file.txt).grep(/error/)
 
-# Method chains can be combined with blocks (see "Ruby iterator blocks" below)
+# Chains can be combined with blocks (see "Ruby iterator blocks" below)
 ls.select { it.end_with?('.rb') }.each { |f| puts f.upcase }
 ```
+
+The first segment needs the parens because bare `cmd.method` is ambiguous with paths and dotted filenames (`./script.sh`, `file.tar.gz`) — once `()` confirms a method-call form, the lexer knows it's safe to chain.
 
 ### Ruby iterator blocks
 
