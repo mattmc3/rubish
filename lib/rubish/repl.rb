@@ -2,6 +2,7 @@
 
 require_relative 'prompt'
 require_relative 'completion'
+require_relative 'highlighter'
 require_relative 'history'
 require_relative 'config'
 require_relative 'arithmetic'
@@ -413,6 +414,12 @@ module Rubish
       Reline.core.config.add_default_key_binding_by_keymap(:emacs, [23], :backward_kill_word)
       # Use autocompletion mode (fish-style inline suggestions)
       Reline.autocompletion = true
+
+      # Live syntax highlighting of the input buffer. Disable by setting
+      # RUBISH_NO_HIGHLIGHT=1 in the environment.
+      unless ENV['RUBISH_NO_HIGHLIGHT'] == '1'
+        Reline.output_modifier_proc = ->(text, complete:) { Highlighter.colorize(text) }
+      end
 
       # Set up key bindings for completion dialog navigation
       setup_completion_dialog_keybindings
