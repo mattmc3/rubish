@@ -173,9 +173,8 @@ if command_string
   # Enable restricted mode AFTER sourcing startup files
   Rubish::Builtins.enable_restricted_mode if restricted
 
-  repl.send(:execute, command_string)
-  # Get last exit status from repl
-  last_status = repl.instance_variable_get(:@last_status) || 0
+  exit_code = catch(:exit) { repl.send(:execute, command_string) }
+  last_status = exit_code || repl.instance_variable_get(:@last_status) || 0
   exit(last_status)
 elsif read_stdin
   # -s mode: read commands from stdin, args are positional parameters
@@ -197,13 +196,16 @@ elsif read_stdin
   Rubish::Builtins.enable_restricted_mode if restricted
 
   # Read and execute commands from stdin
-  $stdin.each_line(chomp: true) do |line|
-    next if line.strip.empty? || line.strip.start_with?('#')
+  exit_code = catch(:exit) do
+    $stdin.each_line(chomp: true) do |line|
+      next if line.strip.empty? || line.strip.start_with?('#')
 
-    repl.send(:execute, line)
+      repl.send(:execute, line)
+    end
+    nil
   end
 
-  last_status = repl.instance_variable_get(:@last_status) || 0
+  last_status = exit_code || repl.instance_variable_get(:@last_status) || 0
   exit(last_status)
 elsif script_file && !force_interactive
   # Script mode: execute script file (non-interactive)

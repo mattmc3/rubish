@@ -88,6 +88,18 @@ class TestRUBISH_EXECUTION_STRING < Test::Unit::TestCase
     assert_equal 'one two three', output
   end
 
+  # exit builtin via -c
+
+  def test_c_option_exit_default
+    system("#{@rubish_bin} -c 'exit'")
+    assert_equal 0, $?.exitstatus
+  end
+
+  def test_c_option_exit_with_code
+    system("#{@rubish_bin} -c 'exit 42'")
+    assert_equal 42, $?.exitstatus
+  end
+
   # Edge cases
 
   def test_c_option_empty_command
