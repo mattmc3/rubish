@@ -116,8 +116,10 @@ module Rubish
       @state.history_loader = -> { load_history }
       @state.history_saver = -> { save_history }
       @state.history_appender = -> { append_history }
-      # Prompt providers so `reset_prompt` can recompute PS1/RPROMPT
-      # mid-readline (used by bind -x callbacks that change cwd etc.)
+      # Prompt providers — bind -x's post-callback hook calls these to
+      # recompute PS1/RPROMPT mid-readline, so a `cd` inside a
+      # key-bound function paints with the new pwd before the next
+      # render. zsh's `zle reset-prompt` equivalent, automatic.
       @state.prompt_provider = -> { prompt }
       @state.right_prompt_provider = -> { right_prompt }
       # Set up Command class to handle functions in pipelines

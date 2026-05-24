@@ -528,6 +528,18 @@ module Rubish
           self.byte_pointer = new_line.bytesize
         end
 
+        # Refresh the dynamic prompt strings so callbacks that changed
+        # shell state the prompt depends on — most commonly `cd` against
+        # a pwd-aware RPROMPT — paint with the new values when we
+        # repaint below. Equivalent to zsh's `zle reset-prompt`.
+        state = Builtins.current_state
+        if state&.prompt_provider
+          @prompt = state.prompt_provider.call.to_s
+        end
+        if state&.right_prompt_provider && respond_to?(:rprompt=)
+          self.rprompt = state.right_prompt_provider.call
+        end
+
         # fzf and other full-screen bind -x commands repaint the terminal
         # behind Reline's back; force a full redraw to restore the prompt.
         Reline::IOGate.move_cursor_up(@rendered_screen.cursor_y)

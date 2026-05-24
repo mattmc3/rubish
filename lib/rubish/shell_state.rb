@@ -61,9 +61,11 @@ module Rubish
     attr_accessor :sourcing_file
     attr_accessor :source_executor
 
-    # Prompt providers — let builtins (`reset_prompt`) recompute PS1
-    # and RPROMPT from the current shell state and push them into
-    # Reline mid-readline. Set in the REPL constructor.
+    # Prompt providers — let the bind -x handler recompute PS1 and
+    # RPROMPT from the current shell state and push the fresh values
+    # into Reline mid-readline (so a `cd` inside a key-bound function
+    # is reflected in a pwd-aware prompt before the next paint).
+    # Set in the REPL constructor.
     attr_accessor :prompt_provider, :right_prompt_provider
 
     def initialize
