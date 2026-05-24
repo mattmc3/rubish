@@ -68,6 +68,16 @@ module Rubish
     # Set in the REPL constructor.
     attr_accessor :prompt_provider, :right_prompt_provider
 
+    # zsh-style push-line state. `push_line_stack` is a LIFO of buffers
+    # stashed by the push-line keystroke (ESC-Q). `push_line_pending`
+    # is the transient "I just pushed" flag the REPL reads to (a) skip
+    # executing the line that Reline returns from the push-line
+    # keystroke, and (b) NOT pre-fill the next prompt — that prompt is
+    # the user's interjection prompt and should be blank. The prompt
+    # *after* the interjection runs is where the top of the stack is
+    # popped back into the line editor.
+    attr_accessor :push_line_stack, :push_line_pending
+
     def initialize
       # Variables state
       @shell_vars = {}
@@ -155,6 +165,10 @@ module Rubish
       @exit_blocked_by_jobs = false
       @sourcing_file = nil
       @source_executor = nil
+
+      # push-line state (zsh ESC-Q)
+      @push_line_stack = []
+      @push_line_pending = false
     end
 
     def clear_variables

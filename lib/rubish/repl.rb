@@ -411,6 +411,10 @@ module Rubish
       # Rebind Ctrl-W to backward_kill_word which stops at non-word characters like /
       # Default em_kill_region only stops at whitespace
       Reline.core.config.add_default_key_binding_by_keymap(:emacs, [23], :backward_kill_word)
+      # zsh-style push-line on ESC-Q / ESC-q: stash the in-progress
+      # buffer, get a fresh prompt to interject a command, and have
+      # the buffer come back on the next prompt.
+      Builtins.install_push_line
       # Use autocompletion mode (fish-style inline suggestions)
       Reline.autocompletion = true
 
@@ -725,8 +729,22 @@ module Rubish
       # PROMPT_SP / PROMPT_EOL_MARK behavior.
       emit_prompt_eol_mark
 
+      # zsh push-line: decide whether this prompt is the interjection
+      # prompt (blank) or a normal one that should restore a stashed
+      # buffer. See Builtins#install_push_line for the full flow.
+      Builtins.configure_push_line_restore
+
       # Don't auto-add to history; we'll do it ourselves after checking HISTCONTROL/HISTIGNORE
       line = @frontend.read_line(prompt: left_prompt, rprompt: right_prompt)
+
+      # If the user just hit ESC-Q, Reline returned the typed text but
+      # we treat it as "pushed, not submitted": skip execution and
+      # history-add, and let the next iteration's
+      # configure_push_line_restore see the still-set pending flag.
+      if Builtins.current_state&.push_line_pending
+        return
+      end
+
       unless line
         # EOF received (Ctrl+D)
         # Check IGNOREEOF variable first, then fall back to set -o ignoreeof

@@ -560,6 +560,78 @@ module Rubish
       Reline.core.config.add_default_key_binding_by_keymap(reline_keymap, keystroke, method_name)
     end
 
+    # zsh-style push-line (ESC-Q). Per the zsh manual: "Push the
+    # current buffer onto the buffer stack and clear the buffer. Next
+    # time the editor starts up, the buffer will be popped off the top
+    # of the buffer stack and loaded into the editing buffer."
+    #
+    # In rubish that breaks into three coordinated pieces:
+    #
+    #   1. THIS handler (LineEditor#rubish_push_line): stash whole
+    #      buffer onto the LIFO stack, set the `push_line_pending`
+    #      flag, and call `finish` *without* touching @buffer_of_lines.
+    #      Leaving the buffer intact lets Reline's render_finished
+    #      commit the typed line to the terminal scrollback exactly as
+    #      accept-line (Enter) would — which is the visual zsh shows.
+    #
+    #   2. REPL post-readline: when push_line_pending is set, skip
+    #      execution and history-add, but leave the flag set so the
+    #      next iteration knows to NOT restore — the next prompt is
+    #      the user's interjection prompt and should be blank.
+    #
+    #   3. REPL pre-readline: if push_line_pending is set, clear it
+    #      and leave the prompt blank. Otherwise, if the stack has
+    #      entries, install a pre_input_hook that pops one per
+    #      subsequent readline until the stack drains.
+    #
+    # Idempotent: safe to call more than once.
+    def install_push_line
+      return unless defined?(Reline)
+      return if Reline::LineEditor.method_defined?(:rubish_push_line)
+
+      Reline::LineEditor.define_method(:rubish_push_line) do |_key = nil, **_kwargs|
+        state = Builtins.current_state
+        if state
+          stashed = whole_buffer
+          state.push_line_stack << stashed unless stashed.nil? || stashed.empty?
+          state.push_line_pending = true
+        end
+        # Do NOT clear @buffer_of_lines — render_finished will write
+        # the prompt + typed text + \r\n on Reline's way out, leaving
+        # the line visible in scrollback (zsh-style).
+        finish
+      end
+
+      # Bind ESC-Q and ESC-q (zsh default) to push-line in emacs mode.
+      Reline.core.config.add_default_key_binding_by_keymap(:emacs, [0x1B, 0x51], :rubish_push_line)
+      Reline.core.config.add_default_key_binding_by_keymap(:emacs, [0x1B, 0x71], :rubish_push_line)
+    end
+
+    # Pre-readline hook the REPL calls before every `read_line` to
+    # coordinate push-line state. See `install_push_line` for the full
+    # state-machine description.
+    def configure_push_line_restore
+      return unless defined?(Reline)
+      state = @state
+      return unless state
+
+      if state.push_line_pending
+        # The line we're about to read is the interjection prompt —
+        # don't restore anything onto it. The pending flag is consumed
+        # here, so the prompt *after* the interjection (or after
+        # another push) will see the stack and arm the restore.
+        state.push_line_pending = false
+        Reline.pre_input_hook = nil
+      elsif state.push_line_stack.any?
+        Reline.pre_input_hook = lambda do
+          if (text = state.push_line_stack.pop)
+            Reline.insert_text(text)
+          end
+          Reline.pre_input_hook = nil if state.push_line_stack.empty?
+        end
+      end
+    end
+
     # Apply a readline variable to Reline (if applicable)
     def apply_readline_variable(var, value)
       @state.readline_variables[var] = value
