@@ -359,6 +359,23 @@ class TestDirsFlags < Test::Unit::TestCase
     assert_match(/~/, output)
   end
 
+  # Regression: $HOME appearing as a substring mid-path must NOT get
+  # tildified. With HOME=/Users/joe, the path /tmp/Users/joe/sub
+  # should print verbatim, not as /tmp~/sub. Bash only substitutes
+  # `~` when $HOME is a real path prefix.
+  def test_dirs_does_not_tildify_home_appearing_mid_path
+    home = ENV['HOME']
+    omit 'HOME unset' if home.nil? || home.empty?
+
+    embedded = File.join(@tempdir, home.sub(%r{\A/}, ''), 'sub')
+    FileUtils.mkdir_p(embedded)
+    Dir.chdir(embedded)
+
+    output = capture_stdout { Rubish::Builtins.run('dirs', []) }
+    assert_no_match(/~/, output,
+                    "$HOME mid-path should not be tildified; got: #{output.inspect}")
+  end
+
   def test_dirs_per_line_one_entry_per_line
     Rubish::Builtins.run('pushd', [@subdir1])
     output = capture_stdout { Rubish::Builtins.run('dirs', ['-p']) }

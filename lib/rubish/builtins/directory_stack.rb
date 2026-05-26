@@ -190,8 +190,18 @@ module Rubish
       home  = ENV['HOME'] || Dir.home
       stack = [Dir.pwd] + @state.dir_stack
 
+      # Tildify only when $HOME is a real path prefix — never anywhere
+      # mid-path. Plain `dir.sub(home, '~')` would rewrite
+      # `/tmp/Users/joe/sub` (HOME=/Users/joe) to `/tmp~/sub`, which
+      # is not what bash does.
+      tildify = ->(dir) {
+        return dir if long || home.nil? || home.empty?
+        return dir.sub(home, '~') if dir == home || dir.start_with?("#{home}/")
+        dir
+      }
+
       format_entry = ->(dir, idx) {
-        display = long ? dir : dir.sub(home, '~')
+        display = tildify.call(dir)
         verbose ? format('%2d  %s', idx, display) : display
       }
 
@@ -209,7 +219,7 @@ module Rubish
       if verbose || per_line
         stack.each_with_index { |d, i| puts format_entry.call(d, i) }
       else
-        puts stack.map { |d| long ? d : d.sub(home, '~') }.join(' ')
+        puts stack.map { |d| tildify.call(d) }.join(' ')
       end
 
       true
