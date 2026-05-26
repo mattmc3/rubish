@@ -1006,14 +1006,11 @@ module Rubish
     end
 
     def generate_case_pattern_match(pattern)
-      # Convert shell pattern to fnmatch check
-      # Handle variable expansion in patterns
-      if pattern.include?('$')
-        pattern_expr = generate_interpolated_string(pattern)
-        "__case_match(#{pattern_expr}, __case_word)"
-      else
-        "__case_match(#{pattern.inspect}, __case_word)"
-      end
+      # Strip shell quoting and expand variables, same as command arguments.
+      # This ensures "x y" matches the string x y rather than the literal
+      # seven-character sequence "x y" (with embedded quote chars).
+      pattern_expr = generate_string_arg(pattern)
+      "__case_match(#{pattern_expr}, __case_word)"
     end
 
     def generate_subshell(node)
