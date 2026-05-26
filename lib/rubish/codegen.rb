@@ -276,7 +276,7 @@ module Rubish
       end
     end
 
-    def generate_interpolated_string(str, unquoted: false, decode_ansi_c: true)
+    def generate_interpolated_string(str, unquoted: false, decode_extquote: true)
       # Build a Ruby string with interpolation for variables
       result = +'"'
       i = 0
@@ -317,6 +317,26 @@ module Rubish
             i += 1
           end
         elsif char == '$'
+          # Parameter-operand context (decode_extquote: false): the
+          # runtime's expand_extquote, called from __param_expand,
+          # is where the extquote shopt decides whether $'...' and
+          # $"..." decode. Preserve those substrings as raw literal
+          # text in the resulting Ruby string so expand_extquote
+          # sees them intact — including the inner `\\` that the
+          # surrounding double-quote rules would otherwise collapse
+          # before the ANSI-C decoder gets a look. Also keeps
+          # $"..." out of parse_variable's codegen-time __translate
+          # branch, which would ignore the extquote shopt.
+          if !decode_extquote && i + 1 < str.length && (str[i + 1] == "'" || str[i + 1] == '"')
+            quote = str[i + 1]
+            end_pos = find_quoted_close(str, i + 2, quote)
+            if end_pos
+              str[i..end_pos].each_char { |c| append_escaped_char(result, c) }
+              i = end_pos + 1
+              next
+            end
+          end
+
           # ANSI-C quoted substring: $'...'. Pure `$'...'` arguments
           # are handled by generate_string_arg up front; here we
           # catch `$'...'` embedded in a larger word — typically the
@@ -324,15 +344,8 @@ module Rubish
           # runtime call to process_escape_sequences so the escapes
           # decode at eval time instead of getting stripped by the
           # unquoted backslash handling further down.
-          #
-          # Skipped when decode_ansi_c is false: inside `${VAR:-...}`
-          # operands the runtime's expand_extquote already handles
-          # `$'...'` and `$"..."` gated by the extquote shopt, so
-          # decoding here would short-circuit the runtime's
-          # extquote check (and break test_ansi_c_quoting_disabled
-          # et al, which `shopt -u extquote` and expect literals).
-          if decode_ansi_c && i + 1 < str.length && str[i + 1] == "'"
-            end_pos = find_ansi_c_quote_end(str, i + 2)
+          if decode_extquote && i + 1 < str.length && str[i + 1] == "'"
+            end_pos = find_quoted_close(str, i + 2, "'")
             if end_pos
               inner = str[(i + 2)...end_pos]
               result << '#{process_escape_sequences(' << inner.inspect << ')}'
@@ -369,16 +382,18 @@ module Rubish
       str.gsub(/\\(.)/, '\1')
     end
 
-    # Scan forward from `start` for the closing single quote of an
-    # ANSI-C `$'...'` substring, honoring backslash escapes (so `\'`
-    # is a literal single quote inside the string, not the terminator).
-    # Returns the index of the closing `'`, or nil if unterminated.
-    def find_ansi_c_quote_end(str, start)
+    # Scan forward from `start` for the closing `quote_char` of a
+    # quoted substring inside a larger word — most commonly an
+    # ANSI-C `$'...'` or locale `$"..."`. Honors `\X` escapes so a
+    # `\'` (or `\"`) is a literal quote inside the string, not the
+    # terminator. Returns the index of the closing quote, or nil if
+    # unterminated.
+    def find_quoted_close(str, start, quote_char)
       i = start
       while i < str.length
         if str[i] == '\\' && i + 1 < str.length
           i += 2
-        elsif str[i] == "'"
+        elsif str[i] == quote_char
           return i
         else
           i += 1
@@ -1280,12 +1295,13 @@ module Rubish
     # Operands can contain $VAR, ${VAR}, backtick substitution, etc.
     def generate_param_operand(operand)
       if operand.include?('$') || operand.include?('`')
-        # Don't decode `$'...'` here — the runtime's expand_extquote
-        # path (invoked from __param_expand) is where the extquote
-        # shopt gating happens. If we decoded at codegen time, the
-        # runtime would receive an already-decoded string and the
-        # shopt toggle would have nothing to gate.
-        generate_interpolated_string(operand, decode_ansi_c: false)
+        # Don't decode `$'...'` or `$"..."` here — the runtime's
+        # expand_extquote path (invoked from __param_expand) is
+        # where the extquote shopt decides whether to decode. If we
+        # decoded at codegen time, the runtime would receive an
+        # already-decoded string and the shopt toggle would have
+        # nothing to gate.
+        generate_interpolated_string(operand, decode_extquote: false)
       else
         operand.inspect
       end
