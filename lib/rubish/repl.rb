@@ -546,16 +546,26 @@ module Rubish
           return
         rescue SyntaxError => e
           if ruby_input_incomplete?(e.message) && !@state.sourcing_file
-            cont = (@frontend.read_continuation_line(continuation_prompt) rescue nil)
+            cancelled = false
+            cont = begin
+              @frontend.read_continuation_line(continuation_prompt)
+            rescue Interrupt
+              cancelled = true
+              nil
+            rescue StandardError
+              nil
+            end
             if cont.nil?
-              # No continuation available — either the user cancelled
-              # (Ctrl-C / EOF) or we're in a non-interactive context
-              # (rubish -c, scripted execute() from a test). In both
-              # cases "incomplete" is terminal: there's no way to
-              # supply the rest. Report it as the syntax error it is
-              # so callers / tests see a real diagnostic instead of a
-              # silent exit-1.
-              $stderr.puts "rubish: #{e.message}"
+              # No continuation available. Two cases:
+              #   1. User pressed Ctrl-C — they want to abandon, not
+              #      hear a complaint about what they didn't finish
+              #      typing. Stay silent.
+              #   2. EOF, no frontend, or non-interactive context
+              #      (rubish -c, scripted execute() from a test) —
+              #      "incomplete" is terminal here, so emit the
+              #      syntax error as the real diagnostic instead of
+              #      a silent exit-1.
+              $stderr.puts "rubish: #{e.message}" unless cancelled
               @last_status = 1
               return
             end
