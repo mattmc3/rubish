@@ -276,7 +276,7 @@ module Rubish
       end
     end
 
-    def generate_interpolated_string(str, unquoted: false)
+    def generate_interpolated_string(str, unquoted: false, decode_ansi_c: true)
       # Build a Ruby string with interpolation for variables
       result = +'"'
       i = 0
@@ -317,6 +317,30 @@ module Rubish
             i += 1
           end
         elsif char == '$'
+          # ANSI-C quoted substring: $'...'. Pure `$'...'` arguments
+          # are handled by generate_string_arg up front; here we
+          # catch `$'...'` embedded in a larger word — typically the
+          # RHS of an assignment like `x=$'a\nb'` — and emit a
+          # runtime call to process_escape_sequences so the escapes
+          # decode at eval time instead of getting stripped by the
+          # unquoted backslash handling further down.
+          #
+          # Skipped when decode_ansi_c is false: inside `${VAR:-...}`
+          # operands the runtime's expand_extquote already handles
+          # `$'...'` and `$"..."` gated by the extquote shopt, so
+          # decoding here would short-circuit the runtime's
+          # extquote check (and break test_ansi_c_quoting_disabled
+          # et al, which `shopt -u extquote` and expect literals).
+          if decode_ansi_c && i + 1 < str.length && str[i + 1] == "'"
+            end_pos = find_ansi_c_quote_end(str, i + 2)
+            if end_pos
+              inner = str[(i + 2)...end_pos]
+              result << '#{process_escape_sequences(' << inner.inspect << ')}'
+              i = end_pos + 1
+              next
+            end
+          end
+
           # Variable expansion
           var_expr, consumed = parse_variable(str, i)
           if var_expr
@@ -343,6 +367,24 @@ module Rubish
     # In shell, \X in unquoted context means just X
     def shell_unescape(str)
       str.gsub(/\\(.)/, '\1')
+    end
+
+    # Scan forward from `start` for the closing single quote of an
+    # ANSI-C `$'...'` substring, honoring backslash escapes (so `\'`
+    # is a literal single quote inside the string, not the terminator).
+    # Returns the index of the closing `'`, or nil if unterminated.
+    def find_ansi_c_quote_end(str, start)
+      i = start
+      while i < str.length
+        if str[i] == '\\' && i + 1 < str.length
+          i += 2
+        elsif str[i] == "'"
+          return i
+        else
+          i += 1
+        end
+      end
+      nil
     end
 
     # Append a character to a Ruby string literal, escaping as needed
@@ -1238,7 +1280,12 @@ module Rubish
     # Operands can contain $VAR, ${VAR}, backtick substitution, etc.
     def generate_param_operand(operand)
       if operand.include?('$') || operand.include?('`')
-        generate_interpolated_string(operand)
+        # Don't decode `$'...'` here — the runtime's expand_extquote
+        # path (invoked from __param_expand) is where the extquote
+        # shopt gating happens. If we decoded at codegen time, the
+        # runtime would receive an already-decoded string and the
+        # shopt toggle would have nothing to gate.
+        generate_interpolated_string(operand, decode_ansi_c: false)
       else
         operand.inspect
       end
