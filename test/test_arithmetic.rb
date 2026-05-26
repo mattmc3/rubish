@@ -174,4 +174,45 @@ class TestArithmetic < Test::Unit::TestCase
     execute("echo $x > #{output_file}")
     assert_equal "5\n", File.read(output_file)
   end
+
+  def test_logical_or_short_circuits_when_true
+    execute('x=1')
+    execute('(( x || (x=5) ))')
+    assert_equal '1', get_shell_var('x')
+  end
+
+  def test_logical_or_evaluates_right_when_false
+    execute('x=0')
+    execute('(( x || (x=5) ))')
+    assert_equal '5', get_shell_var('x')
+  end
+
+  def test_logical_and_evaluates_right_when_true
+    execute('x=1')
+    execute('(( x && (x=5) ))')
+    assert_equal '5', get_shell_var('x')
+  end
+
+  def test_logical_and_short_circuits_when_false
+    execute('x=0')
+    execute('(( x && (x=5) ))')
+    assert_equal '0', get_shell_var('x')
+  end
+
+  def test_logical_or_chained
+    execute('x=0; y=0')
+    execute('(( x || y || (x=7) ))')
+    assert_equal '7', get_shell_var('x')
+  end
+
+  def test_logical_and_chained
+    execute('x=1; y=1')
+    execute('(( x && y && (x=9) ))')
+    assert_equal '9', get_shell_var('x')
+  end
+
+  def test_assignment_inside_parens
+    execute('(( x = 42 ))')
+    assert_equal '42', get_shell_var('x')
+  end
 end
