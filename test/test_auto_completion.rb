@@ -758,6 +758,10 @@ class TestAutoCompletion < Test::Unit::TestCase
   end
 
   def test_sandbox_blocks_network
+    # The network-blocking guarantee is enforced via macOS's
+    # sandbox-exec. On Linux/Windows there's no equivalent in
+    # rubish today; the test's invariant doesn't hold there.
+    omit 'network sandbox only enforced on macOS via sandbox-exec' unless RUBY_PLATFORM.include?('darwin')
     # Verify network access is blocked
     output, success = Rubish::Builtins.sandboxed_help_command('curl -s --max-time 1 https://example.com')
     assert_false success
