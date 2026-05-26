@@ -548,7 +548,14 @@ module Rubish
           if ruby_input_incomplete?(e.message) && !@state.sourcing_file
             cont = (@frontend.read_continuation_line(continuation_prompt) rescue nil)
             if cont.nil?
-              # User cancelled (Ctrl-C / EOF) or no frontend available.
+              # No continuation available — either the user cancelled
+              # (Ctrl-C / EOF) or we're in a non-interactive context
+              # (rubish -c, scripted execute() from a test). In both
+              # cases "incomplete" is terminal: there's no way to
+              # supply the rest. Report it as the syntax error it is
+              # so callers / tests see a real diagnostic instead of a
+              # silent exit-1.
+              $stderr.puts "rubish: #{e.message}"
               @last_status = 1
               return
             end
