@@ -160,6 +160,20 @@ module Rubish
           commands << cmd
           next
         end
+        # Pipeline-form Ruby-style iterators: `cmd | each|map|detect {block}`.
+        # The DOT-chain form (`cmd.each {block}`) is handled in the DOT
+        # branch above; here we mirror it for the pipe form so the block
+        # gets attached to the command instead of being orphaned and the
+        # iterator name treated as an external command (`detect: command
+        # not found`).
+        if peek(:WORD) && current.value =~ /\A(each|map|detect)\z/ && peek_at(1, :BLOCK)
+          method_name = consume(:WORD).value
+          block = consume(:BLOCK).value
+          cmd = AST::Command.new(name: method_name, block: block)
+          cmd = parse_redirections(cmd)
+          commands << cmd
+          next
+        end
         cmd = parse_command
         commands << cmd if cmd
       end
