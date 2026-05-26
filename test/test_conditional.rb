@@ -174,4 +174,23 @@ class TestConditional < Test::Unit::TestCase
     execute("[[ bar =~ f(o+) ]] && echo yes > #{@tempfile.path} || echo no > #{@tempfile.path}")
     assert_equal "no\n", File.read(@tempfile.path)
   end
+
+  # [[ ]] with a variable as operator is a parse error (status 2) — parsed before var evaluation
+  def test_double_bracket_variable_as_operator_is_parse_error
+    execute('op="=="')
+    execute("[[ a $op a ]]; echo \"exit=$?\" > #{@tempfile.path}")
+    assert_match(/exit=2/, File.read(@tempfile.path))
+  end
+
+  # Invalid regex in =~ should exit 2
+  def test_double_bracket_invalid_regex_exits_2
+    execute("[[ foo.py =~ * ]]; echo \"exit=$?\" > #{@tempfile.path}")
+    assert_match(/exit=2/, File.read(@tempfile.path))
+  end
+
+  # [[ ]] supports octal literals with numeric comparison operators
+  def test_double_bracket_octal_eq
+    execute("[[ 15 -eq 017 ]] && echo yes > #{@tempfile.path} || echo no > #{@tempfile.path}")
+    assert_equal "yes\n", File.read(@tempfile.path)
+  end
 end

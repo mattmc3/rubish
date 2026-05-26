@@ -601,4 +601,16 @@ class TestTest < Test::Unit::TestCase
     assert_not_nil help
     assert help[:options].key?('-R varname')
   end
+
+  # Unquoted empty var: [ $empty = "" ] expands to [ = "" ] which is a parse error (status 2)
+  def test_unquoted_empty_var_is_parse_error
+    repl = Rubish::REPL.new
+    tmpfile = Tempfile.new('rubish_empty_var')
+    tmpfile.close
+    repl.send(:execute, 'empty=""')
+    repl.send(:execute, "[ $empty = \"\" ]; echo \"exit=$?\" > #{tmpfile.path}")
+    assert_match(/exit=2/, File.read(tmpfile.path))
+  ensure
+    tmpfile&.unlink
+  end
 end

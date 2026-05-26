@@ -2659,6 +2659,9 @@ module Rubish
           # modified since last read
           return File.exist?(arg) && File.mtime(arg) > File.atime(arg)
         end
+        # No valid unary operator matched — parse error
+        $stderr.puts "test: #{op}: unary operator expected"
+        return ExitStatus.new(2)
       end
 
       # Binary operators

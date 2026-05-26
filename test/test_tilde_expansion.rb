@@ -140,4 +140,16 @@ class TestTildeExpansion < Test::Unit::TestCase
   def test_tilde_not_expanded_after_equals_in_double_quotes
     assert_equal '"path=~"', expand('"path=~"')
   end
+
+  def test_tilde_not_expanded_in_non_assignment_word
+    # "echo x=~" looks like an assignment but isn't — tilde should stay literal.
+    # bash mistakenly expands here; POSIX says don't. rubish matches POSIX.
+    assert_equal 'echo x=~', expand('echo x=~')
+  end
+
+  def test_tilde_no_dynamic_assignment_expansion
+    # Tilde in a string that becomes an assignment via eval/readonly "$binding"
+    # should NOT expand at the point of initial string creation.
+    assert_equal "binding='const=~/src'", expand("binding='const=~/src'")
+  end
 end

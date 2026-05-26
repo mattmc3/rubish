@@ -1058,6 +1058,16 @@ module Rubish
     end
 
     def generate_conditional_expr(node)
+      # In [[, operators must be literal tokens — a variable reference at the operator
+      # position (middle of a 3-token binary expression) is a parse error (exit 2).
+      expr = node.expression
+      if expr.length == 3 &&
+         expr.all? { |t| t.type == :WORD || t.type == :FUNC_CALL } &&
+         expr[1].type == :WORD &&
+         (expr[1].value.include?('$') || expr[1].value.include?('`'))
+        return '__cond_syntax_error("variable used as conditional operator")'
+      end
+
       # Convert tokens to expression parts for runtime evaluation
       parts = node.expression.map do |token|
         case token.type
