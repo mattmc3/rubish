@@ -175,6 +175,17 @@ class TestConditional < Test::Unit::TestCase
     assert_equal "no\n", File.read(@tempfile.path)
   end
 
+  # Regex pattern with a literal comma — the lexer tokenizes `f(o,p)`
+  # as FUNC_CALL with args=["o","p"], so the codegen re-joins with
+  # comma when reconstructing the literal pattern. Space-joining
+  # would produce /f(o p)/ instead of /f(o,p)/ at runtime and miss
+  # the input "fo,p" (the regex matches because `(o,p)` is a capture
+  # group; on a space-joined pattern it'd want `o p` instead).
+  def test_double_bracket_regex_comma_in_pattern
+    execute("[[ fo,p =~ f(o,p) ]] && echo yes > #{@tempfile.path} || echo no > #{@tempfile.path}")
+    assert_equal "yes\n", File.read(@tempfile.path)
+  end
+
   # [[ ]] with a variable as operator is a parse error (status 2) — parsed before var evaluation
   def test_double_bracket_variable_as_operator_is_parse_error
     execute('op="=="')

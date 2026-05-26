@@ -1082,10 +1082,13 @@ module Rubish
         when :RPAREN
           '")"'
         when :FUNC_CALL
-          # Parser saw word(args) as a function call — reconstruct as literal string
-          # so regex patterns like f(o+) aren't evaluated as Ruby method calls
+          # Parser saw word(args) as a function call — reconstruct as a
+          # literal string so regex patterns like f(o+) aren't evaluated
+          # as Ruby method calls. Re-join args with commas (which is what
+          # the lexer split on); space-joining would turn `f(o,p)` into
+          # `f(o p)` and break regexes with literal commas.
           v = token.value
-          (v[:name].to_s + '(' + Array(v[:args]).join(' ') + ')').inspect
+          (v[:name].to_s + '(' + Array(v[:args]).join(',') + ')').inspect
         else
           token.value.inspect
         end
