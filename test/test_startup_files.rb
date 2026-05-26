@@ -8,6 +8,10 @@ class TestStartupFiles < Test::Unit::TestCase
     @original_home = ENV['HOME']
     @tempdir = Dir.mktmpdir('rubish_startup_test')
     ENV['HOME'] = @tempdir
+    # Without this, the developer's real ~/.config/rubish (or whatever
+    # XDG_CONFIG_HOME points at) would still be on the lookup path and
+    # the tests would observe its contents instead of the empty tempdir.
+    ENV.delete('XDG_CONFIG_HOME')
     # Create REPL to initialize context (needed for Builtins calls)
     @repl = Rubish::REPL.new
     # Reset shell options
