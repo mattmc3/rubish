@@ -2610,7 +2610,7 @@ module Rubish
         when '-z' then return arg.empty?
         when '-n' then return !arg.empty?
         # Variable tests
-        when '-v' then return ENV.key?(arg) || nameref?(arg)
+        when '-v' then return var_set?(arg) || nameref?(arg)
         when '-R' then return nameref?(arg)
         # File existence and type tests
         when '-e' then return File.exist?(arg)

@@ -574,7 +574,7 @@ module Rubish
       if tokens.length > 3
         tokens.each_with_index do |token, i|
           next if i == 0 || i == tokens.length - 1
-          if %w[== != =~ < > -eq -ne -lt -le -gt -ge -nt -ot -ef].include?(token)
+          if %w[== = != =~ < > -eq -ne -lt -le -gt -ge -nt -ot -ef].include?(token)
             left = tokens[0...i].join(' ')
             right_parts = tokens[i + 1..]
             # For regex (=~), reconstruct pattern without spaces around parens
@@ -647,7 +647,7 @@ module Rubish
       when '-x' then File.executable?(arg)
       when '-s' then File.exist?(arg) && File.size(arg) > 0
       when '-L', '-h' then File.symlink?(arg)
-      when '-v' then ENV.key?(arg)
+      when '-v' then Builtins.var_set?(arg)
       else false
       end
     rescue SystemCallError
@@ -656,7 +656,7 @@ module Rubish
 
     def eval_binary_test(left, op, right)
       case op
-      when '==' then cond_pattern_match?(left, right)
+      when '==', '=' then cond_pattern_match?(left, right)
       when '!=' then !cond_pattern_match?(left, right)
       when '=~' then cond_regex_match?(left, right)
       when '<' then left.to_s < right.to_s

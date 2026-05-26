@@ -56,11 +56,11 @@ class TestTildeExpansion < Test::Unit::TestCase
   end
 
   def test_tilde_in_double_quotes
-    assert_equal "\"#{Dir.home}\"", expand('"~"')
+    assert_equal '"~"', expand('"~"')
   end
 
   def test_tilde_path_in_double_quotes
-    assert_equal "\"#{Dir.home}/Documents\"", expand('"~/Documents"')
+    assert_equal '"~/Documents"', expand('"~/Documents"')
   end
 
   def test_tilde_not_at_word_start
@@ -131,5 +131,13 @@ class TestTildeExpansion < Test::Unit::TestCase
   def test_tilde_plus_not_followed_by_slash_or_space
     # ~+extra should expand ~ only, not ~+
     assert_match(/\+extra$/, expand('~+extra'))
+  end
+
+  def test_tilde_not_expanded_inside_double_quotes
+    assert_equal '"no =~"', expand('"no =~"')
+  end
+
+  def test_tilde_not_expanded_after_equals_in_double_quotes
+    assert_equal '"path=~"', expand('"path=~"')
   end
 end

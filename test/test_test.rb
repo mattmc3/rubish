@@ -576,6 +576,20 @@ class TestTest < Test::Unit::TestCase
     assert help[:options].key?('e1 -a e2')
   end
 
+  def test_v_unexported_shell_var
+    Rubish::Builtins.set_var('MY_SHELL_VAR', 'hello')
+    assert_equal true, Rubish::Builtins.run('test', ['-v', 'MY_SHELL_VAR'])
+  ensure
+    Rubish::Builtins.delete_var('MY_SHELL_VAR')
+  end
+
+  def test_v_bracket_unexported_shell_var
+    Rubish::Builtins.set_var('MY_SHELL_VAR', 'hello')
+    assert_equal true, Rubish::Builtins.run('[', ['-v', 'MY_SHELL_VAR', ']'])
+  ensure
+    Rubish::Builtins.delete_var('MY_SHELL_VAR')
+  end
+
   def test_help_has_v_option
     help = Rubish::Builtins::BUILTIN_HELP['test']
     assert_not_nil help

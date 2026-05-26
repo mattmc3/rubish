@@ -1071,6 +1071,11 @@ module Rubish
           '"("'
         when :RPAREN
           '")"'
+        when :FUNC_CALL
+          # Parser saw word(args) as a function call — reconstruct as literal string
+          # so regex patterns like f(o+) aren't evaluated as Ruby method calls
+          v = token.value
+          (v[:name].to_s + '(' + Array(v[:args]).join(' ') + ')').inspect
         else
           token.value.inspect
         end
