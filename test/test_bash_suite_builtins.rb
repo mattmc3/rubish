@@ -28,21 +28,18 @@ class TestBash_Builtins < Test::Unit::TestCase
 
   # read from here-string
   def test_read_basic_herestr
-    omit 'here-string with read not yet working'
     execute("read x <<<hello; echo $x > #{outf}")
     assert_equal "hello\n", File.read(outf)
   end
 
   # read two vars
   def test_read_two_vars
-    omit 'here-string with read not yet working'
     execute("read x y <<<'hello world'; echo $x $y > #{outf}")
     assert_equal "hello world\n", File.read(outf)
   end
 
   # read -r preserves backslash
   def test_read_r_backslash
-    omit 'here-string with read not yet working'
     execute("read -r x <<<'a\\\\b'; echo $x > #{outf}")
     assert_equal "a\\\\b\n", File.read(outf)
   end
