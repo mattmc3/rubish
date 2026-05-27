@@ -18,7 +18,7 @@ Each file in `test/test_bash_suite_*.rb` corresponds to one or more files in
 | test_bash_suite_cond.rb      | cond.tests                               | 23    | 1       |
 | test_bash_suite_exp.rb       | exp.tests, new-exp.tests, more-exp.tests | 63    | 10      |
 | test_bash_suite_func.rb      | func.tests                               | 12    | 7       |
-| test_bash_suite_heredoc.rb   | heredoc.tests, herestr.tests             | 10    | 5       |
+| test_bash_suite_heredoc.rb   | heredoc.tests, herestr.tests             | 10    | 0       |
 | test_bash_suite_ifs.rb       | ifs.tests                                | 5     | 0       |
 | test_bash_suite_invert.rb    | invert.tests                             | 6     | 0       |
 | test_bash_suite_loops.rb     | (while/until, no direct bash file)       | 8     | 0       |
@@ -27,7 +27,7 @@ Each file in `test/test_bash_suite_*.rb` corresponds to one or more files in
 | test_bash_suite_posixpipe.rb | posixpipe.tests                          | 7     | 1       |
 | test_bash_suite_printf.rb    | printf.tests                             | 20    | 0       |
 | test_bash_suite_quote.rb     | quote.tests                              | 10    | 1       |
-| test_bash_suite_read.rb      | read.tests                               | 8     | 5       |
+| test_bash_suite_read.rb      | read.tests                               | 8     | 4       |
 | test_bash_suite_redir.rb     | redir.tests                              | 8     | 3       |
 | test_bash_suite_strip.rb     | strip.tests                              | 10    | 1       |
 | test_bash_suite_subshell.rb  | (subshell, no direct bash file)          | 6     | 1       |
@@ -35,7 +35,7 @@ Each file in `test/test_bash_suite_*.rb` corresponds to one or more files in
 | test_bash_suite_tilde.rb     | tilde.tests                              | 8     | 5       |
 | test_bash_suite_varenv.rb    | varenv.tests                             | 13    | 0       |
 
-**Total: 438 tests — 378 passing, 0 failing, 60 omitted (86% passing)**
+**Total: 438 tests — 384 passing, 0 failing, 54 omitted (88% passing)**
 
 ## Not yet covered — practical to add
 
@@ -103,32 +103,32 @@ These cover bash features rubish will not implement:
 
 | #   | Feature                                                                                             | Omissions |
 | --- | --------------------------------------------------------------------------------------------------- | --------- |
-| 1   | `$'...'` ANSI C quoting (`$'\n'`, `$'\t'`, octal escapes)                                          | 8         |
-| 2   | Functions: fix IOError closed stream on define/call                                                 | 5         |
-| 3   | Tilde expansion (`~`, `~/path`, `~` in assignment)                                                  | 5         |
-| 4   | `here-string` with `read`: `read x <<<val`                                                          | 5         |
-| 5   | Multi-line heredoc support in the REPL                                                              | 5         |
-| 6   | Anchored substitution `${x/#pat/rep}` and `${x/%pat/rep}`                                           | 4         |
-| 7   | IFS word splitting in `for` loop                                                                    | 4         |
-| 8   | `function return N` — fix uncaught `:return` throw                                                  | 3         |
+| 1   | Anchored substitution `${x/#pat/rep}` and `${x/%pat/rep}`                                           | 6         |
+| 2   | Brace expansion edge cases (empty braces, lone `}`, escaped braces, var in list)                   | 6         |
+| 3   | Functions: fix IOError closed stream on define/call                                                 | 5         |
+| 4   | Tilde expansion (`~`, `~/path`, `~` in assignment, `~` in export)                                  | 5         |
+| 5   | Case statement edge cases (`;& ` fallthrough, `;;& ` continue, reserved word pattern)              | 4         |
+| 6   | `here-string` with `read`: `read x <<<val`                                                         | 3         |
+| 7   | Read from file redirect (`read x < file`)                                                           | 3         |
+| 8   | Stderr and fd redirect (`>&2`, `2>&1`)                                                              | 3         |
+| 9   | `function return N`: fix uncaught `:return` throw                                                   | 2         |
+| 10  | Subshell exit code propagated to `$?`                                                               | 2         |
 
 ## Common omit reasons
 
 | Reason                                             | Count |
 | -------------------------------------------------- | ----- |
+| anchored replacement ${x/#pat} / ${x/%pat}         | 6     |
 | function define/call causes IOError: closed stream | 5     |
-| function return throws uncaught :return            | 3     |
-| multi-line heredoc not supported via execute       | 6     |
-| tilde expansion not yet supported                  | 5     |
+| tilde expansion not yet supported (all forms)      | 5     |
+| here-string with read not yet working              | 3     |
 | read from file redirect not yet working            | 3     |
-| $'...' ANSI C quoting not yet supported            | 8     |
-| (()) null expression not yet supported             | 1     |
+| stderr redirect >&2 / fd dup 2>&1 not yet working  | 3     |
+| function return throws uncaught :return            | 2     |
 | subshell exit code not propagated to $?            | 2     |
+| case ;& / ;;& fallthrough not yet supported        | 2     |
+| (()) null expression not yet supported             | 1     |
 | ${a[@]} expansion in for loop not yet working      | 1     |
 | ${a[@]:offset:len} array slice not yet supported   | 1     |
 | negative offset in ${x: -N:L} not yet supported    | 1     |
-| anchored replacement ${x/#pat} / ${x/%pat}         | 4     |
-| IFS word splitting in for loop                     | 4     |
-| case ;& fallthrough not yet supported              | 3     |
-| here-string with read not yet working              | 4     |
-| stderr redirect >&2 not yet working                | 3     |
+| IFS= read not yet working                          | 1     |

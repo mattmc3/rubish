@@ -74,7 +74,6 @@ class TestBash_Read < Test::Unit::TestCase
 
   # read a b c <<EOF  ->  a=a b=b c=c
   def test_read_heredoc
-    omit 'multi-line heredoc not supported via execute'
     execute("read a b c <<EOF\na b c\nEOF\necho \"a=$a b=$b c=$c\" > #{outf}")
     assert_equal "a=a b=b c=c\n", File.read(outf)
   end

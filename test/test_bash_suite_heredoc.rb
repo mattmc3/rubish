@@ -22,28 +22,24 @@ class TestBash_Heredoc < Test::Unit::TestCase
 
   # cat <<EOF\na\nb\nc\nEOF  ->  a\nb\nc
   def test_heredoc_basic
-    omit 'multi-line heredoc not supported via execute'
     execute("cat <<EOF > #{outf}\na\nb\nc\nEOF")
     assert_equal "a\nb\nc\n", File.read(outf)
   end
 
   # quoted heredoc: no variable expansion
   def test_heredoc_quoted_no_expansion
-    omit 'multi-line heredoc not supported via execute'
     execute("a=foo; cat <<'EOF' > #{outf}\nthere$a\nstuff\nEOF")
     assert_equal "there$a\nstuff\n", File.read(outf)
   end
 
   # unquoted heredoc: variable expansion
   def test_heredoc_unquoted_expansion
-    omit 'multi-line heredoc not supported via execute'
     execute("a=foo; cat <<EOF > #{outf}\nthere$a\nEOF")
     assert_equal "therefoo\n", File.read(outf)
   end
 
   # tab-stripped heredoc with <<-
   def test_heredoc_tab_strip
-    omit 'heredoc tab-strip (<<-) not tested via execute'
     execute("cat <<- EOF > #{outf}\n\ttab1\n\ttab2\n\tEOF")
     assert_equal "tab1\ntab2\n", File.read(outf)
   end
@@ -56,7 +52,6 @@ class TestBash_Heredoc < Test::Unit::TestCase
 
   # heredoc with variable in body
   def test_heredoc_var_in_body
-    omit 'multi-line heredoc not supported via execute'
     execute("x=hello; cat <<EOF > #{outf}\n$x world\nEOF")
     assert_equal "hello world\n", File.read(outf)
   end
