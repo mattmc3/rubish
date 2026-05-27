@@ -52,7 +52,6 @@ class TestBash_Arith < Test::Unit::TestCase
 
   # echo $((!0))  ->  1
   def test_arith_logical_not
-    omit '! operator not yet supported in $(( ))'
     execute("echo $((! 0)) > #{outf}")
     assert_equal "1\n", File.read(outf)
   end
@@ -131,14 +130,12 @@ class TestBash_Arith < Test::Unit::TestCase
 
   # echo $((0xff))  ->  255
   def test_arith_hex_literal
-    omit 'hex literals in $(( )) not yet supported'
     execute("echo $((0xff)) > #{outf}")
     assert_equal "255\n", File.read(outf)
   end
 
   # echo $((0x100 | 007))  ->  263
   def test_arith_hex_or_octal
-    omit 'hex/octal literals in $(( )) not yet supported'
     execute("echo $((0x100 | 007)) > #{outf}")
     assert_equal "263\n", File.read(outf)
   end
@@ -195,56 +192,48 @@ class TestBash_Arith < Test::Unit::TestCase
 
   # x=5; echo $((x+=3))  ->  8
   def test_arith_compound_plus_eq
-    omit 'compound assignment += in $(( )) not yet supported'
     execute("x=5; echo $((x+=3)) > #{outf}")
     assert_equal "8\n", File.read(outf)
   end
 
   # x=10; echo $((x-=3))  ->  7
   def test_arith_compound_minus_eq
-    omit 'compound assignment -= in $(( )) not yet supported'
     execute("x=10; echo $((x-=3)) > #{outf}")
     assert_equal "7\n", File.read(outf)
   end
 
   # x=3; echo $((x*=4))  ->  12
   def test_arith_compound_mul_eq
-    omit 'compound assignment *= in $(( )) not yet supported'
     execute("x=3; echo $((x*=4)) > #{outf}")
     assert_equal "12\n", File.read(outf)
   end
 
   # x=12; echo $((x/=4))  ->  3
   def test_arith_compound_div_eq
-    omit 'compound assignment /= in $(( )) not yet supported'
     execute("x=12; echo $((x/=4)) > #{outf}")
     assert_equal "3\n", File.read(outf)
   end
 
   # x=7; echo $((x%=3))  ->  1
   def test_arith_compound_mod_eq
-    omit 'compound assignment %= in $(( )) not yet supported'
     execute("x=7; echo $((x%=3)) > #{outf}")
     assert_equal "1\n", File.read(outf)
   end
 
   # echo $((4 == 4))  ->  1
   def test_arith_equality_true
-    omit '== operator in $(( )) not yet supported'
     execute("echo $((4 == 4)) > #{outf}")
     assert_equal "1\n", File.read(outf)
   end
 
   # echo $((4 == 5))  ->  0
   def test_arith_equality_false
-    omit '== operator in $(( )) not yet supported'
     execute("echo $((4 == 5)) > #{outf}")
     assert_equal "0\n", File.read(outf)
   end
 
   # echo $((4 != 5))  ->  1
   def test_arith_not_equal
-    omit '!= operator in $(( )) not yet supported'
     execute("echo $((4 != 5)) > #{outf}")
     assert_equal "1\n", File.read(outf)
   end
@@ -263,14 +252,12 @@ class TestBash_Arith < Test::Unit::TestCase
 
   # x=4; echo $((++x))  ->  5
   def test_arith_pre_increment
-    omit 'prefix ++ in $(( )) not yet supported'
     execute("x=4; echo $((++x)) > #{outf}")
     assert_equal "5\n", File.read(outf)
   end
 
   # x=4; echo $((--x))  ->  3
   def test_arith_pre_decrement
-    omit 'prefix -- in $(( )) not yet supported'
     execute("x=4; echo $((--x)) > #{outf}")
     assert_equal "3\n", File.read(outf)
   end
@@ -332,14 +319,12 @@ class TestBash_Arith < Test::Unit::TestCase
 
   # i=5; echo $((i++)); echo $i  ->  5\n6  (post-increment returns old)
   def test_arith_post_increment_return
-    omit 'post-increment return value in $(( )) not working'
     execute("i=5; echo $((i++)) > #{outf}; echo $i >> #{outf}")
     assert_equal "5\n6\n", File.read(outf)
   end
 
   # i=5; echo $((i--)); echo $i  ->  5\n4
   def test_arith_post_decrement_return
-    omit 'post-decrement return value in $(( )) not working'
     execute("i=5; echo $((i--)) > #{outf}; echo $i >> #{outf}")
     assert_equal "5\n4\n", File.read(outf)
   end
