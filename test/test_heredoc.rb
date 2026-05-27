@@ -128,6 +128,33 @@ class TestHeredoc < Test::Unit::TestCase
     assert_equal "hello\n", File.read(output_file)
   end
 
+  def test_herestring_with_read_builtin
+    execute('read -r ret <<< "hello world"')
+    assert_equal 'hello world', get_shell_var('ret')
+  end
+
+  def test_herestring_with_read_builtin_unquoted
+    execute("a='x  y'")
+    execute('read -r ret <<< $a')
+    assert_equal 'x  y', get_shell_var('ret')
+  end
+
+  def test_herestring_with_read_multiple_vars
+    execute('read -r first rest <<< "hello world foo"')
+    assert_equal 'hello', get_shell_var('first')
+    assert_equal 'world foo', get_shell_var('rest')
+  end
+
+  def test_herestring_with_read_builtin_literal
+    execute('read -r ret <<< hello')
+    assert_equal 'hello', get_shell_var('ret')
+  end
+
+  def test_herestring_with_read_in_compound_statement
+    execute('read -r first rest <<< "hello world foo"; ret="$first/$rest"')
+    assert_equal 'hello/world foo', get_shell_var('ret')
+  end
+
   # Script-based heredoc tests
   def test_heredoc_in_script
     script = File.join(@tempdir, 'heredoc.sh')
