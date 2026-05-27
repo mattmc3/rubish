@@ -249,4 +249,55 @@ class TestPosixCharClasses < Test::Unit::TestCase
     assert_equal 1, matches.length
     assert matches.first.include?('[[:digit:]]')
   end
+
+  # POSIX classes in case pattern matching (via __case_match / posix_glob_to_regex)
+  def test_case_alpha_matches
+    execute("case a in [[:alpha:]]) echo ok > #{output_file};; esac")
+    assert_equal "ok\n", File.read(output_file)
+  end
+
+  def test_case_alpha_no_match_digit
+    execute("case 9 in [[:alpha:]]) echo bad > #{output_file};; *) echo ok > #{output_file};; esac")
+    assert_equal "ok\n", File.read(output_file)
+  end
+
+  def test_case_digit_matches
+    execute("case 5 in [[:digit:]]) echo ok > #{output_file};; esac")
+    assert_equal "ok\n", File.read(output_file)
+  end
+
+  def test_case_cntrl_no_match_A
+    execute("case A in [[:cntrl:]]) echo bad > #{output_file};; *) echo ok > #{output_file};; esac")
+    assert_equal "ok\n", File.read(output_file)
+  end
+
+  def test_case_negated_alpha_matches_digit
+    execute("case 9 in [![:alpha:]]) echo ok > #{output_file};; esac")
+    assert_equal "ok\n", File.read(output_file)
+  end
+
+  def test_case_mixed_bracket_with_posix
+    execute("case '!' in [abc[:punct:][0-9]) echo ok > #{output_file};; esac")
+    assert_equal "ok\n", File.read(output_file)
+  end
+
+  def test_case_multiple_posix_classes
+    execute("case a in [[:alpha:][:digit:]]) echo ok > #{output_file};; *) echo bad > #{output_file};; esac")
+    assert_equal "ok\n", File.read(output_file)
+  end
+
+  def test_case_posix_with_wildcard
+    execute("case PATH in [_[:alpha:]]*) echo ok > #{output_file};; esac")
+    assert_equal "ok\n", File.read(output_file)
+  end
+
+  def test_case_lower_upper_pair
+    execute("case aB in [[:lower:]][[:upper:]]) echo ok > #{output_file};; esac")
+    assert_equal "ok\n", File.read(output_file)
+  end
+
+  def test_case_invalid_posix_class_no_match
+    execute("case a in [[:al:]]) echo bad > #{output_file};; *) echo ok > #{output_file};; esac")
+    assert_equal "ok\n", File.read(output_file)
+  end
 end

@@ -359,7 +359,83 @@ module Rubish
       expanded_content = content.gsub(/\[:([a-z]+):\]/) do |match|
         POSIX_CHAR_CLASSES[$1] || match
       end
-      "[#{negation}#{expanded_content}]"
+      "[#{negation}#{expanded_content.delete("\x00")}]"
+    end
+
+    def posix_glob_to_regex(pattern, icase: false)
+      result = +'\A'
+      i = 0
+      while i < pattern.length
+        case pattern[i]
+        when '*'
+          result << '.*'
+          i += 1
+        when '?'
+          result << '.'
+          i += 1
+        when '['
+          bracket, len = extract_regex_bracket(pattern, i)
+          if bracket
+            result << bracket
+            i += len
+          else
+            result << '\['
+            i += 1
+          end
+        when '\\'
+          i += 1
+          result << (i < pattern.length ? Regexp.escape(pattern[i]) : '\\\\')
+          i += 1
+        else
+          result << Regexp.escape(pattern[i])
+          i += 1
+        end
+      end
+      result << '\z'
+      Regexp.new(result, icase ? Regexp::IGNORECASE : 0)
+    rescue RegexpError
+      nil
+    end
+
+    def extract_regex_bracket(pattern, start)
+      i = start + 1
+      return nil if i >= pattern.length
+      buf = +'['
+      if i < pattern.length && (pattern[i] == '!' || pattern[i] == '^')
+        buf << '^'
+        i += 1
+      end
+      if i < pattern.length && pattern[i] == ']'
+        buf << '\\]'
+        i += 1
+      end
+      while i < pattern.length
+        ch = pattern[i]
+        if ch == '[' && i + 1 < pattern.length && pattern[i + 1] == ':'
+          end_pos = pattern.index(':]', i + 2)
+          if end_pos
+            buf << pattern[i..end_pos + 1]
+            i = end_pos + 2
+          else
+            buf << '\\['
+            i += 1
+          end
+        elsif ch == '['
+          buf << '\\['
+          i += 1
+        elsif ch == ']'
+          buf << ']'
+          return [buf, i - start + 1]
+        elsif ch == '\\'
+          i += 1
+          buf << (i < pattern.length ? "\\#{pattern[i]}" : '\\\\')
+          i += 1
+        else
+          buf << ch
+          i += 1
+        end
+      end
+      nil
     end
 
     def apply_globignore(matches)
