@@ -105,6 +105,11 @@ module Rubish
         return left_val == 0 ? 0 : eval_single_arithmetic(expr[pos + 2..])
       end
 
+      # Logical not: ! expr  (bash: 0=false, non-zero=true, opposite of Ruby)
+      if expr =~ /\A!\s*(.+)\z/
+        return eval_single_arithmetic($1) == 0 ? 1 : 0
+      end
+
       # Handle pre-increment/decrement: ++var, --var
       if expr =~ /\A\+\+([a-zA-Z_][a-zA-Z0-9_]*)\z/
         var = $1
@@ -165,6 +170,8 @@ module Rubish
       end
 
       # Regular arithmetic expression - evaluate directly to handle booleans
+      # Pre-convert hex literals so their letter chars don't get treated as variables
+      expr = expr.gsub(/0[xX][0-9a-fA-F]+/) { |m| Integer(m).to_s }
       # Expand variables first
       expanded = expr.gsub(/\$\{([^}]+)\}|\$(\d+)|\$([a-zA-Z_][a-zA-Z0-9_]*)|([a-zA-Z_][a-zA-Z0-9_]*)/) do |match|
         if $2 # Positional parameter like $1, $2
