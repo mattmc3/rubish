@@ -43,7 +43,7 @@ These bash test files have not been converted yet but contain tests that are
 tractable to write (not blocked by job control, history, completion, etc.).
 
 | Bash source                   | Notes                                                 |
-| ----------------------------- | ----------------------------------------------------- | --- | ------------------- |
+| ----------------------------- | ----------------------------------------------------- |
 | alias.tests                   | basic alias/unalias; most content spawns sub-scripts  |
 | assoc.tests                   | associative arrays (declare -A)                       |
 | attr.tests                    | declare/typeset attributes (-i, -r, -x, -l, -u)       |
@@ -66,7 +66,7 @@ tractable to write (not blocked by job control, history, completion, etc.).
 | posix2.tests                  | POSIX compliance tests                                |
 | posixexp.tests                | POSIX parameter expansion (uses recho helper)         |
 | posixexp2.tests               | more POSIX parameter expansion                        |
-| precedence.tests              | && and                                                |     | operator precedence |
+| precedence.tests              | && and \|\| operator precedence                       |
 | quotearray.tests              | quoting in array contexts                             |
 | rhs-exp.tests                 | RHS parameter expansion                               |
 | set-e.tests                   | set -e (errexit) behavior                             |
