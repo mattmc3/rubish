@@ -191,6 +191,51 @@ class TestCase < Test::Unit::TestCase
     assert_equal "bar\n", File.read(output_file)
   end
 
+  def test_case_variable_prefix_with_glob
+    execute("p=foo")
+    execute("x=foo_bar")
+    execute("case $x in ${p}_*) echo matched > #{output_file};; *) echo no > #{output_file};; esac")
+    assert_equal "matched\n", File.read(output_file)
+  end
+
+  def test_case_variable_concat_with_glob
+    execute("p=foo")
+    execute("x=foobar")
+    execute("case $x in ${p}*) echo matched > #{output_file};; *) echo no > #{output_file};; esac")
+    assert_equal "matched\n", File.read(output_file)
+  end
+
+  def test_case_quoted_variable_in_pattern
+    execute("p='x y'")
+    execute("x='x y'")
+    execute("case $x in \"$p\") echo matched > #{output_file};; *) echo no > #{output_file};; esac")
+    assert_equal "matched\n", File.read(output_file)
+  end
+
+  def test_case_double_quoted_pattern_with_space
+    execute("a='x y'")
+    execute("case $a in \"x y\") echo matched > #{output_file};; *) echo no > #{output_file};; esac")
+    assert_equal "matched\n", File.read(output_file)
+  end
+
+  def test_case_single_quoted_pattern_with_space
+    execute("a='x y'")
+    execute("case $a in 'x y') echo matched > #{output_file};; *) echo no > #{output_file};; esac")
+    assert_equal "matched\n", File.read(output_file)
+  end
+
+  def test_case_word_no_split_on_spaces
+    execute("a='hello world'")
+    execute("case $a in 'hello world') echo matched > #{output_file};; *) echo no > #{output_file};; esac")
+    assert_equal "matched\n", File.read(output_file)
+  end
+
+  def test_case_word_no_split_custom_ifs
+    execute('IFS=:')
+    execute("a='foo:bar'")
+    execute("case $a in 'foo:bar') echo matched > #{output_file};; *) echo no > #{output_file};; esac")
+    assert_equal "matched\n", File.read(output_file)
+  end
   # Ruby-style case-when tests
 
   # Lexer tests
