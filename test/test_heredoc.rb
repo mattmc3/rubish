@@ -300,6 +300,18 @@ class TestHeredoc < Test::Unit::TestCase
     assert_equal '', File.read(output_file)
   end
 
+  # Space between <<- and delimiter: "<<- EOF" must be recognized
+  def test_heredoc_spaced_delimiter_via_execute
+    execute("cat <<- EOF > #{output_file}\n\tline1\n\tline2\n\tEOF")
+    assert_equal "line1\nline2\n", File.read(output_file)
+  end
+
+  # Commands after the closing delimiter must still run
+  def test_heredoc_cmd_after_delimiter_via_execute
+    execute("read a b c <<EOF\nalpha beta gamma\nEOF\necho \"$a/$b/$c\" > #{output_file}")
+    assert_equal "alpha/beta/gamma\n", File.read(output_file)
+  end
+
   # Helper tests
   def test_detect_heredoc
     assert_equal ['EOF', false], Rubish::Builtins.detect_heredoc('cat <<EOF')
