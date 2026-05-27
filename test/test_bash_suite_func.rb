@@ -22,14 +22,12 @@ class TestBash_Func < Test::Unit::TestCase
 
   # basic function define and call
   def test_func_define_and_call
-    omit 'function define/call causes IOError: closed stream'
     execute("f() { echo hello; }; f > #{outf}")
     assert_equal "hello\n", File.read(outf)
   end
 
   # function return value
   def test_func_return_value
-    omit 'function return throws uncaught :return'
     execute("f() { return 5; }; f; echo $? > #{outf}")
     assert_equal "5\n", File.read(outf)
   end
@@ -48,21 +46,18 @@ class TestBash_Func < Test::Unit::TestCase
 
   # chained function return codes
   def test_func_chained_return_codes
-    omit 'function return throws uncaught :return'
     execute("a() { return 5; }; b() { a; echo $?; }; b > #{outf}")
     assert_equal "5\n", File.read(outf)
   end
 
   # function with args
   def test_func_with_args
-    omit 'function define/call causes IOError: closed stream'
     execute("greet() { echo hello $1; }; greet world > #{outf}")
     assert_equal "hello world\n", File.read(outf)
   end
 
   # function sees global var
   def test_func_sees_global_var
-    omit 'function define/call causes IOError: closed stream'
     execute("X=global; f() { echo $X; }; f > #{outf}")
     assert_equal "global\n", File.read(outf)
   end
@@ -75,7 +70,6 @@ class TestBash_Func < Test::Unit::TestCase
 
   # nested function calls
   def test_func_nested_calls
-    omit 'function define/call causes IOError: closed stream'
     execute("inner() { echo inner; }; outer() { echo outer; inner; }; outer > #{outf}")
     assert_equal "outer\ninner\n", File.read(outf)
   end
@@ -88,7 +82,6 @@ class TestBash_Func < Test::Unit::TestCase
 
   # recursive function
   def test_func_recursive
-    omit 'function define/call causes IOError: closed stream'
     execute("count() { if [ $1 -gt 0 ]; then echo $1; count $(($1-1)); fi; }; count 3 > #{outf}")
     assert_equal "3\n2\n1\n", File.read(outf)
   end
