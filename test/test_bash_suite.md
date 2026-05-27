@@ -16,7 +16,7 @@ Each file in `test/test_bash_suite_*.rb` corresponds to one or more files in
 | test_bash_suite_case.rb      | case.tests                               | 16    | 4       |
 | test_bash_suite_comsub.rb    | comsub.tests                             | 10    | 1       |
 | test_bash_suite_cond.rb      | cond.tests                               | 23    | 1       |
-| test_bash_suite_exp.rb       | exp.tests, new-exp.tests, more-exp.tests | 63    | 10      |
+| test_bash_suite_exp.rb       | exp.tests, new-exp.tests, more-exp.tests | 63    | 4       |
 | test_bash_suite_func.rb      | func.tests                               | 12    | 7       |
 | test_bash_suite_heredoc.rb   | heredoc.tests, herestr.tests             | 10    | 0       |
 | test_bash_suite_ifs.rb       | ifs.tests                                | 5     | 0       |
@@ -35,7 +35,7 @@ Each file in `test/test_bash_suite_*.rb` corresponds to one or more files in
 | test_bash_suite_tilde.rb     | tilde.tests                              | 8     | 5       |
 | test_bash_suite_varenv.rb    | varenv.tests                             | 13    | 0       |
 
-**Total: 438 tests — 387 passing, 0 failing, 51 omitted (88% passing)**
+**Total: 438 tests — 393 passing, 0 failing, 45 omitted (90% passing)**
 
 ## Not yet covered — practical to add
 
@@ -103,21 +103,19 @@ These cover bash features rubish will not implement:
 
 | #   | Feature                                                                                             | Omissions |
 | --- | --------------------------------------------------------------------------------------------------- | --------- |
-| 1   | Anchored substitution `${x/#pat/rep}` and `${x/%pat/rep}`                                           | 6         |
-| 2   | Brace expansion edge cases (empty braces, lone `}`, escaped braces, var in list)                   | 6         |
-| 3   | Functions: fix IOError closed stream on define/call                                                 | 5         |
-| 4   | Tilde expansion (`~`, `~/path`, `~` in assignment, `~` in export)                                  | 5         |
-| 5   | Case statement edge cases (`;& ` fallthrough, `;;& ` continue, reserved word pattern)              | 4         |
-| 6   | Read from file redirect (`read x < file`)                                                           | 3         |
-| 7   | Stderr and fd redirect (`>&2`, `2>&1`)                                                              | 3         |
-| 8   | `function return N`: fix uncaught `:return` throw                                                   | 2         |
-| 9   | Subshell exit code propagated to `$?`                                                               | 2         |
+| 1   | Brace expansion edge cases (empty braces, lone `}`, escaped braces, var in list)                   | 6         |
+| 2   | Functions: fix IOError closed stream on define/call                                                 | 5         |
+| 3   | Tilde expansion (`~`, `~/path`, `~` in assignment, `~` in export)                                  | 5         |
+| 4   | Case statement edge cases (`;& ` fallthrough, `;;& ` continue, reserved word pattern)              | 4         |
+| 5   | Read from file redirect (`read x < file`)                                                           | 3         |
+| 6   | Stderr and fd redirect (`>&2`, `2>&1`)                                                              | 3         |
+| 7   | `function return N`: fix uncaught `:return` throw                                                   | 2         |
+| 8   | Subshell exit code propagated to `$?`                                                               | 2         |
 
 ## Common omit reasons
 
 | Reason                                             | Count |
 | -------------------------------------------------- | ----- |
-| anchored replacement ${x/#pat} / ${x/%pat}         | 6     |
 | function define/call causes IOError: closed stream | 5     |
 | tilde expansion not yet supported (all forms)      | 5     |
 | read from file redirect not yet working            | 3     |

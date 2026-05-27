@@ -210,14 +210,12 @@ class TestBash_Exp < Test::Unit::TestCase
 
   # x=hello; echo ${x/#hel/HEL}  ->  HELlo
   def test_param_replace_anchor_start
-    omit '${x/#pat/rep} anchored replacement not yet supported'
     execute("x=hello; echo ${x/#hel/HEL} > #{outf}")
     assert_equal "HELlo\n", File.read(outf)
   end
 
   # x=hello; echo ${x/%llo/LLO}  ->  heLLO
   def test_param_replace_anchor_end
-    omit '${x/%pat/rep} anchored replacement not yet supported'
     execute("x=hello; echo ${x/%llo/LLO} > #{outf}")
     assert_equal "heLLO\n", File.read(outf)
   end
@@ -285,14 +283,12 @@ class TestBash_Exp < Test::Unit::TestCase
 
   # v=abcde; echo ${v/#a/ab}  ->  abbcde
   def test_newexp_replace_anchor_start
-    omit '${v/#pat/rep} anchored replacement not yet supported'
     execute("v=abcde; echo ${v/#a/ab} > #{outf}")
     assert_equal "abbcde\n", File.read(outf)
   end
 
   # v=abcde; echo ${v/#d/ab}  ->  abcde  (no match at start)
   def test_newexp_replace_anchor_start_no_match
-    omit '${v/#pat/rep} anchored replacement not yet supported'
     execute("v=abcde; echo ${v/#d/ab} > #{outf}")
     assert_equal "abcde\n", File.read(outf)
   end
@@ -305,14 +301,12 @@ class TestBash_Exp < Test::Unit::TestCase
 
   # v=abcde; echo ${v/%?/last}  ->  abcdlast
   def test_newexp_replace_anchor_end
-    omit '${v/%pat/rep} anchored replacement not yet supported'
     execute("v=abcde; echo ${v/%?/last} > #{outf}")
     assert_equal "abcdlast\n", File.read(outf)
   end
 
   # v=abcde; echo ${v/%x/last}  ->  abcde  (no match)
   def test_newexp_replace_anchor_end_no_match
-    omit '${v/%pat/rep} anchored replacement not yet supported'
     execute("v=abcde; echo ${v/%x/last} > #{outf}")
     assert_equal "abcde\n", File.read(outf)
   end
