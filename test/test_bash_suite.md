@@ -23,7 +23,7 @@ Each file in `test/test_bash_suite_*.rb` corresponds to one or more files in
 | test_bash_suite_invert.rb    | invert.tests                             | 6     | 0       |
 | test_bash_suite_loops.rb     | (while/until, no direct bash file)       | 8     | 0       |
 | test_bash_suite_nquote.rb    | nquote.tests                             | 8     | 0       |
-| test_bash_suite_posixpat.rb  | posixpat.tests                           | 15    | 15      |
+| test_bash_suite_posixpat.rb  | posixpat.tests                           | 15    | 0       |
 | test_bash_suite_posixpipe.rb | posixpipe.tests                          | 7     | 1       |
 | test_bash_suite_printf.rb    | printf.tests                             | 20    | 0       |
 | test_bash_suite_quote.rb     | quote.tests                              | 10    | 1       |
@@ -35,7 +35,7 @@ Each file in `test/test_bash_suite_*.rb` corresponds to one or more files in
 | test_bash_suite_tilde.rb     | tilde.tests                              | 8     | 5       |
 | test_bash_suite_varenv.rb    | varenv.tests                             | 13    | 0       |
 
-**Total: 438 tests — 340 passing, 8 failing (regressions in strip/comsub), 90 omitted (78% passing)**
+**Total: 438 tests — 363 passing, 0 failing, 75 omitted (83% passing)**
 
 ## Not yet covered — practical to add
 
@@ -103,22 +103,20 @@ These cover bash features rubish will not implement:
 
 | #   | Feature                                                                                                                                         | Omissions |
 | --- | ----------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
-| 1   | POSIX character classes `[[:alpha:]]` etc. in `case`/glob                                                                                       | 15        |
-| 2   | Arith operators: `==`, `!=`, `+=`, `-=`, `*=`, `/=`, `%=`, prefix `++`/`--`, post-inc return value, `(())` null expr, short-circuit `&&`/`\|\|` | ~17       |
-| 3   | `$'...'` ANSI C quoting (`$'\n'`, `$'\t'`, octal escapes)                                                                                       | 8         |
-| 4   | Functions: fix IOError closed stream on define/call                                                                                             | 5         |
-| 5   | Tilde expansion (`~`, `~/path`, `~` in assignment)                                                                                              | 5         |
-| 6   | `here-string` with `read`: `read x <<<val`                                                                                                      | 5         |
-| 7   | Multi-line heredoc support in the REPL                                                                                                          | 5         |
-| 8   | Anchored substitution `${x/#pat/rep}` and `${x/%pat/rep}`                                                                                       | 4         |
-| 9   | IFS word splitting in `for` loop                                                                                                                | 4         |
-| 10  | `function return N` — fix uncaught `:return` throw                                                                                              | 3         |
+| 1   | Arith operators: `==`, `!=`, `+=`, `-=`, `*=`, `/=`, `%=`, prefix `++`/`--`, post-inc return value, `(())` null expr, short-circuit `&&`/`\|\|` | ~17       |
+| 2   | `$'...'` ANSI C quoting (`$'\n'`, `$'\t'`, octal escapes)                                                                                       | 8         |
+| 3   | Functions: fix IOError closed stream on define/call                                                                                             | 5         |
+| 4   | Tilde expansion (`~`, `~/path`, `~` in assignment)                                                                                              | 5         |
+| 5   | `here-string` with `read`: `read x <<<val`                                                                                                      | 5         |
+| 6   | Multi-line heredoc support in the REPL                                                                                                          | 5         |
+| 7   | Anchored substitution `${x/#pat/rep}` and `${x/%pat/rep}`                                                                                       | 4         |
+| 8   | IFS word splitting in `for` loop                                                                                                                | 4         |
+| 9   | `function return N` — fix uncaught `:return` throw                                                                                              | 3         |
 
 ## Common omit reasons
 
 | Reason                                             | Count |
 | -------------------------------------------------- | ----- |
-| POSIX character classes in case not yet supported  | 15    |
 | function define/call causes IOError: closed stream | 5     |
 | function return throws uncaught :return            | 3     |
 | multi-line heredoc not supported via execute       | 6     |
