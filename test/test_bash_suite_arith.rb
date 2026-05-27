@@ -163,7 +163,6 @@ class TestBash_Arith < Test::Unit::TestCase
 
   # B=9; (( 0 && (B=42) )); echo $B  ->  9  (right side not evaluated)
   def test_arith_short_circuit_and_skips
-    omit 'short-circuit && in (( )) not yet on master'
     execute('B=9')
     execute('(( 0 && (B=42) ))')
     assert_equal '9', get_shell_var('B')
@@ -171,7 +170,6 @@ class TestBash_Arith < Test::Unit::TestCase
 
   # B=9; (( 1 || (B=88) )); echo $B  ->  9  (right side not evaluated)
   def test_arith_short_circuit_or_skips
-    omit 'short-circuit || in (( )) not yet on master'
     execute('B=9')
     execute('(( 1 || (B=88) ))')
     assert_equal '9', get_shell_var('B')

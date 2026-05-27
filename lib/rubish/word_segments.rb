@@ -30,7 +30,37 @@ module Rubish
           yield :double, str[i + 1...j]
           i = j < str.length ? j + 1 : str.length
         else
-          j = str.index(/\$'|['"]/, i) || str.length
+          j = i
+          while j < str.length
+            c = str[j]
+            if c == '$' && j + 1 < str.length
+              nc = str[j + 1]
+              if nc == "'"
+                break
+              elsif nc == '(' || nc == '{'
+                open_c = nc; close_c = nc == '(' ? ')' : '}'; depth = 1; j += 2
+                while j < str.length && depth > 0
+                  depth += 1 if str[j] == open_c
+                  depth -= 1 if str[j] == close_c
+                  j += 1
+                end
+              else
+                j += 1
+              end
+            elsif c == '`'
+              j += 1
+              while j < str.length
+                break if str[j] == '`'
+                j += 2 if str[j] == '\\'
+                j += 1
+              end
+              j += 1 if j < str.length
+            elsif c == "'" || c == '"'
+              break
+            else
+              j += 1
+            end
+          end
           yield :bare, str[i...j]
           i = j
         end
@@ -88,7 +118,39 @@ module Rubish
       # $(...), ${...}, $"..." and `...` are single tokens, not multi-segment words
       return false if str.start_with?('$(', '${', '$"', '`')
 
-      true  # bare start with quotes somewhere inside
+      # bare word — scan for top-level quote boundaries, skipping $(, ${, ` blocks
+      j = 0
+      while j < str.length
+        c = str[j]
+        if c == '$' && j + 1 < str.length
+          nc = str[j + 1]
+          if nc == "'"
+            return true
+          elsif nc == '(' || nc == '{'
+            open_c = nc; close_c = nc == '(' ? ')' : '}'; depth = 1; j += 2
+            while j < str.length && depth > 0
+              depth += 1 if str[j] == open_c
+              depth -= 1 if str[j] == close_c
+              j += 1
+            end
+          else
+            j += 1
+          end
+        elsif c == '`'
+          j += 1
+          while j < str.length
+            break if str[j] == '`'
+            j += 2 if str[j] == '\\'
+            j += 1
+          end
+          j += 1 if j < str.length
+        elsif c == "'" || c == '"'
+          return true
+        else
+          j += 1
+        end
+      end
+      false
     end
   end
 end

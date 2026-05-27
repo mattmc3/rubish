@@ -63,7 +63,6 @@ class TestBash_Heredoc < Test::Unit::TestCase
 
   # here-string: read x <<< "alpha"; echo $x  ->  alpha
   def test_herestr_basic_read
-    omit 'here-string with read not yet working'
     execute("read x <<<alpha; echo $x > #{outf}")
     assert_equal "alpha\n", File.read(outf)
   end
@@ -82,7 +81,6 @@ class TestBash_Heredoc < Test::Unit::TestCase
 
   # here-string: read x <<< "alpha beta"; echo $x  ->  alpha beta
   def test_herestr_read_spaces
-    omit 'here-string with read not yet working'
     execute("read x <<<'alpha beta'; echo $x > #{outf}")
     assert_equal "alpha beta\n", File.read(outf)
   end

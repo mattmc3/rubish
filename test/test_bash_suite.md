@@ -8,21 +8,21 @@ Each file in `test/test_bash_suite_*.rb` corresponds to one or more files in
 | Test file                    | Bash source                              | Tests | Omitted |
 | ---------------------------- | ---------------------------------------- | ----- | ------- |
 | test_bash_suite_appendop.rb  | appendop.tests                           | 4     | 1       |
-| test_bash_suite_arith.rb     | arith.tests                              | 63    | 18      |
+| test_bash_suite_arith.rb     | arith.tests                              | 63    | 16      |
 | test_bash_suite_arith_for.rb | arith-for.tests                          | 10    | 0       |
 | test_bash_suite_array.rb     | array.tests                              | 10    | 2       |
 | test_bash_suite_braces.rb    | braces.tests                             | 24    | 6       |
 | test_bash_suite_builtins.rb  | builtins.tests                           | 13    | 4       |
-| test_bash_suite_case.rb      | case.tests                               | 16    | 5       |
+| test_bash_suite_case.rb      | case.tests                               | 16    | 4       |
 | test_bash_suite_comsub.rb    | comsub.tests                             | 10    | 1       |
 | test_bash_suite_cond.rb      | cond.tests                               | 23    | 1       |
 | test_bash_suite_exp.rb       | exp.tests, new-exp.tests, more-exp.tests | 63    | 10      |
 | test_bash_suite_func.rb      | func.tests                               | 12    | 7       |
-| test_bash_suite_heredoc.rb   | heredoc.tests, herestr.tests             | 10    | 7       |
-| test_bash_suite_ifs.rb       | ifs.tests                                | 5     | 4       |
+| test_bash_suite_heredoc.rb   | heredoc.tests, herestr.tests             | 10    | 5       |
+| test_bash_suite_ifs.rb       | ifs.tests                                | 5     | 0       |
 | test_bash_suite_invert.rb    | invert.tests                             | 6     | 0       |
 | test_bash_suite_loops.rb     | (while/until, no direct bash file)       | 8     | 0       |
-| test_bash_suite_nquote.rb    | nquote.tests                             | 8     | 8       |
+| test_bash_suite_nquote.rb    | nquote.tests                             | 8     | 0       |
 | test_bash_suite_posixpat.rb  | posixpat.tests                           | 15    | 15      |
 | test_bash_suite_posixpipe.rb | posixpipe.tests                          | 7     | 1       |
 | test_bash_suite_printf.rb    | printf.tests                             | 20    | 0       |
@@ -35,7 +35,7 @@ Each file in `test/test_bash_suite_*.rb` corresponds to one or more files in
 | test_bash_suite_tilde.rb     | tilde.tests                              | 8     | 5       |
 | test_bash_suite_varenv.rb    | varenv.tests                             | 13    | 0       |
 
-**Total: 438 tests — 331 passing, 107 omitted (75% passing)**
+**Total: 438 tests — 340 passing, 8 failing (regressions in strip/comsub), 90 omitted (78% passing)**
 
 ## Not yet covered — practical to add
 

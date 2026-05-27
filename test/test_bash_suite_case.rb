@@ -42,7 +42,6 @@ class TestBash_Case < Test::Unit::TestCase
 
   # case a in a) echo a;& esac  ->  a  (fallthrough with no next branch)
   def test_case_fallthrough_at_end
-    omit 'case ;& fallthrough not yet supported'
     execute("case a in a) echo a > #{outf} ;& esac")
     assert_equal "a\n", File.read(outf)
   end
