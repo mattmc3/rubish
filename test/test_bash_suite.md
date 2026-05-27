@@ -8,7 +8,7 @@ Each file in `test/test_bash_suite_*.rb` corresponds to one or more files in
 | Test file                    | Bash source                              | Tests | Omitted |
 | ---------------------------- | ---------------------------------------- | ----- | ------- |
 | test_bash_suite_appendop.rb  | appendop.tests                           | 4     | 1       |
-| test_bash_suite_arith.rb     | arith.tests                              | 63    | 16      |
+| test_bash_suite_arith.rb     | arith.tests                              | 63    | 1       |
 | test_bash_suite_arith_for.rb | arith-for.tests                          | 10    | 0       |
 | test_bash_suite_array.rb     | array.tests                              | 10    | 2       |
 | test_bash_suite_braces.rb    | braces.tests                             | 24    | 6       |
@@ -35,7 +35,7 @@ Each file in `test/test_bash_suite_*.rb` corresponds to one or more files in
 | test_bash_suite_tilde.rb     | tilde.tests                              | 8     | 5       |
 | test_bash_suite_varenv.rb    | varenv.tests                             | 13    | 0       |
 
-**Total: 438 tests — 363 passing, 0 failing, 75 omitted (83% passing)**
+**Total: 438 tests — 378 passing, 0 failing, 60 omitted (86% passing)**
 
 ## Not yet covered — practical to add
 
@@ -101,17 +101,16 @@ These cover bash features rubish will not implement:
 
 ## Top 10 features to fix (by omissions unblocked)
 
-| #   | Feature                                                                                                                                         | Omissions |
-| --- | ----------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
-| 1   | Arith operators: `==`, `!=`, `+=`, `-=`, `*=`, `/=`, `%=`, prefix `++`/`--`, post-inc return value, `(())` null expr, short-circuit `&&`/`\|\|` | ~17       |
-| 2   | `$'...'` ANSI C quoting (`$'\n'`, `$'\t'`, octal escapes)                                                                                       | 8         |
-| 3   | Functions: fix IOError closed stream on define/call                                                                                             | 5         |
-| 4   | Tilde expansion (`~`, `~/path`, `~` in assignment)                                                                                              | 5         |
-| 5   | `here-string` with `read`: `read x <<<val`                                                                                                      | 5         |
-| 6   | Multi-line heredoc support in the REPL                                                                                                          | 5         |
-| 7   | Anchored substitution `${x/#pat/rep}` and `${x/%pat/rep}`                                                                                       | 4         |
-| 8   | IFS word splitting in `for` loop                                                                                                                | 4         |
-| 9   | `function return N` — fix uncaught `:return` throw                                                                                              | 3         |
+| #   | Feature                                                                                             | Omissions |
+| --- | --------------------------------------------------------------------------------------------------- | --------- |
+| 1   | `$'...'` ANSI C quoting (`$'\n'`, `$'\t'`, octal escapes)                                          | 8         |
+| 2   | Functions: fix IOError closed stream on define/call                                                 | 5         |
+| 3   | Tilde expansion (`~`, `~/path`, `~` in assignment)                                                  | 5         |
+| 4   | `here-string` with `read`: `read x <<<val`                                                          | 5         |
+| 5   | Multi-line heredoc support in the REPL                                                              | 5         |
+| 6   | Anchored substitution `${x/#pat/rep}` and `${x/%pat/rep}`                                           | 4         |
+| 7   | IFS word splitting in `for` loop                                                                    | 4         |
+| 8   | `function return N` — fix uncaught `:return` throw                                                  | 3         |
 
 ## Common omit reasons
 
@@ -123,10 +122,7 @@ These cover bash features rubish will not implement:
 | tilde expansion not yet supported                  | 5     |
 | read from file redirect not yet working            | 3     |
 | $'...' ANSI C quoting not yet supported            | 8     |
-| hex/octal literals in $(( )) not yet supported     | 2     |
-| compound assignment +=/-=/\*=//=/%= in $(( ))      | 5     |
-| == / != operators in $(( )) not yet supported      | 3     |
-| prefix ++ / -- in $(( )) not yet supported         | 2     |
+| (()) null expression not yet supported             | 1     |
 | subshell exit code not propagated to $?            | 2     |
 | ${a[@]} expansion in for loop not yet working      | 1     |
 | ${a[@]:offset:len} array slice not yet supported   | 1     |
