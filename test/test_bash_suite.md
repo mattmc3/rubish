@@ -12,7 +12,7 @@ Each file in `test/test_bash_suite_*.rb` corresponds to one or more files in
 | test_bash_suite_arith_for.rb | arith-for.tests                          | 10    | 0       |
 | test_bash_suite_array.rb     | array.tests                              | 10    | 2       |
 | test_bash_suite_braces.rb    | braces.tests                             | 24    | 6       |
-| test_bash_suite_builtins.rb  | builtins.tests                           | 13    | 4       |
+| test_bash_suite_builtins.rb  | builtins.tests                           | 13    | 1       |
 | test_bash_suite_case.rb      | case.tests                               | 16    | 4       |
 | test_bash_suite_comsub.rb    | comsub.tests                             | 10    | 1       |
 | test_bash_suite_cond.rb      | cond.tests                               | 23    | 1       |
@@ -35,7 +35,7 @@ Each file in `test/test_bash_suite_*.rb` corresponds to one or more files in
 | test_bash_suite_tilde.rb     | tilde.tests                              | 8     | 5       |
 | test_bash_suite_varenv.rb    | varenv.tests                             | 13    | 0       |
 
-**Total: 438 tests — 384 passing, 0 failing, 54 omitted (88% passing)**
+**Total: 438 tests — 387 passing, 0 failing, 51 omitted (88% passing)**
 
 ## Not yet covered — practical to add
 
@@ -108,11 +108,10 @@ These cover bash features rubish will not implement:
 | 3   | Functions: fix IOError closed stream on define/call                                                 | 5         |
 | 4   | Tilde expansion (`~`, `~/path`, `~` in assignment, `~` in export)                                  | 5         |
 | 5   | Case statement edge cases (`;& ` fallthrough, `;;& ` continue, reserved word pattern)              | 4         |
-| 6   | `here-string` with `read`: `read x <<<val`                                                         | 3         |
-| 7   | Read from file redirect (`read x < file`)                                                           | 3         |
-| 8   | Stderr and fd redirect (`>&2`, `2>&1`)                                                              | 3         |
-| 9   | `function return N`: fix uncaught `:return` throw                                                   | 2         |
-| 10  | Subshell exit code propagated to `$?`                                                               | 2         |
+| 6   | Read from file redirect (`read x < file`)                                                           | 3         |
+| 7   | Stderr and fd redirect (`>&2`, `2>&1`)                                                              | 3         |
+| 8   | `function return N`: fix uncaught `:return` throw                                                   | 2         |
+| 9   | Subshell exit code propagated to `$?`                                                               | 2         |
 
 ## Common omit reasons
 
@@ -121,7 +120,6 @@ These cover bash features rubish will not implement:
 | anchored replacement ${x/#pat} / ${x/%pat}         | 6     |
 | function define/call causes IOError: closed stream | 5     |
 | tilde expansion not yet supported (all forms)      | 5     |
-| here-string with read not yet working              | 3     |
 | read from file redirect not yet working            | 3     |
 | stderr redirect >&2 / fd dup 2>&1 not yet working  | 3     |
 | function return throws uncaught :return            | 2     |
