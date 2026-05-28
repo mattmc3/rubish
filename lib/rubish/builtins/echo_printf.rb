@@ -44,7 +44,9 @@ module Rubish
       end
 
       if newline
-        puts output
+        # Use print instead of puts: puts suppresses the trailing newline if the
+        # string already ends with one, which breaks echo $'\n' producing only 1 newline.
+        print output + "\n"
       else
         print output
       end

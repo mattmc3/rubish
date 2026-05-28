@@ -701,4 +701,14 @@ class TestPrintf < Test::Unit::TestCase
     output = capture_output { Rubish::Builtins.run('echo', ['-e', '\7']) }
     assert_equal "\a\n", output
   end
+
+  def test_echo_newline_arg_gets_trailing_newline
+    output = capture_output { Rubish::Builtins.run('echo', ["\n"]) }
+    assert_equal "\n\n", output
+  end
+
+  def test_echo_multiple_newline_args_get_trailing_newline
+    output = capture_output { Rubish::Builtins.run('echo', ["\n\n\n"]) }
+    assert_equal "\n\n\n\n", output
+  end
 end
