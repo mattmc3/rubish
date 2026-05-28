@@ -330,4 +330,213 @@ class TestBash_Test < Test::Unit::TestCase
     execute("[ \\( -n 'x' \\) ]; echo $? > #{outf}")
     assert_equal "0\n", File.read(outf)
   end
+
+  # test (no args)  ->  1
+  def test_no_args
+    execute("test; echo $? > #{outf}")
+    assert_equal "1\n", File.read(outf)
+  end
+
+  # [ ] (no args)  ->  1
+  def test_bracket_no_args
+    execute("[ ]; echo $? > #{outf}")
+    assert_equal "1\n", File.read(outf)
+  end
+
+  # [ -c /dev/tty ]  ->  0
+  def test_bracket_c_char_device
+    execute("[ -c /dev/tty ]; echo $? > #{outf}")
+    assert_equal "0\n", File.read(outf)
+  end
+
+  # [ -c /etc ]  ->  1 (directory is not a char device)
+  def test_bracket_c_not_char_device
+    execute("[ -c /etc ]; echo $? > #{outf}")
+    assert_equal "1\n", File.read(outf)
+  end
+
+  # [ -p fifo ]  ->  0 (named pipe)
+  def test_bracket_p_named_pipe
+    tf = "#{@tempdir}/mypipe"
+    system("mkfifo #{tf}")
+    execute("[ -p #{tf} ]; echo $? > #{outf}")
+    assert_equal "0\n", File.read(outf)
+  end
+
+  # [ -p regular_file ]  ->  1 (regular file is not a pipe)
+  def test_bracket_p_not_named_pipe
+    tf = "#{@tempdir}/notpipe"
+    File.write(tf, "data")
+    execute("[ -p #{tf} ]; echo $? > #{outf}")
+    assert_equal "1\n", File.read(outf)
+  end
+
+  # [ -d "" ]  ->  1 (empty string is not a directory)
+  def test_bracket_d_empty_string
+    execute("[ -d '' ]; echo $? > #{outf}")
+    assert_equal "1\n", File.read(outf)
+  end
+
+  # [ "hello" == "hello" ]  ->  0 (double-equals string comparison)
+  def test_bracket_str_double_eq_true
+    execute("[ hello == hello ]; echo $? > #{outf}")
+    assert_equal "0\n", File.read(outf)
+  end
+
+  # [ "hello" == "goodbye" ]  ->  1
+  def test_bracket_str_double_eq_false
+    execute("[ hello == goodbye ]; echo $? > #{outf}")
+    assert_equal "1\n", File.read(outf)
+  end
+
+  # [ "hello" > "goodbye" ]  ->  0 (h comes after g lexicographically)
+  def test_bracket_str_gt_true
+    execute("[ hello \\> goodbye ]; echo $? > #{outf}")
+    assert_equal "0\n", File.read(outf)
+  end
+
+  # [ "hello" < "goodbye" ]  ->  1 (h does not come before g)
+  def test_bracket_str_lt_false
+    execute("[ hello \\< goodbye ]; echo $? > #{outf}")
+    assert_equal "1\n", File.read(outf)
+  end
+
+  # [ -t 20 ]  ->  1 (fd 20 is not a terminal)
+  def test_bracket_t_non_terminal_fd
+    execute("[ -t 20 ]; echo $? > #{outf}")
+    assert_equal "1\n", File.read(outf)
+  end
+
+  # [ -32 -eq 32 ]  ->  1 (negative number vs positive)
+  def test_bracket_eq_negative_vs_positive
+    execute("[ -32 -eq 32 ]; echo $? > #{outf}")
+    assert_equal "1\n", File.read(outf)
+  end
+
+  # [ -32 -eq -32 ]  ->  0 (negative numbers equal)
+  def test_bracket_eq_negative_equal
+    execute("[ -32 -eq -32 ]; echo $? > #{outf}")
+    assert_equal "0\n", File.read(outf)
+  end
+
+  # non-numeric arg to -eq  ->  exit 2
+  def test_bracket_eq_non_numeric
+    omit 'rubish returns 1 for bad integers, bash returns 2'
+    execute("[ 4+3 -eq 7 ]; echo $? > #{outf}")
+    assert_equal "2\n", File.read(outf)
+  end
+
+  # [ -n abcd -o aaa ]  ->  0 (either side true)
+  def test_bracket_or_with_bare_string
+    execute("[ -n abcd -o aaa ]; echo $? > #{outf}")
+    assert_equal "0\n", File.read(outf)
+  end
+
+  # [ -n abcd -o -z aaa ]  ->  0 (-n abcd is true, -z aaa is false)
+  def test_bracket_or_first_true
+    execute("[ -n abcd -o -z aaa ]; echo $? > #{outf}")
+    assert_equal "0\n", File.read(outf)
+  end
+
+  # [ -n abcd -a aaa ]  ->  0 (both sides true)
+  def test_bracket_and_with_bare_string
+    execute("[ -n abcd -a aaa ]; echo $? > #{outf}")
+    assert_equal "0\n", File.read(outf)
+  end
+
+  # [ -n abcd -a -z aaa ]  ->  1 (-z aaa is false)
+  def test_bracket_and_second_false
+    execute("[ -n abcd -a -z aaa ]; echo $? > #{outf}")
+    assert_equal "1\n", File.read(outf)
+  end
+
+  # [ xx -a yy ]  ->  0 (both non-empty strings)
+  def test_bracket_bare_and_both_nonempty
+    execute("[ xx -a yy ]; echo $? > #{outf}")
+    assert_equal "0\n", File.read(outf)
+  end
+
+  # [ xx -o "" ]  ->  0 (first is non-empty)
+  def test_bracket_bare_or_first_nonempty
+    execute("[ xx -o '' ]; echo $? > #{outf}")
+    assert_equal "0\n", File.read(outf)
+  end
+
+  # [ xx -a "" ]  ->  1 (second is empty)
+  def test_bracket_bare_and_second_empty
+    execute("[ xx -a '' ]; echo $? > #{outf}")
+    assert_equal "1\n", File.read(outf)
+  end
+
+  # [ file -ef hardlink ]  ->  0 (hard link is same inode)
+  def test_bracket_ef_hardlink
+    tf1 = "#{@tempdir}/original"
+    tf2 = "#{@tempdir}/hardlink"
+    File.write(tf1, "x")
+    File.link(tf1, tf2)
+    execute("[ #{tf1} -ef #{tf2} ]; echo $? > #{outf}")
+    assert_equal "0\n", File.read(outf)
+  end
+
+  # [ file1 -ef file2 ] where they are different files  ->  1
+  def test_bracket_ef_different_files
+    tf1 = "#{@tempdir}/file1"
+    tf2 = "#{@tempdir}/file2"
+    File.write(tf1, "x")
+    File.write(tf2, "y")
+    execute("[ #{tf1} -ef #{tf2} ]; echo $? > #{outf}")
+    assert_equal "1\n", File.read(outf)
+  end
+
+  # [ noexist -ot file ]  ->  0 (nonexistent is considered older than existing)
+  def test_bracket_ot_nonexistent_lhs
+    omit 'rubish returns 1 for -ot when lhs does not exist; bash returns 0'
+    tf = "#{@tempdir}/existing"
+    File.write(tf, "x")
+    execute("[ noexist_xyz -ot #{tf} ]; echo $? > #{outf}")
+    assert_equal "0\n", File.read(outf)
+  end
+
+  # [ file -ot noexist ]  ->  1 (existing file is not older than nonexistent)
+  def test_bracket_ot_nonexistent_rhs
+    tf = "#{@tempdir}/existing2"
+    File.write(tf, "x")
+    execute("[ #{tf} -ot noexist_xyz ]; echo $? > #{outf}")
+    assert_equal "1\n", File.read(outf)
+  end
+
+  # [ noexist -nt file ]  ->  1 (nonexistent is not newer)
+  def test_bracket_nt_nonexistent_lhs
+    tf = "#{@tempdir}/existing3"
+    File.write(tf, "x")
+    execute("[ noexist_xyz -nt #{tf} ]; echo $? > #{outf}")
+    assert_equal "1\n", File.read(outf)
+  end
+
+  # [ noexist -ef file ]  ->  1 (nonexistent has no inode)
+  def test_bracket_ef_nonexistent_lhs
+    tf = "#{@tempdir}/existing4"
+    File.write(tf, "x")
+    execute("[ noexist_xyz -ef #{tf} ]; echo $? > #{outf}")
+    assert_equal "1\n", File.read(outf)
+  end
+
+  # [ ! ( compound ) ]  ->  1 (negation of a true compound)
+  def test_bracket_not_parens_compound
+    omit 'escaped parens \\( \\) in [ ] not yet working'
+    execute("[ ! \\( 700 -le 1000 -a -n 1 -a 20 = 20 \\) ]; echo $? > #{outf}")
+    assert_equal "1\n", File.read(outf)
+  end
+
+  # [ -r /dev/fd/0 ]  ->  0 (stdin is readable)
+  def test_bracket_r_fd0
+    execute("[ -r /dev/fd/0 ]; echo $? > #{outf}")
+    assert_equal "0\n", File.read(outf)
+  end
+
+  # [ -w /dev/fd/1 ]  ->  0 (stdout is writable)
+  def test_bracket_w_fd1
+    execute("[ -w /dev/fd/1 ]; echo $? > #{outf}")
+    assert_equal "0\n", File.read(outf)
+  end
 end

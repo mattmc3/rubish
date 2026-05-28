@@ -80,4 +80,99 @@ class TestBash_Comsub < Test::Unit::TestCase
     execute("x=`echo hello`; echo $x > #{outf}")
     assert_equal "hello\n", File.read(outf)
   end
+
+  # comsub inline concatenation: ab$(echo mn; echo op)yz  ->  abmn opyz
+  def test_comsub_inline_concat
+    omit 'comsub with semicolon splits at newline instead of joining inline'
+    execute("echo ab$(echo mn; echo op)yz > #{outf}")
+    assert_equal "abmn opyz\n", File.read(outf)
+  end
+
+  # comsub with pipeline grep filter assigned to var
+  def test_comsub_pipeline_grep_assign
+    execute("a=$(echo 'a b c' | tr ' ' '\\n' | grep 'b'); echo $a > #{outf}")
+    assert_equal "b\n", File.read(outf)
+  end
+
+  # empty multiline comsub (newline inside parens)  ->  ----
+  def test_comsub_empty_multiline
+    execute("printf 'blank --%s--\\n' \"$(true)\" > #{outf}")
+    assert_equal "blank ----\n", File.read(outf)
+  end
+
+  # deeply nested comsub: 4 levels  ->  nested
+  def test_comsub_deeply_nested
+    execute("echo $(echo $(echo $(echo $( echo nested )))) > #{outf}")
+    assert_equal "nested\n", File.read(outf)
+  end
+
+  # multiple trailing newlines all stripped
+  def test_comsub_strips_multiple_trailing_newlines
+    execute("x=$(printf 'hello\\n\\n\\n'); echo \"[$x]\" > #{outf}")
+    assert_equal "[hello]\n", File.read(outf)
+  end
+
+  # internal newlines preserved, only trailing stripped
+  def test_comsub_strips_trailing_preserves_internal
+    execute("x=$(printf 'a\\nb\\nc\\n\\n\\n'); echo \"$x\" > #{outf}")
+    assert_equal "a\nb\nc\n", File.read(outf)
+  end
+
+  # comsub output word-splits when unquoted
+  def test_comsub_word_split_unquoted
+    execute("x=$(echo 'a b c'); echo $x > #{outf}")
+    assert_equal "a b c\n", File.read(outf)
+  end
+
+  # comsub output not word-split when quoted
+  def test_comsub_no_word_split_quoted
+    execute("x=$(echo 'a  b  c'); echo \"$x\" > #{outf}")
+    assert_equal "a  b  c\n", File.read(outf)
+  end
+
+  # chained backtick comsubs: use result of one in the next
+  def test_comsub_backtick_chained
+    execute("x=`echo hello`; y=`echo $x world`; echo $y > #{outf}")
+    assert_equal "hello world\n", File.read(outf)
+  end
+
+  # comsub in parameter default value: ${foo:-$(echo fallback)}
+  def test_comsub_in_param_default
+    execute("echo ${foo:-$(echo fallback)} > #{outf}")
+    assert_equal "fallback\n", File.read(outf)
+  end
+
+  # return inside comsub aborts comsub, function continues
+  def test_comsub_return_aborts_comsub
+    omit '$FUNCNAME not set in rubish function context'
+    execute("func() { local v; v=$(echo comsub; return; echo after); echo \"$FUNCNAME: v = $v\"; }; func > #{outf}")
+    assert_equal "func: v = comsub\n", File.read(outf)
+  end
+
+  # prefix-$(echo val)-suffix inline substitution
+  def test_comsub_prefix_suffix_inline
+    execute("echo prefix-$(echo hello)-suffix > #{outf}")
+    assert_equal "prefix-hello-suffix\n", File.read(outf)
+  end
+
+  # backtick with \$ produces literal dollar sign
+  def test_comsub_backtick_escaped_dollar
+    omit 'backtick comsub does not unescape \\$ to $ inside backtick body'
+    execute("echo `echo '\\$' bab` > #{outf}")
+    assert_equal "$ bab\n", File.read(outf)
+  end
+
+  # backtick with \\ produces literal backslash
+  def test_comsub_backtick_escaped_backslash
+    omit 'backtick comsub does not unescape \\\\ to \\ inside backtick body'
+    execute("echo `echo '\\\\' ab` > #{outf}")
+    assert_equal "\\ ab\n", File.read(outf)
+  end
+
+  # exit status from comsub is propagated
+  def test_comsub_exit_status
+    omit 'standalone $(exit N) treated as command not found instead of propagating exit status'
+    execute("$(exit 42); echo $? > #{outf}")
+    assert_equal "42\n", File.read(outf)
+  end
 end

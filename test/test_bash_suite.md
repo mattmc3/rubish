@@ -7,35 +7,35 @@ Each file in `test/test_bash_suite_*.rb` corresponds to one or more files in
 
 | Test file                    | Bash source                              | Tests | Omitted |
 | ---------------------------- | ---------------------------------------- | ----- | ------- |
-| test_bash_suite_appendop.rb  | appendop.tests                           | 4     | 1       |
+| test_bash_suite_appendop.rb  | appendop.tests                           | 19    | 13      |
 | test_bash_suite_arith.rb     | arith.tests                              | 63    | 1       |
-| test_bash_suite_arith_for.rb | arith-for.tests                          | 10    | 0       |
+| test_bash_suite_arith_for.rb | arith-for.tests                          | 20    | 5       |
 | test_bash_suite_array.rb     | array.tests                              | 10    | 2       |
 | test_bash_suite_braces.rb    | braces.tests                             | 24    | 6       |
-| test_bash_suite_builtins.rb  | builtins.tests                           | 13    | 1       |
+| test_bash_suite_builtins.rb  | builtins.tests                           | 46    | 12      |
 | test_bash_suite_case.rb      | case.tests                               | 16    | 4       |
-| test_bash_suite_comsub.rb    | comsub.tests                             | 10    | 1       |
-| test_bash_suite_cond.rb      | cond.tests                               | 23    | 1       |
-| test_bash_suite_exp.rb       | exp.tests, new-exp.tests, more-exp.tests | 63    | 4       |
-| test_bash_suite_func.rb      | func.tests                               | 12    | 0       |
-| test_bash_suite_heredoc.rb   | heredoc.tests, herestr.tests             | 10    | 0       |
-| test_bash_suite_ifs.rb       | ifs.tests                                | 5     | 0       |
+| test_bash_suite_comsub.rb    | comsub.tests                             | 25    | 6       |
+| test_bash_suite_cond.rb      | cond.tests                               | 52    | 6       |
+| test_bash_suite_exp.rb       | exp.tests, new-exp.tests, more-exp.tests | 110   | 20      |
+| test_bash_suite_func.rb      | func.tests                               | 23    | 8       |
+| test_bash_suite_heredoc.rb   | heredoc.tests, herestr.tests             | 35    | 7       |
+| test_bash_suite_ifs.rb       | ifs.tests                                | 15    | 5       |
 | test_bash_suite_invert.rb    | invert.tests                             | 6     | 0       |
 | test_bash_suite_loops.rb     | (while/until, no direct bash file)       | 8     | 0       |
-| test_bash_suite_nquote.rb    | nquote.tests                             | 8     | 0       |
-| test_bash_suite_posixpat.rb  | posixpat.tests                           | 15    | 0       |
-| test_bash_suite_posixpipe.rb | posixpipe.tests                          | 7     | 1       |
+| test_bash_suite_nquote.rb    | nquote.tests                             | 18    | 2       |
+| test_bash_suite_posixpat.rb  | posixpat.tests                           | 49    | 20      |
+| test_bash_suite_posixpipe.rb | posixpipe.tests                          | 16    | 3       |
 | test_bash_suite_printf.rb    | printf.tests                             | 20    | 0       |
-| test_bash_suite_quote.rb     | quote.tests                              | 10    | 1       |
-| test_bash_suite_read.rb      | read.tests                               | 8     | 4       |
+| test_bash_suite_quote.rb     | quote.tests                              | 26    | 7       |
+| test_bash_suite_read.rb      | read.tests                               | 22    | 10      |
 | test_bash_suite_redir.rb     | redir.tests                              | 8     | 3       |
 | test_bash_suite_strip.rb     | strip.tests                              | 10    | 1       |
 | test_bash_suite_subshell.rb  | (subshell, no direct bash file)          | 6     | 1       |
-| test_bash_suite_test.rb      | test.tests                               | 48    | 1       |
-| test_bash_suite_tilde.rb     | tilde.tests                              | 8     | 5       |
-| test_bash_suite_varenv.rb    | varenv.tests                             | 13    | 0       |
+| test_bash_suite_test.rb      | test.tests                               | 79    | 4       |
+| test_bash_suite_tilde.rb     | tilde.tests                              | 25    | 14      |
+| test_bash_suite_varenv.rb    | varenv.tests                             | 24    | 6       |
 
-**Total: 438 tests — 400 passing, 0 failing, 38 omitted (91% passing)**
+**Total: 775 tests — 609 passing, 0 failing, 166 omitted (79% passing)**
 
 ## Not yet covered — practical to add
 
@@ -103,24 +103,32 @@ These cover bash features rubish will not implement:
 
 | #   | Feature                                                                                             | Omissions |
 | --- | --------------------------------------------------------------------------------------------------- | --------- |
-| 1   | Brace expansion edge cases (empty braces, lone `}`, escaped braces, var in list)                   | 6         |
-| 2   | Tilde expansion (`~`, `~/path`, `~` in assignment, `~` in export)                                  | 5         |
-| 3   | Case statement edge cases (`;& ` fallthrough, `;;& ` continue, reserved word pattern)              | 4         |
-| 4   | Read from file redirect (`read x < file`)                                                           | 3         |
-| 5   | Stderr and fd redirect (`>&2`, `2>&1`)                                                              | 3         |
-| 6   | Subshell exit code propagated to `$?`                                                               | 2         |
+| 1   | Tilde expansion (all forms: `~`, `~/path`, `~+`, `~-`, `~user`, in assignment/export)              | 14        |
+| 2   | Parameter expansion: var-as-pattern (`${x#$y}`), positional `${#}`, `${#N}`, `${N}` with braces   | 10        |
+| 3   | Read builtin: IFS variants, file redirect, readonly-var error, trailing-space stripping             | 10        |
+| 4   | Posixpat bracket expressions (extglob, CTLESC, dangling backslash)                                  | 20        |
+| 5   | Appendop: `typeset -i` arithmetic, array literal `+=`, command-local `+=` prefix                   | 13        |
+| 6   | Builtins: eval double-expansion, `builtin`/`command` keyword, `declare -p`, alias format           | 12        |
+| 7   | Brace expansion edge cases (empty braces, lone `}`, escaped braces, var in list)                   | 6         |
+| 8   | Subshell exit code propagated to `$?`                                                               | 3         |
+| 9   | Stderr and fd redirect (`>&2`, `2>&1`)                                                              | 3         |
+| 10  | Case statement edge cases (`;& ` fallthrough, `;;& ` continue, reserved word pattern)              | 4         |
 
 ## Common omit reasons
 
-| Reason                                             | Count |
-| -------------------------------------------------- | ----- |
-| tilde expansion not yet supported (all forms)      | 5     |
-| read from file redirect not yet working            | 3     |
-| stderr redirect >&2 / fd dup 2>&1 not yet working  | 3     |
-| subshell exit code not propagated to $?            | 2     |
-| case ;& / ;;& fallthrough not yet supported        | 2     |
-| (()) null expression not yet supported             | 1     |
-| ${a[@]} expansion in for loop not yet working      | 1     |
-| ${a[@]:offset:len} array slice not yet supported   | 1     |
-| negative offset in ${x: -N:L} not yet supported    | 1     |
-| IFS= read not yet working                          | 1     |
+| Reason                                                        | Count |
+| ------------------------------------------------------------- | ----- |
+| tilde expansion not yet supported (all forms)                 | 14    |
+| posixpat bracket/extglob/CTLESC patterns not handled          | 20    |
+| appendop typeset -i arithmetic / array / command-prefix       | 13    |
+| builtin/command keyword, eval double-expansion, declare -p    | 12    |
+| read: IFS variants, file redirect, trailing-space, readonly   | 10    |
+| param expansion: var-as-pattern, ${#}, ${#N}, ${N} with {}   | 10    |
+| quote/nquote: backslash-newline continuation, $'...' in dquot | 9     |
+| comsub edge cases (inline concat, backtick escapes, exit)     | 6     |
+| brace expansion edge cases                                    | 6     |
+| case ;& / ;;& fallthrough not yet supported                   | 4     |
+| subshell exit code not propagated to $?                       | 3     |
+| stderr redirect >&2 / fd dup 2>&1 not yet working             | 3     |
+| IFS: typeset/env-prefix local IFS, eval split, posix mode    | 5     |
+| heredoc: backslash-newline join, multiple heredocs, dquote    | 7     |

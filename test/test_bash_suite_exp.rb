@@ -404,4 +404,338 @@ class TestBash_Exp < Test::Unit::TestCase
     execute("x=''; echo ${x:+alt} > #{outf}")
     assert_equal "\n", File.read(outf)
   end
+
+  # exp.tests: arithmetic expansion $((expr))
+  # expect '<42>'; recho $((28 + 14))
+  def test_arith_expansion_basic
+    execute("echo $((28 + 14)) > #{outf}")
+    assert_equal "42\n", File.read(outf)
+  end
+
+  # exp.tests: arithmetic expansion $[expr]
+  # expect '<26>'; recho $[ 13 * 2 ]
+  def test_arith_expansion_bracket
+    omit '$[...] arithmetic syntax not yet supported'
+    execute("echo $[ 13 * 2 ] > #{outf}")
+    assert_equal "26\n", File.read(outf)
+  end
+
+  # exp.tests: strip suffix then append -- x=file.c; echo ${x%.c}.o  ->  file.o
+  # expect '<file.o>'; recho ${x%.c}.o
+  def test_param_strip_suffix_then_append
+    execute("x=file.c; echo ${x%.c}.o > #{outf}")
+    assert_equal "file.o\n", File.read(outf)
+  end
+
+  # exp.tests: strip longest leading pattern -- x=posix/src/std; echo ${x%%/*}  ->  posix
+  # expect '<posix>'; recho ${x%%/*}
+  def test_param_strip_suffix_longest_slash
+    execute("x=posix/src/std; echo ${x%%/*} > #{outf}")
+    assert_equal "posix\n", File.read(outf)
+  end
+
+  # exp.tests: strip prefix using var as pattern -- x=$HOME/src/cmd; echo ${x#$HOME}  ->  /src/cmd
+  # expect '</src/cmd>'; recho ${x#$HOME}
+  def test_param_strip_prefix_var_pattern
+    omit 'var-as-pattern in ${x#$HOME} not yet working'
+    execute("HOME=/usr/homes/chet; x=/usr/homes/chet/src/cmd; echo ${x#$HOME} > #{outf}")
+    assert_equal "/src/cmd\n", File.read(outf)
+  end
+
+  # exp.tests: non-matching pattern removal leaves value unchanged
+  # z=abcdef; expect '<abcdef>'; recho ${z#xyz}
+  def test_param_strip_prefix_no_match
+    execute("z=abcdef; echo ${z#xyz} > #{outf}")
+    assert_equal "abcdef\n", File.read(outf)
+  end
+
+  # exp.tests: non-matching longest prefix removal
+  # z=abcdef; expect '<abcdef>'; recho ${z##xyz}
+  def test_param_strip_prefix_longest_no_match
+    execute("z=abcdef; echo ${z##xyz} > #{outf}")
+    assert_equal "abcdef\n", File.read(outf)
+  end
+
+  # exp.tests: non-matching suffix removal
+  # z=abcdef; expect '<abcdef>'; recho ${z%xyz}
+  def test_param_strip_suffix_no_match
+    execute("z=abcdef; echo ${z%xyz} > #{outf}")
+    assert_equal "abcdef\n", File.read(outf)
+  end
+
+  # exp.tests: non-matching longest suffix removal
+  # z=abcdef; expect '<abcdef>'; recho ${z%%xyz}
+  def test_param_strip_suffix_longest_no_match
+    execute("z=abcdef; echo ${z%%xyz} > #{outf}")
+    assert_equal "abcdef\n", File.read(outf)
+  end
+
+  # exp.tests: count positional params -- set one two three four five; echo $#  ->  5
+  def test_param_count_positional
+    execute("set -- one two three four five; echo $# > #{outf}")
+    assert_equal "5\n", File.read(outf)
+  end
+
+  # exp.tests: count positional params via ${#}
+  def test_param_count_positional_braces
+    omit '${#} positional param count not yet supported'
+    execute("set -- one two three four five; echo ${#} > #{outf}")
+    assert_equal "5\n", File.read(outf)
+  end
+
+  # exp.tests: length of positional param ${#1}
+  # set one two three four five; expect '<3>'; recho ${#1}
+  def test_param_length_of_positional
+    omit '${#N} length of positional param not yet supported'
+    execute("set -- one two three four five; echo ${#1} > #{outf}")
+    assert_equal "3\n", File.read(outf)
+  end
+
+  # exp.tests: count via ${#@} and ${#*} equals number of positional params
+  # set one two three four five; expect '<5>'; recho ${#@}
+  def test_param_count_via_hash_at
+    omit '${#@} param count not yet supported'
+    execute("set -- one two three four five; echo ${#@} > #{outf}")
+    assert_equal "5\n", File.read(outf)
+  end
+
+  # exp.tests: select specific positional params -- $1 $3 ${5}; skip unset $8 $9
+  # set one two three four five; expect '<one> <three> <five>'; recho $1 $3 ${5} $8 ${9}
+  def test_positional_params_select
+    omit '${N} positional param with braces not yet working'
+    execute("set -- one two three four five; echo $1 $3 ${5} > #{outf}")
+    assert_equal "one three five\n", File.read(outf)
+  end
+
+  # exp.tests: declare assignment does not word-split
+  # a="a b c d e"; declare b=$a; recho $b -> <a> <b> <c> <d> <e>
+  def test_declare_no_wordsplit_in_assignment
+    execute("a='a b c d e'; declare b=$a; echo $b > #{outf}")
+    assert_equal "a b c d e\n", File.read(outf)
+  end
+
+  # exp.tests: null string concat with bare var -- abcd""efgh -> abcdefgh
+  def test_null_string_concat_quoted
+    execute("echo abcd\"\"efgh > #{outf}")
+    assert_equal "abcdefgh\n", File.read(outf)
+  end
+
+  # exp.tests: null string concat with single-quoted empty -- abcd''efgh -> abcdefgh
+  def test_null_string_concat_single_quoted
+    execute("echo abcd''efgh > #{outf}")
+    assert_equal "abcdefgh\n", File.read(outf)
+  end
+
+  # exp.tests: ${x:-$(cmd)} with command substitution in default
+  # unset x; echo "${x:-$(echo "foo bar")}"  ->  foo bar
+  def test_param_default_comsub
+    execute("unset x; echo \"${x:-$(echo 'foo bar')}\" > #{outf}")
+    assert_equal "foo bar\n", File.read(outf)
+  end
+
+  # exp.tests: escape of backslash -- echo "\\\\"  ->  \\
+  def test_backslash_escape
+    execute("echo \"\\\\\\\\\" > #{outf}")
+    assert_equal "\\\\\n", File.read(outf)
+  end
+
+  # exp.tests: tilde in single quotes is literal
+  # expect '<~>'; recho '~'
+  def test_tilde_single_quotes_literal
+    execute("echo '~' > #{outf}")
+    assert_equal "~\n", File.read(outf)
+  end
+
+  # exp.tests: $* unquoted splits on IFS
+  # set "abc" "def ghi" "jkl"; echo $*  ->  abc def ghi jkl (word-split)
+  def test_dollar_star_unquoted
+    execute("set -- \"abc\" \"def ghi\" \"jkl\"; echo $* > #{outf}")
+    assert_equal "abc def ghi jkl\n", File.read(outf)
+  end
+
+  # exp.tests: "$*" quoted joins with first IFS char (space by default)
+  # set "abc" "def ghi" "jkl"; echo "$*"  ->  abc def ghi jkl
+  def test_dollar_star_quoted
+    execute("set -- \"abc\" \"def ghi\" \"jkl\"; echo \"$*\" > #{outf}")
+    assert_equal "abc def ghi jkl\n", File.read(outf)
+  end
+
+  # exp.tests: "$@" quoted preserves word boundaries
+  # set "abc" "def ghi" "jkl"; echo "$@"  ->  abc def ghi jkl (same in echo, but words differ)
+  def test_dollar_at_quoted
+    execute("set -- \"abc\" \"def ghi\" \"jkl\"; echo \"$@\" > #{outf}")
+    assert_equal "abc def ghi jkl\n", File.read(outf)
+  end
+
+  # exp.tests: "$*" with non-default IFS joins with first IFS char
+  # IFS=":$IFS"; set "abc" "def ghi" "jkl"; echo "$*"  ->  abc:def ghi:jkl
+  def test_dollar_star_quoted_custom_ifs
+    execute("OIFS=\"$IFS\"; IFS=\":$IFS\"; set -- \"abc\" \"def ghi\" \"jkl\"; echo \"$*\" > #{outf}")
+    assert_equal "abc:def ghi:jkl\n", File.read(outf)
+  end
+
+  # exp.tests: ${POSIX} length -- POSIX=/usr/posix; echo ${#POSIX}  ->  10
+  def test_param_length_known_value
+    execute("POSIX=/usr/posix; echo ${#POSIX} > #{outf}")
+    assert_equal "10\n", File.read(outf)
+  end
+
+  # exp.tests: ${x##*/} strips longest leading component -- x=/one/two/three; echo ${x##*/}  ->  three
+  def test_param_strip_prefix_longest_path
+    execute("x=/one/two/three; echo ${x##*/} > #{outf}")
+    assert_equal "three\n", File.read(outf)
+  end
+
+  # new-exp.tests: ${foo:-"foo bar"} with spaces in default
+  # expect '<foo bar>'; recho "${undef-"foo bar"}"
+  def test_param_default_quoted_spaces
+    execute("unset foo; echo \"${foo:-foo bar}\" > #{outf}")
+    assert_equal "foo bar\n", File.read(outf)
+  end
+
+  # new-exp.tests: ${z: -3:3} negative offset from end
+  # z=abcdefghijklmnop; expect '<nop>'; recho ${z: -3:3}
+  def test_newexp_substr_negative_offset_nop
+    omit 'negative offset in ${x: -N:L} not yet supported'
+    execute("z=abcdefghijklmnop; echo ${z: -3:3} > #{outf}")
+    assert_equal "nop\n", File.read(outf)
+  end
+
+  # new-exp.tests: out-of-range substring -> empty
+  # var=abc; c=${var:3}; echo $c  -> (empty)
+  def test_param_substr_out_of_range_empty
+    execute("var=abc; c=${var:3}; echo $c > #{outf}")
+    assert_equal "\n", File.read(outf)
+  end
+
+  # new-exp.tests: negative length means offset from end (bash-4.2+)
+  # var=abc; c=${var:0:-2}; echo $c  ->  a
+  def test_param_substr_negative_length
+    omit 'negative length in ${var:offset:-N} not yet supported'
+    execute("var=abc; echo ${var:0:-2} > #{outf}")
+    assert_equal "a\n", File.read(outf)
+  end
+
+  # new-exp.tests: replace first match using var as pattern
+  # xxx=endocrine; yyy=n; echo ${xxx/$yyy/*}  ->  e*docrine
+  def test_param_replace_var_pattern
+    omit 'var-as-pattern in ${x/$yyy/r} not yet working'
+    execute("xxx=endocrine; yyy=n; echo ${xxx/$yyy/*} > #{outf}")
+    assert_equal "e*docrine\n", File.read(outf)
+  end
+
+  # new-exp.tests: replace all matches using var as pattern
+  # xxx=endocrine; yyy=n; echo ${xxx//$yyy/*}  ->  e*docri*e
+  def test_param_replace_all_var_pattern
+    omit 'var-as-pattern in ${x//$yyy/r} not yet working'
+    execute("xxx=endocrine; yyy=n; echo ${xxx//$yyy/*} > #{outf}")
+    assert_equal "e*docri*e\n", File.read(outf)
+  end
+
+  # new-exp.tests: replace with unset-var pattern (empty pattern) replaces each char
+  # xxx=endocrine; unset zzz; echo ${xxx/$zzz/*}  ->  *endocrine (inserts before first char)
+  def test_param_replace_unset_var_pattern
+    omit 'empty pattern behavior (unset var) in substitution not consistent'
+    execute("xxx=endocrine; unset zzz; echo ${xxx/$zzz/*} > #{outf}")
+    assert_equal "*endocrine\n", File.read(outf)
+  end
+
+  # new-exp.tests: prefix insertion -- ${var/#/x} on empty var
+  # unset var; var=; echo "${var/#/x}"  ->  x
+  def test_param_replace_prefix_insert_empty
+    omit '${var/#/x} prefix insert on empty var not yet working'
+    execute("var=''; echo \"${var/#/x}\" > #{outf}")
+    assert_equal "x\n", File.read(outf)
+  end
+
+  # new-exp.tests: replace whole value -- ${var/*/x} on empty var -> x
+  # unset var; var=; echo "${var/*/x}"  ->  x
+  def test_param_replace_star_empty_var
+    omit '${var/*/x} with empty var not yet working'
+    execute("var=''; echo \"${var/*/x}\" > #{outf}")
+    assert_equal "x\n", File.read(outf)
+  end
+
+  # new-exp.tests: replace prefix on non-empty var -- var=abc; echo "${var/#/x}"  ->  xabc
+  def test_param_replace_prefix_insert_nonempty
+    execute("var=abc; echo \"${var/#/x}\" > #{outf}")
+    assert_equal "xabc\n", File.read(outf)
+  end
+
+  # new-exp.tests: replace * pattern on non-empty var -- var=abc; echo "${var/*/x}"  ->  x
+  def test_param_replace_star_pattern_nonempty
+    execute("var=abc; echo \"${var/*/x}\" > #{outf}")
+    assert_equal "x\n", File.read(outf)
+  end
+
+  # more-exp.tests: ${P%"*"} -- quoted literal asterisk as suffix pattern
+  # P='*@*'; echo ${P%"*"}  ->  *@
+  def test_param_strip_suffix_quoted_literal_star
+    omit 'quoted literal star in suffix pattern not yet working'
+    execute("P='*@*'; echo ${P%\"*\"} > #{outf}")
+    assert_equal "*@\n", File.read(outf)
+  end
+
+  # more-exp.tests: ${P%""} empty pattern strip -> unchanged
+  # P='*@*'; echo ${P%""}  ->  *@*
+  def test_param_strip_suffix_empty_pattern
+    execute("P='*@*'; echo ${P%\"\"} > #{outf}")
+    assert_equal "*@*\n", File.read(outf)
+  end
+
+  # more-exp.tests: ${P#""} empty pattern prefix strip -> unchanged
+  # P='*@*'; echo ${P#""}  ->  *@*
+  def test_param_strip_prefix_empty_pattern
+    execute("P='*@*'; echo ${P#\"\"} > #{outf}")
+    assert_equal "*@*\n", File.read(outf)
+  end
+
+  # more-exp.tests: declare a=$zz -- no word splitting in declare
+  # zz="a b c d e"; declare a=$zz; echo "$a"  ->  a b c d e
+  def test_declare_preserves_spaces_in_value
+    execute("zz='a b c d e'; declare a=$zz; echo \"$a\" > #{outf}")
+    assert_equal "a b c d e\n", File.read(outf)
+  end
+
+  # more-exp.tests: nested ${} -- FOO=${BAR:-${XXX} yyy}
+  # XXX=xxx; FOO=${BAR:-${XXX} yyy}; echo $FOO  ->  xxx yyy (two words)
+  def test_nested_param_expansion
+    omit 'nested ${} in parameter default not yet supported'
+    execute("XXX=xxx; unset BAR; FOO=${BAR:-${XXX} yyy}; echo $FOO > #{outf}")
+    assert_equal "xxx yyy\n", File.read(outf)
+  end
+
+  # exp.tests: escaped backslash in pattern -- a="a?b?c"; echo ${a//\?/ }  ->  a b c
+  def test_param_replace_escaped_question
+    omit 'escaped \\? in param replace pattern not yet working'
+    execute("a='a?b?c'; echo ${a//\\?/ } > #{outf}")
+    assert_equal "a b c\n", File.read(outf)
+  end
+
+  # exp.tests: backslash-question unescaped in pattern -- a="a?b?c"; echo ${a//\\\\?/ }
+  # with \\? the backslash is literal, matches literal backslash-then-any -> no match here
+  # actual bash output: a?b?c (the \\? matches literal \<char>, but there's no \ in a?b?c)
+  def test_param_replace_double_backslash_question
+    execute("a='a?b?c'; echo ${a//\\\\?/ } > #{outf}")
+    assert_equal "a?b?c\n", File.read(outf)
+  end
+
+  # more-exp.tests: ${!-posparams} when $! is unset -> posparams
+  def test_param_bang_default_when_unset
+    execute("echo ${!:-posparams} > #{outf}")
+    assert_equal "posparams\n", File.read(outf)
+  end
+
+  # exp.tests: $! expands to nothing when no background job
+  def test_param_bang_empty_no_bg_job
+    execute("echo ${!} > #{outf}")
+    assert_equal "\n", File.read(outf)
+  end
+
+  # exp.tests: x=''; recho "$xxx"  -> (nothing, empty line after unset var)
+  # unset xxx; echo "$xxx"  ->  (empty line)
+  def test_param_unset_quoted_empty_line
+    execute("unset xxx; echo \"$xxx\" > #{outf}")
+    assert_equal "\n", File.read(outf)
+  end
 end

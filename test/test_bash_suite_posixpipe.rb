@@ -62,4 +62,60 @@ class TestBash_Posixpipe < Test::Unit::TestCase
     execute("true | false; echo $? > #{outf}")
     assert_equal "1\n", File.read(outf)
   end
+
+  # ! true; echo $?  ->  1  (! negates exit status)
+  def test_bang_negates_true
+    execute("! true; echo $? > #{outf}")
+    assert_equal "1\n", File.read(outf)
+  end
+
+  # ! false; echo $?  ->  0
+  def test_bang_negates_false
+    execute("! false; echo $? > #{outf}")
+    assert_equal "0\n", File.read(outf)
+  end
+
+  # ! ! true; echo $?  ->  0  (double negation)
+  def test_bang_double_negation
+    omit 'rubish emits error for chained ! but gives correct exit'
+    execute("! ! true; echo $? > #{outf}")
+    assert_equal "0\n", File.read(outf)
+  end
+
+  # ! ! ! true; echo $?  ->  1  (triple negation)
+  def test_bang_triple_negation
+    omit 'rubish does not chain ! correctly: gives 0 instead of 1'
+    execute("! ! ! true; echo $? > #{outf}")
+    assert_equal "1\n", File.read(outf)
+  end
+
+  # ! true | false; echo $?  ->  0  (! negates whole pipeline; last cmd is false)
+  def test_bang_pipeline_last_false
+    execute("! true | false; echo $? > #{outf}")
+    assert_equal "0\n", File.read(outf)
+  end
+
+  # ! false | true; echo $?  ->  1  (! negates whole pipeline; last cmd is true)
+  def test_bang_pipeline_last_true
+    execute("! false | true; echo $? > #{outf}")
+    assert_equal "1\n", File.read(outf)
+  end
+
+  # three-stage pipeline: true | true | false; echo $?  ->  1
+  def test_pipe_three_stage_exit_last_false
+    execute("true | true | false; echo $? > #{outf}")
+    assert_equal "1\n", File.read(outf)
+  end
+
+  # three-stage pipeline: false | false | true; echo $?  ->  0
+  def test_pipe_three_stage_exit_last_true
+    execute("false | false | true; echo $? > #{outf}")
+    assert_equal "0\n", File.read(outf)
+  end
+
+  # ! echo hello; echo $?  ->  1  (echo exits 0, ! flips to 1; output still goes through)
+  def test_bang_echo_exit_status
+    execute("! echo hello > #{outf}; echo $? >> #{outf}")
+    assert_equal "hello\n1\n", File.read(outf)
+  end
 end
