@@ -631,4 +631,50 @@ class TestPrintf < Test::Unit::TestCase
     # Missing width arg defaults to 0
     assert_equal '', output
   end
+
+  # Float specifiers must not truncate decimal via to_i — parse_numeric_arg
+  # falls back to String#to_i on non-integer input, losing the fractional part.
+  def test_f_preserves_decimal
+    output = capture_output { Rubish::Builtins.run('printf', ['%.2f', '3.14']) }
+    assert_equal '3.14', output
+  end
+
+  def test_e_preserves_decimal
+    output = capture_output { Rubish::Builtins.run('printf', ['%.2e', '12345.6']) }
+    assert_equal '1.23e+04', output
+  end
+
+  def test_g_preserves_decimal
+    output = capture_output { Rubish::Builtins.run('printf', ['%.4g', '3.14159']) }
+    assert_equal '3.142', output
+  end
+
+  # %f with 'x char-value notation must still work after the float-arg fix.
+  def test_f_char_value_notation
+    output = capture_output { Rubish::Builtins.run('printf', ['%6.2f', "'s"]) }
+    assert_equal '115.00', output
+  end
+
+  # %b bare octal \NNN (no \0 prefix) was silently dropped when %b switched
+  # from process_escape_sequences to process_echo_escapes.
+  def test_b_bare_octal_single_digit
+    output = capture_output { Rubish::Builtins.run('printf', ['%b', '\7']) }
+    assert_equal "\a", output
+  end
+
+  def test_b_bare_octal_three_digits
+    output = capture_output { Rubish::Builtins.run('printf', ['%b', '\101']) }
+    assert_equal 'A', output
+  end
+
+  def test_b_0prefix_octal_unaffected
+    output = capture_output { Rubish::Builtins.run('printf', ['%b', '\0007']) }
+    assert_equal "\a", output
+  end
+
+  # echo -e gets the same bare-octal fix from process_echo_escapes.
+  def test_echo_e_bare_octal
+    output = capture_output { Rubish::Builtins.run('echo', ['-e', '\7']) }
+    assert_equal "\a\n", output
+  end
 end

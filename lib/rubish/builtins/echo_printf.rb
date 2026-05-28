@@ -73,7 +73,7 @@ module Rubish
             result << ECHO_STOP_OUTPUT
             break
           when '0'
-            # Octal escape \0nnn (up to 3 octal digits)
+            # Octal escape \0nnn (up to 3 octal digits after \0)
             i += 2
             octal = +''
             while octal.length < 3 && i < str.length && str[i] >= '0' && str[i] <= '7'
@@ -81,6 +81,11 @@ module Rubish
               i += 1
             end
             result << (octal.empty? ? "\0" : octal.to_i(8).chr)
+          when /[1-7]/
+            # Bare octal escape \NNN (1-3 octal digits, no \0 prefix)
+            octal = str[i + 1, 3].match(/\A[0-7]{1,3}/)[0]
+            result << octal.to_i(8).chr
+            i += 1 + octal.length
           when 'x'
             # Hex escape \xHH (1 or 2 hex digits)
             i += 2
@@ -401,6 +406,13 @@ module Rubish
       Shellwords.escape(str)
     end
 
+    def parse_float_arg(arg)
+      s = arg.to_s
+      return s[1] ? s[1].ord.to_f : 0.0 if s.start_with?("'") || s.start_with?('"')
+
+      s.to_f
+    end
+
     def parse_numeric_arg(arg)
       s = arg.to_s
       # 'x or "x notation: numeric value is the ASCII code of the character after the quote
@@ -451,27 +463,27 @@ module Rubish
                  "#{prefix}#{num.to_s(16).upcase}"
                when 'f', 'F'
                  # Floating point
-                 num = parse_numeric_arg(arg).to_f
+                 num = parse_float_arg(arg)
                  prec = prec_int || 6
                  format("%.#{prec}f", num)
                when 'e'
                  # Scientific notation lowercase
-                 num = parse_numeric_arg(arg).to_f
+                 num = parse_float_arg(arg)
                  prec = prec_int || 6
                  format("%.#{prec}e", num)
                when 'E'
                  # Scientific notation uppercase
-                 num = parse_numeric_arg(arg).to_f
+                 num = parse_float_arg(arg)
                  prec = prec_int || 6
                  format("%.#{prec}E", num)
                when 'g'
                  # Shorter of %e or %f
-                 num = parse_numeric_arg(arg).to_f
+                 num = parse_float_arg(arg)
                  prec = prec_int || 6
                  format("%.#{prec}g", num)
                when 'G'
                  # Shorter of %E or %F
-                 num = parse_numeric_arg(arg).to_f
+                 num = parse_float_arg(arg)
                  prec = prec_int || 6
                  format("%.#{prec}G", num)
                when 'c'
