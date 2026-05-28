@@ -24,20 +24,20 @@ Each file in `test/test_bash_suite_*.rb` corresponds to one or more files in
 | test_bash_suite_ifs.rb       | ifs.tests                                | 15    | 5       |
 | test_bash_suite_invert.rb    | invert.tests                             | 6     | 0       |
 | test_bash_suite_loops.rb     | (while/until, no direct bash file)       | 8     | 0       |
-| test_bash_suite_nquote.rb    | nquote.tests                             | 18    | 2       |
+| test_bash_suite_nquote.rb    | nquote.tests                             | 18    | 3       |
 | test_bash_suite_posixpat.rb  | posixpat.tests                           | 49    | 20      |
 | test_bash_suite_posixpipe.rb | posixpipe.tests                          | 16    | 3       |
-| test_bash_suite_printf.rb    | printf.tests                             | 132   | 20      |
+| test_bash_suite_printf.rb    | printf.tests                             | 132   | 31      |
 | test_bash_suite_quote.rb     | quote.tests                              | 26    | 7       |
 | test_bash_suite_read.rb      | read.tests                               | 22    | 10      |
-| test_bash_suite_redir.rb     | redir.tests                              | 18    | 11      |
+| test_bash_suite_redir.rb     | redir.tests                              | 18    | 12      |
 | test_bash_suite_strip.rb     | strip.tests                              | 10    | 1       |
 | test_bash_suite_subshell.rb  | (subshell, no direct bash file)          | 6     | 1       |
 | test_bash_suite_test.rb      | test.tests                               | 79    | 4       |
 | test_bash_suite_tilde.rb     | tilde.tests                              | 25    | 14      |
 | test_bash_suite_varenv.rb    | varenv.tests                             | 24    | 6       |
 
-**Total: 1013 tests — 766 passing, 0 failing, 247 omitted (76% passing)**
+**Total: 1013 tests — 753 passing, 0 failing, 260 omitted (74% passing)**
 
 ## Not yet covered — practical to add
 
@@ -105,16 +105,16 @@ These cover bash features rubish will not implement:
 
 | #   | Feature                                                                                             | Omissions |
 | --- | --------------------------------------------------------------------------------------------------- | --------- |
-| 1   | Tilde expansion (all forms: `~`, `~/path`, `~+`, `~-`, `~user`, in assignment/export)              | 14        |
+| 1   | Posixpat bracket expressions (extglob, CTLESC, dangling backslash)                                  | 20        |
 | 2   | Parameter expansion: var-as-pattern (`${x#$y}`), positional `${#}`, `${#N}`, `${N}` with braces   | 10        |
-| 3   | Read builtin: IFS variants, file redirect, readonly-var error, trailing-space stripping             | 10        |
-| 4   | Posixpat bracket expressions (extglob, CTLESC, dangling backslash)                                  | 20        |
-| 5   | Appendop: `typeset -i` arithmetic, array literal `+=`, command-local `+=` prefix                   | 13        |
-| 6   | Builtins: eval double-expansion, `builtin`/`command` keyword, `declare -p`, alias format           | 12        |
-| 7   | Brace expansion edge cases (empty braces, lone `}`, escaped braces, var in list)                   | 6         |
-| 8   | Subshell exit code propagated to `$?`                                                               | 3         |
-| 9   | Stderr and fd redirect (`>&2`, `2>&1`)                                                              | 3         |
-| 10  | Case statement edge cases (`;& ` fallthrough, `;;& ` continue, reserved word pattern)              | 4         |
+| 3   | Tilde expansion (all forms: `~`, `~/path`, `~+`, `~-`, `~user`, in assignment/export)              | 14        |
+| 4   | Appendop: `typeset -i` arithmetic, array literal `+=`, command-local `+=` prefix                   | 13        |
+| 5   | Builtins: eval double-expansion, `builtin`/`command` keyword, `declare -p`, alias format           | 12        |
+| 6   | printf `'x` char-value notation for numeric formats (`%d`, `%o`, `%x`, `%f`)                       | 5         |
+| 7   | printf `%b` precision/width truncation (like `%s` but after escape expansion)                       | 5         |
+| 8   | Read builtin: IFS variants, file redirect, readonly-var error, trailing-space stripping             | 10        |
+| 9   | printf format repetition when args exceed format slots                                              | 2         |
+| 10  | Brace expansion edge cases (empty braces, lone `}`, escaped braces, var in list)                   | 6         |
 
 ## Common omit reasons
 
@@ -126,11 +126,11 @@ These cover bash features rubish will not implement:
 | builtin/command keyword, eval double-expansion, declare -p    | 12    |
 | read: IFS variants, file redirect, trailing-space, readonly   | 10    |
 | param expansion: var-as-pattern, ${#}, ${#N}, ${N} with {}   | 10    |
+| printf 'x char-value, %b precision, format repeat, octal fmt | 14    |
 | quote/nquote: backslash-newline continuation, $'...' in dquot | 9     |
-| comsub edge cases (inline concat, backtick escapes, exit)     | 6     |
+| heredoc: backslash-newline join, multiple heredocs, dquote    | 7     |
 | brace expansion edge cases                                    | 6     |
+| comsub edge cases (inline concat, backtick escapes, exit)     | 6     |
+| IFS: typeset/env-prefix local IFS, eval split, posix mode    | 5     |
 | case ;& / ;;& fallthrough not yet supported                   | 4     |
 | subshell exit code not propagated to $?                       | 3     |
-| stderr redirect >&2 / fd dup 2>&1 not yet working             | 3     |
-| IFS: typeset/env-prefix local IFS, eval split, posix mode    | 5     |
-| heredoc: backslash-newline join, multiple heredocs, dquote    | 7     |
