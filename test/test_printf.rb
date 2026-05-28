@@ -324,20 +324,17 @@ class TestPrintf < Test::Unit::TestCase
 
   def test_printf_q_double_quote
     output = capture_output { Rubish::Builtins.run('printf', ['%q', 'say "hello"']) }
-    # Double quotes inside single quotes are safe
-    assert_match(/'say "hello"'/, output)
+    assert_equal 'say\ \"hello\"', output
   end
 
   def test_printf_q_special_chars
     output = capture_output { Rubish::Builtins.run('printf', ['%q', 'a*b?c']) }
-    # Glob characters should be quoted
-    assert_match(/^'a\*b\?c'$/, output)
+    assert_equal 'a\*b\?c', output
   end
 
   def test_printf_q_dollar_sign
     output = capture_output { Rubish::Builtins.run('printf', ['%q', '$HOME']) }
-    # Dollar sign should be quoted to prevent expansion
-    assert_match(/'\$HOME'/, output)
+    assert_equal '\$HOME', output
   end
 
   def test_printf_q_backslash
@@ -387,20 +384,17 @@ class TestPrintf < Test::Unit::TestCase
 
   def test_printf_q_semicolon
     output = capture_output { Rubish::Builtins.run('printf', ['%q', 'cmd1; cmd2']) }
-    # Semicolon should be quoted
-    assert_match(/'cmd1; cmd2'/, output)
+    assert_equal 'cmd1\;\ cmd2', output
   end
 
   def test_printf_q_pipe
     output = capture_output { Rubish::Builtins.run('printf', ['%q', 'a|b']) }
-    # Pipe should be quoted
-    assert_match(/'a\|b'/, output)
+    assert_equal 'a\|b', output
   end
 
   def test_printf_q_parentheses
     output = capture_output { Rubish::Builtins.run('printf', ['%q', '(subshell)']) }
-    # Parentheses should be quoted
-    assert_match(/'\(subshell\)'/, output)
+    assert_equal '\(subshell\)', output
   end
 
   def test_printf_q_via_repl
@@ -409,6 +403,36 @@ class TestPrintf < Test::Unit::TestCase
     capture_output do
       result = Rubish::Builtins.run('printf', ['%q\n', 'hello world'])
       assert result
+    end
+  end
+
+  # shell_quote: strings with shell metacharacters get backslash-escaped (bash printf %q style)
+  def test_shell_quote_backslash_escapes_metacharacters
+    {
+      '$HOME'       => '\$HOME',
+      'a*b?c'       => 'a\*b\?c',
+      'cmd1; cmd2'  => 'cmd1\;\ cmd2',
+      'a|b'         => 'a\|b',
+      '(subshell)'  => '\(subshell\)',
+      'this&that'   => 'this\&that',
+      'say "hello"' => 'say\ \"hello\"',
+    }.each do |input, expected|
+      output = capture_output { Rubish::Builtins.run('printf', ['%q', input]) }
+      assert_equal expected, output, "shell_quote(#{input.inspect})"
+    end
+  end
+
+  # shell_quote: strings containing single quotes use $'...' syntax
+  def test_shell_quote_single_quote_uses_dollar_syntax
+    output = capture_output { Rubish::Builtins.run('printf', ['%q', "it's"]) }
+    assert_equal "$'it\\'s'", output
+  end
+
+  # shell_quote: safe strings pass through unquoted
+  def test_shell_quote_safe_strings_unquoted
+    %w[hello file.txt /usr/bin foo-bar_baz].each do |s|
+      output = capture_output { Rubish::Builtins.run('printf', ['%q', s]) }
+      assert_equal s, output, "shell_quote(#{s.inspect}) should be unquoted"
     end
   end
 
