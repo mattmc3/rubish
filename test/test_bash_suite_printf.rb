@@ -100,7 +100,6 @@ class TestBash_Printf < Test::Unit::TestCase
 
   # printf repeats format: printf "%s\n" a b c  ->  a\nb\nc\n
   def test_printf_repeats_format
-    omit 'printf does not repeat format for extra args'
     execute("printf '%s\\n' a b c > #{outf}")
     assert_equal "a\nb\nc\n", File.read(outf)
   end
@@ -190,7 +189,6 @@ class TestBash_Printf < Test::Unit::TestCase
 
   # printf "%d " 1 2 3 4 5  ->  1 2 3 4 5 (format reused)
   def test_printf_d_format_reused
-    omit 'printf does not repeat format for extra args'
     execute("printf '%d ' 1 2 3 4 5 > #{outf}")
     assert_equal "1 2 3 4 5 ", File.read(outf)
   end
@@ -222,7 +220,6 @@ class TestBash_Printf < Test::Unit::TestCase
   # printf -- "--%b--\n" '\t\0101'  ->  --\tA--\n  (\0101 = octal 010 = 'A' then '1'? actually \010 = 8 = backspace, \0101 = \010 then '1')
   # .right line 33: --\tA--  so \0101 = 'A' (octal 101 = 65 = 'A')
   def test_printf_b_octal_101
-    omit '%b: \\0NNN 4-char octal not handled correctly'
     execute("printf -- '--%b--\\n' '\\t\\0101' > #{outf}")
     assert_equal "--\tA--\n", File.read(outf)
   end
@@ -332,14 +329,12 @@ class TestBash_Printf < Test::Unit::TestCase
 
   # printf "%4.2b\n" 4.4BSD  ->  "  4.\n"
   def test_printf_b_width_and_precision
-    omit '%b does not support precision (string truncation)'
     execute("printf '%4.2b\\n' 4.4BSD > #{outf}")
     assert_equal "  4.\n", File.read(outf)
   end
 
   # printf "%.3b\n" 4.4BSD  ->  "4.4\n"
   def test_printf_b_precision_only
-    omit '%b does not support precision (string truncation)'
     execute("printf '%.3b\\n' 4.4BSD > #{outf}")
     assert_equal "4.4\n", File.read(outf)
   end
@@ -448,35 +443,30 @@ class TestBash_Printf < Test::Unit::TestCase
 
   # printf "%d\n" "'string'"  ->  115\n  (ASCII value of 's')
   def test_printf_d_char_value
-    omit "printf: 'x char-value notation not supported"
     execute("printf '%d\\n' \"'string'\" > #{outf}")
     assert_equal "115\n", File.read(outf)
   end
 
   # printf "%#o\n" "'string'"  ->  0163\n
   def test_printf_o_char_value
-    omit "printf: 'x char-value notation not supported"
     execute("printf '%#o\\n' \"'string'\" > #{outf}")
     assert_equal "0163\n", File.read(outf)
   end
 
   # printf "%#x\n" "'string'"  ->  0x73\n
   def test_printf_x_char_value
-    omit "printf: 'x char-value notation not supported"
     execute("printf '%#x\\n' \"'string'\" > #{outf}")
     assert_equal "0x73\n", File.read(outf)
   end
 
   # printf "%#X\n" '"string"'  ->  0X73\n
   def test_printf_X_char_value
-    omit "printf: 'x char-value notation not supported"
     execute("printf '%#X\\n' '\"string\"' > #{outf}")
     assert_equal "0X73\n", File.read(outf)
   end
 
   # printf "%6.2f\n" "'string'"  ->  115.00\n
   def test_printf_f_char_value
-    omit "printf: 'x char-value notation not supported"
     execute("printf '%6.2f\\n' \"'string'\" > #{outf}")
     assert_equal "115.00\n", File.read(outf)
   end
@@ -489,7 +479,6 @@ class TestBash_Printf < Test::Unit::TestCase
 
   # printf -- "--%6.4b--\n" abcdefghijklmnopqrstuvwxyz  ->  --  abcd--\n
   def test_printf_b_width_precision_long
-    omit '%b does not support precision (string truncation)'
     execute("printf -- '--%6.4b--\\n' abcdefghijklmnopqrstuvwxyz > #{outf}")
     assert_equal "--  abcd--\n", File.read(outf)
   end
@@ -502,7 +491,6 @@ class TestBash_Printf < Test::Unit::TestCase
 
   # printf -- "--%12.10b--\n" abcdefghijklmnopqrstuvwxyz  ->  --  abcdefghij--\n
   def test_printf_b_width_precision_long2
-    omit '%b does not support precision (string truncation)'
     execute("printf -- '--%12.10b--\\n' abcdefghijklmnopqrstuvwxyz > #{outf}")
     assert_equal "--  abcdefghij--\n", File.read(outf)
   end
@@ -534,14 +522,12 @@ class TestBash_Printf < Test::Unit::TestCase
 
   # printf "%d\n" 0x1a  ->  26\n  (hex input)
   def test_printf_d_hex_input
-    omit 'printf: 0x hex input not parsed as integer'
     execute("printf '%d\\n' 0x1a > #{outf}")
     assert_equal "26\n", File.read(outf)
   end
 
   # printf "%d\n" 032  ->  26\n  (octal input)
   def test_printf_d_octal_input
-    omit 'printf: 0-prefix octal input not parsed as integer'
     execute("printf '%d\\n' 032 > #{outf}")
     assert_equal "26\n", File.read(outf)
   end
@@ -560,7 +546,6 @@ class TestBash_Printf < Test::Unit::TestCase
 
   # printf '%.0b-%.0s\n' foo bar  ->  "-\n"
   def test_printf_b_s_zero_precision
-    omit '%b does not support precision (string truncation)'
     execute("printf '%.0b-%.0s\\n' foo bar > #{outf}")
     assert_equal "-\n", File.read(outf)
   end
@@ -579,7 +564,6 @@ class TestBash_Printf < Test::Unit::TestCase
 
   # printf '%b\n' '\0007'  ->  ^G (BEL)
   def test_printf_b_octal_0007
-    omit '%b: \\0NNN 4-char octal not handled correctly'
     execute("printf '%b\\n' '\\0007' > #{outf}")
     assert_equal "\a\n", File.read(outf)
   end
