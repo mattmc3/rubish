@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'shellwords'
+
 module Rubish
   module Builtins
     ECHO_STOP_OUTPUT = "\x00STOP_OUTPUT\x00"
@@ -391,16 +393,8 @@ module Rubish
         } + "'"
       end
 
-      # For strings with single quotes, use $'...' syntax
-      if str.include?("'")
-        return "$'" + str.gsub(/['\\]/) { |c|
-          c == "'" ? "\\'" : '\\\\'
-        } + "'"
-      end
-
-      # For other special characters, use single quotes
-      # (single quotes preserve everything literally except single quote itself)
-      "'" + str + "'"
+      # For all other strings, use Shellwords.escape (backslash-escaping like bash %q)
+      Shellwords.escape(str)
     end
 
     def format_arg(specifier, arg, flags, width, precision)

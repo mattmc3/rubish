@@ -1295,6 +1295,9 @@ module Rubish
         handle_bare_assignments([result.name] + result.args)
         @last_status = 0
         @pipestatus = [0]
+      elsif result.is_a?(Command) && Builtins.builtin?(result.name)
+        run_builtin_with_redirects(result)
+        @pipestatus = [@last_status]
       elsif result.is_a?(Command) || result.is_a?(Pipeline) || result.is_a?(Subshell) || result.is_a?(HeredocCommand)
         result.run
         # Update PIPESTATUS array
@@ -1314,6 +1317,26 @@ module Rubish
       @last_bg_pid = @context.last_bg_pid
 
       result
+    end
+
+    def run_builtin_with_redirects(cmd)
+      saved_stdout, saved_stderr, saved_stdin = $stdout, $stderr, $stdin
+      begin
+        $stdout = cmd.stdout if cmd.stdout.is_a?(IO)
+        $stdout = $stderr   if cmd.stdout == :stderr
+        $stderr = cmd.stderr if cmd.stderr.is_a?(IO)
+        $stderr = $stdout   if cmd.stderr == :stdout
+        $stdin  = cmd.stdin  if cmd.stdin.is_a?(IO)
+        success = Builtins.run(cmd.name, cmd.args)
+        @last_status = success.is_a?(ExitStatus) ? success.exitstatus : (success ? 0 : 1)
+      ensure
+        $stdout = saved_stdout
+        $stderr = saved_stderr
+        $stdin  = saved_stdin
+        cmd.stdout.close if cmd.stdout.is_a?(IO) && !cmd.stdout.closed?
+        cmd.stderr.close if cmd.stderr.is_a?(IO) && !cmd.stderr.closed?
+        cmd.stdin.close  if cmd.stdin.is_a?(IO)  && !cmd.stdin.closed?
+      end
     end
 
     def call_function_with_redirects(cmd)

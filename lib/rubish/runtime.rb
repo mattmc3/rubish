@@ -1140,15 +1140,35 @@ module Rubish
         check_errexit
         # Return ExitStatus to prevent eval_in_context from trying to run command again
         ExitStatus.new(@last_status)
-      elsif result.is_a?(Command) && Builtins.builtin?(result.name) && !result.stdout && !result.stderr
-        # Run builtins without explicit redirects in current process
-        # This allows them to respect $stdout set by __with_redirect for compound commands
-        success = Builtins.run(result.name, result.args)
-        @last_status = success.is_a?(ExitStatus) ? success.exitstatus : (success ? 0 : 1)
-        run_err_trap_if_failed
-        check_errexit
-        # Return ExitStatus so callers (like Subshell) know the real exit status
-        ExitStatus.new(@last_status)
+      elsif result.is_a?(Command) && Builtins.builtin?(result.name)
+        # Run builtins in current process, applying any explicit redirects in Ruby
+        # (without forking) so $stdout/$stderr/$stdin are temporarily swapped
+        saved_stdout, saved_stderr, saved_stdin = $stdout, $stderr, $stdin
+        begin
+          if result.stdout.is_a?(IO)
+            $stdout = result.stdout
+          elsif result.stdout == :stderr
+            $stdout = $stderr
+          end
+          if result.stderr.is_a?(IO)
+            $stderr = result.stderr
+          elsif result.stderr == :stdout
+            $stderr = $stdout
+          end
+          $stdin = result.stdin if result.stdin.is_a?(IO)
+          success = Builtins.run(result.name, result.args)
+          @last_status = success.is_a?(ExitStatus) ? success.exitstatus : (success ? 0 : 1)
+          run_err_trap_if_failed
+          check_errexit
+          ExitStatus.new(@last_status)
+        ensure
+          $stdout = saved_stdout
+          $stderr = saved_stderr
+          $stdin = saved_stdin
+          result.stdout.close if result.stdout.is_a?(IO) && !result.stdout.closed?
+          result.stderr.close if result.stderr.is_a?(IO) && !result.stderr.closed?
+          result.stdin.close if result.stdin.is_a?(IO) && !result.stdin.closed?
+        end
       elsif result.is_a?(Command) && @functions.key?(result.name)
         # Call user-defined function with redirects
         status = call_function_with_redirects(result)
