@@ -44,7 +44,9 @@ module Rubish
       end
 
       if newline
-        puts output
+        # Use print instead of puts: puts suppresses the trailing newline if the
+        # string already ends with one, which breaks echo $'\n' producing only 1 newline.
+        print output + "\n"
       else
         print output
       end
@@ -369,20 +371,12 @@ module Rubish
     end
 
     def shell_quote(str)
-      # Quote a string for safe reuse as shell input (like bash's printf %q)
-      # Returns a string that, when parsed by the shell, yields the original string
-
-      # Empty string needs explicit quoting
       return "''" if str.empty?
 
-      # If string contains only safe characters, no quoting needed
-      # Safe chars: alphanumeric, underscore, hyphen, dot, slash, colon, at, percent, plus, comma, equals
-      if str.match?(/\A[a-zA-Z0-9_\-.\/:@%+=,]+\z/)
-        return str
-      end
+      return str if str.match?(/\A[a-zA-Z0-9_\-.\/:@%+=,]+\z/)
 
-      # Use $'...' syntax for strings with control characters
-      if str.match?(/[\x00-\x1f\x7f]/)
+      # Control chars or single quotes: use $'...' syntax
+      if str.match?(/[\x00-\x1f\x7f']/)
         return "$'" + str.gsub(/[\x00-\x1f\x7f'\\]/) { |c|
           case c
           when "\n" then '\\n'
@@ -395,14 +389,12 @@ module Rubish
           when "\e" then '\\e'
           when "'" then "\\'"
           when '\\' then '\\\\'
-          else
-            # Other control characters as octal
-            format('\\%03o', c.ord)
+          else format('\\%03o', c.ord)
           end
         } + "'"
       end
 
-      # For all other strings, use Shellwords.escape (backslash-escaping like bash %q)
+      # Backslash-escape remaining metacharacters (bash printf %q style)
       Shellwords.escape(str)
     end
 
