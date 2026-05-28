@@ -7,13 +7,15 @@ Each file in `test/test_bash_suite_*.rb` corresponds to one or more files in
 
 | Test file                    | Bash source                              | Tests | Omitted |
 | ---------------------------- | ---------------------------------------- | ----- | ------- |
+| Test file                    | Bash source                              | Tests | Omitted |
+| ---------------------------- | ---------------------------------------- | ----- | ------- |
 | test_bash_suite_appendop.rb  | appendop.tests                           | 19    | 13      |
 | test_bash_suite_arith.rb     | arith.tests                              | 63    | 1       |
 | test_bash_suite_arith_for.rb | arith-for.tests                          | 20    | 5       |
-| test_bash_suite_array.rb     | array.tests                              | 10    | 2       |
-| test_bash_suite_braces.rb    | braces.tests                             | 24    | 6       |
+| test_bash_suite_array.rb     | array.tests                              | 47    | 26      |
+| test_bash_suite_braces.rb    | braces.tests                             | 89    | 29      |
 | test_bash_suite_builtins.rb  | builtins.tests                           | 46    | 12      |
-| test_bash_suite_case.rb      | case.tests                               | 16    | 4       |
+| test_bash_suite_case.rb      | case.tests                               | 30    | 10      |
 | test_bash_suite_comsub.rb    | comsub.tests                             | 25    | 6       |
 | test_bash_suite_cond.rb      | cond.tests                               | 52    | 6       |
 | test_bash_suite_exp.rb       | exp.tests, new-exp.tests, more-exp.tests | 110   | 20      |
@@ -25,17 +27,17 @@ Each file in `test/test_bash_suite_*.rb` corresponds to one or more files in
 | test_bash_suite_nquote.rb    | nquote.tests                             | 18    | 2       |
 | test_bash_suite_posixpat.rb  | posixpat.tests                           | 49    | 20      |
 | test_bash_suite_posixpipe.rb | posixpipe.tests                          | 16    | 3       |
-| test_bash_suite_printf.rb    | printf.tests                             | 20    | 0       |
+| test_bash_suite_printf.rb    | printf.tests                             | 132   | 20      |
 | test_bash_suite_quote.rb     | quote.tests                              | 26    | 7       |
 | test_bash_suite_read.rb      | read.tests                               | 22    | 10      |
-| test_bash_suite_redir.rb     | redir.tests                              | 8     | 3       |
+| test_bash_suite_redir.rb     | redir.tests                              | 18    | 11      |
 | test_bash_suite_strip.rb     | strip.tests                              | 10    | 1       |
 | test_bash_suite_subshell.rb  | (subshell, no direct bash file)          | 6     | 1       |
 | test_bash_suite_test.rb      | test.tests                               | 79    | 4       |
 | test_bash_suite_tilde.rb     | tilde.tests                              | 25    | 14      |
 | test_bash_suite_varenv.rb    | varenv.tests                             | 24    | 6       |
 
-**Total: 775 tests — 609 passing, 0 failing, 166 omitted (79% passing)**
+**Total: 1013 tests — 766 passing, 0 failing, 247 omitted (76% passing)**
 
 ## Not yet covered — practical to add
 

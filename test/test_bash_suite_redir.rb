@@ -83,4 +83,92 @@ class TestBash_Redir < Test::Unit::TestCase
     execute('set +o noclobber')
     assert_equal "second\n", File.read(outf)
   end
+
+  # noclobber: > on a new file succeeds
+  def test_redir_noclobber_new_file_ok
+    f2 = "#{@tempdir}/new"
+    execute('set -o noclobber')
+    execute("echo hello > #{f2}")
+    execute('set +o noclobber')
+    assert_equal "hello\n", File.read(f2)
+  end
+
+  # >| on a new file (no pre-existing file)
+  def test_redir_clobber_override_new_file
+    execute("echo newfile >| #{outf}")
+    assert_equal "newfile\n", File.read(outf)
+  end
+
+  # null redirect: > file creates empty file
+  def test_redir_null_creates_empty_file
+    omit 'bare null redirect does not create file'
+    execute("> #{outf}")
+    assert File.exist?(outf)
+    assert_equal '', File.read(outf)
+  end
+
+  # block redirect: { cmds } > file captures output
+  def test_redir_block_to_file
+    omit 'block redirect { } > file not supported'
+    f2 = "#{@tempdir}/blk"
+    execute("{ echo before; echo after; } > #{f2}")
+    assert_equal "before\nafter\n", File.read(f2)
+  end
+
+  # exec N>file opens fd for writing
+  def test_redir_exec_fd_write
+    omit 'exec FD-only redirect not supported'
+    fa = "#{@tempdir}/a"
+    execute("exec 4>#{fa}")
+    execute('echo to4 1>&4')
+    execute('exec 4>&-')
+    assert_equal "to4\n", File.read(fa)
+  end
+
+  # exec N>file and exec M>file open two fds simultaneously
+  def test_redir_exec_two_fds
+    omit 'exec FD-only redirect not supported'
+    fa = "#{@tempdir}/a"
+    fb = "#{@tempdir}/b"
+    execute("exec 4>#{fa}; exec 5>#{fb}")
+    execute('echo toa 1>&4; echo tob 1>&5')
+    execute('exec 4>&- 5>&-')
+    assert_equal "toa\n", File.read(fa)
+    assert_equal "tob\n", File.read(fb)
+  end
+
+  # exec N<>file opens fd for read/write
+  def test_redir_exec_fd_readwrite
+    omit 'exec FD-only redirect not supported'
+    f2 = "#{@tempdir}/rw"
+    execute("exec 6<>#{f2}")
+    execute('echo torw 1>&6')
+    execute('exec 6<&-')
+    assert_equal "torw\n", File.read(f2)
+  end
+
+  # exec N<file opens fd for reading
+  def test_redir_exec_fd_read
+    omit 'exec FD-only redirect not supported'
+    src = "#{@tempdir}/src"
+    File.write(src, "srcline\n")
+    execute("exec 3<#{src}")
+    execute("read line <&3; echo $line > #{outf}")
+    execute('exec 3<&-')
+    assert_equal "srcline\n", File.read(outf)
+  end
+
+  # while read line; done << EOF passes lines from heredoc
+  def test_redir_while_read_heredoc
+    omit 'while read loop with heredoc input not supported'
+    execute("while read line; do echo $line >> #{outf}; done <<EOF\nab\ncd\nEOF")
+    assert_equal "ab\ncd\n", File.read(outf)
+  end
+
+  # while read loop: variable set inside loop persists after loop ends
+  def test_redir_while_read_heredoc_var_persists
+    omit 'while read loop variable does not persist after loop'
+    execute("while read line; do l2=$line; done <<EOF\nab\ncd\nEOF\necho $l2 > #{outf}")
+    assert_equal "cd\n", File.read(outf)
+  end
 end
