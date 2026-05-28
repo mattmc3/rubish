@@ -151,133 +151,137 @@ module Rubish
       # Process escape sequences in format string
       format = process_escape_sequences(format)
 
-      # Build output by processing format specifiers
+      # Build output by processing format specifiers.
+      # Repeat format string until all arguments are consumed (bash behavior).
       output = +''
-      i = 0
-      while i < format.length
-        if format[i] == '%'
-          if i + 1 < format.length && format[i + 1] == '%'
-            # Literal %
-            output << '%'
-            i += 2
-            next
-          end
-
-          # Parse format specifier
-          spec_start = i
-          i += 1
-
-          # Check for %(strftime_format)T time format
-          if i < format.length && format[i] == '('
-            # Find the closing )T
-            paren_start = i + 1
-            paren_end = format.index(')T', i)
-            if paren_end
-              strftime_fmt = format[paren_start...paren_end]
-              i = paren_end + 2  # Skip past )T
-
-              # Get the time argument
-              arg = if arg_index < arguments.length
-                      arguments[arg_index]
-                    else
-                      '-1'  # Default to current time
-                    end
-              arg_index += 1
-
-              # Convert argument to time
-              time = case arg.to_s
-                     when '-1', ''
-                       Time.now
-                     when '-2'
-                       # Shell start time - use a class variable or fall back to current
-                       @shell_start_time ||= Time.now
-                     else
-                       Time.at(arg.to_i)
-                     end
-
-              output << time.strftime(strftime_fmt)
+      begin
+        prev_arg_index = arg_index
+        i = 0
+        while i < format.length
+          if format[i] == '%'
+            if i + 1 < format.length && format[i + 1] == '%'
+              # Literal %
+              output << '%'
+              i += 2
               next
             end
-          end
 
-          # Parse flags
-          flags = +''
-          while i < format.length && '-+ #0'.include?(format[i])
-            flags << format[i]
+            # Parse format specifier
+            spec_start = i
             i += 1
-          end
 
-          # Parse width (can be * for dynamic width from argument)
-          width = +''
-          if i < format.length && format[i] == '*'
-            # Dynamic width from argument
-            i += 1
-            width_arg = if arg_index < arguments.length
-                          arguments[arg_index]
-                        else
-                          '0'
-                        end
-            arg_index += 1
-            width_val = width_arg.to_i
-            # Negative width means left-align
-            if width_val < 0
-              flags << '-' unless flags.include?('-')
-              width_val = width_val.abs
+            # Check for %(strftime_format)T time format
+            if i < format.length && format[i] == '('
+              # Find the closing )T
+              paren_start = i + 1
+              paren_end = format.index(')T', i)
+              if paren_end
+                strftime_fmt = format[paren_start...paren_end]
+                i = paren_end + 2  # Skip past )T
+
+                # Get the time argument
+                arg = if arg_index < arguments.length
+                        arguments[arg_index]
+                      else
+                        '-1'  # Default to current time
+                      end
+                arg_index += 1
+
+                # Convert argument to time
+                time = case arg.to_s
+                       when '-1', ''
+                         Time.now
+                       when '-2'
+                         # Shell start time - use a class variable or fall back to current
+                         @shell_start_time ||= Time.now
+                       else
+                         Time.at(arg.to_i)
+                       end
+
+                output << time.strftime(strftime_fmt)
+                next
+              end
             end
-            width = width_val.to_s
-          else
-            while i < format.length && format[i] =~ /\d/
-              width << format[i]
+
+            # Parse flags
+            flags = +''
+            while i < format.length && '-+ #0'.include?(format[i])
+              flags << format[i]
               i += 1
             end
-          end
 
-          # Parse precision (can be * for dynamic precision from argument)
-          precision = nil
-          if i < format.length && format[i] == '.'
-            i += 1
+            # Parse width (can be * for dynamic width from argument)
+            width = +''
             if i < format.length && format[i] == '*'
-              # Dynamic precision from argument
+              # Dynamic width from argument
               i += 1
-              prec_arg = if arg_index < arguments.length
-                           arguments[arg_index]
-                         else
-                           '0'
-                         end
+              width_arg = if arg_index < arguments.length
+                            arguments[arg_index]
+                          else
+                            '0'
+                          end
               arg_index += 1
-              prec_val = prec_arg.to_i
-              # Negative precision is treated as if precision were omitted
-              precision = prec_val >= 0 ? prec_val.to_s : nil
+              width_val = width_arg.to_i
+              # Negative width means left-align
+              if width_val < 0
+                flags << '-' unless flags.include?('-')
+                width_val = width_val.abs
+              end
+              width = width_val.to_s
             else
-              precision = +''
               while i < format.length && format[i] =~ /\d/
-                precision << format[i]
+                width << format[i]
                 i += 1
               end
             end
-          end
 
-          # Parse conversion specifier
-          if i < format.length
-            specifier = format[i]
+            # Parse precision (can be * for dynamic precision from argument)
+            precision = nil
+            if i < format.length && format[i] == '.'
+              i += 1
+              if i < format.length && format[i] == '*'
+                # Dynamic precision from argument
+                i += 1
+                prec_arg = if arg_index < arguments.length
+                               arguments[arg_index]
+                             else
+                               '0'
+                             end
+                arg_index += 1
+                prec_val = prec_arg.to_i
+                # Negative precision is treated as if precision were omitted
+                precision = prec_val >= 0 ? prec_val.to_s : nil
+              else
+                precision = +''
+                while i < format.length && format[i] =~ /\d/
+                  precision << format[i]
+                  i += 1
+                end
+              end
+            end
+
+            # Parse conversion specifier
+            if i < format.length
+              specifier = format[i]
+              i += 1
+
+              # Get argument (reuse arguments if we run out)
+              arg = if arg_index < arguments.length
+                      arguments[arg_index]
+                    else
+                      specifier =~ /[diouxXeEfFgG]/ ? '0' : ''
+                    end
+              arg_index += 1
+
+              # Format the argument
+              output << format_arg(specifier, arg, flags, width, precision)
+            end
+          else
+            output << format[i]
             i += 1
-
-            # Get argument (reuse arguments if we run out)
-            arg = if arg_index < arguments.length
-                    arguments[arg_index]
-                  else
-                    specifier =~ /[diouxXeEfFgG]/ ? '0' : ''
-                  end
-            arg_index += 1
-
-            # Format the argument
-            output << format_arg(specifier, arg, flags, width, precision)
           end
-        else
-          output << format[i]
-          i += 1
         end
-      end
+      end while arg_index < arguments.length && arg_index > prev_arg_index
 
       if var_name
         # Assign to variable instead of printing
@@ -397,6 +401,16 @@ module Rubish
       Shellwords.escape(str)
     end
 
+    def parse_numeric_arg(arg)
+      s = arg.to_s
+      # 'x or "x notation: numeric value is the ASCII code of the character after the quote
+      return s[1] ? s[1].ord : 0 if s.start_with?("'") || s.start_with?('"')
+
+      Integer(s, 0)
+    rescue ArgumentError
+      s.to_i
+    end
+
     def format_arg(specifier, arg, flags, width, precision)
       width_int = width.empty? ? nil : width.to_i
       prec_int = precision.nil? ? nil : (precision.empty? ? 0 : precision.to_i)
@@ -409,7 +423,7 @@ module Rubish
                  s
                when 'd', 'i'
                  # Signed integer
-                 num = arg.to_i
+                 num = parse_numeric_arg(arg)
                  if prec_int
                    format("%0#{prec_int}d", num)
                  else
@@ -417,55 +431,58 @@ module Rubish
                  end
                when 'u'
                  # Unsigned integer
-                 num = arg.to_i
+                 num = parse_numeric_arg(arg)
                  num = num & 0xFFFFFFFF if num < 0
                  num.to_s
                when 'o'
                  # Octal
-                 num = arg.to_i
+                 num = parse_numeric_arg(arg)
                  prefix = flags.include?('#') ? '0' : ''
                  "#{prefix}#{num.to_s(8)}"
                when 'x'
                  # Hexadecimal lowercase
-                 num = arg.to_i
+                 num = parse_numeric_arg(arg)
                  prefix = flags.include?('#') ? '0x' : ''
                  "#{prefix}#{num.to_s(16)}"
                when 'X'
                  # Hexadecimal uppercase
-                 num = arg.to_i
+                 num = parse_numeric_arg(arg)
                  prefix = flags.include?('#') ? '0X' : ''
                  "#{prefix}#{num.to_s(16).upcase}"
                when 'f', 'F'
                  # Floating point
-                 num = arg.to_f
+                 num = parse_numeric_arg(arg).to_f
                  prec = prec_int || 6
                  format("%.#{prec}f", num)
                when 'e'
                  # Scientific notation lowercase
-                 num = arg.to_f
+                 num = parse_numeric_arg(arg).to_f
                  prec = prec_int || 6
                  format("%.#{prec}e", num)
                when 'E'
                  # Scientific notation uppercase
-                 num = arg.to_f
+                 num = parse_numeric_arg(arg).to_f
                  prec = prec_int || 6
                  format("%.#{prec}E", num)
                when 'g'
                  # Shorter of %e or %f
-                 num = arg.to_f
+                 num = parse_numeric_arg(arg).to_f
                  prec = prec_int || 6
                  format("%.#{prec}g", num)
                when 'G'
                  # Shorter of %E or %F
-                 num = arg.to_f
+                 num = parse_numeric_arg(arg).to_f
                  prec = prec_int || 6
                  format("%.#{prec}G", num)
                when 'c'
                  # Character
                  arg.to_s[0] || ''
                when 'b'
-                 # String with backslash escapes
-                 process_escape_sequences(arg.to_s)
+                 # String with echo-style backslash escapes (\0NNN octal, \t, \n, etc.)
+                 expanded = process_echo_escapes(arg.to_s)
+                 expanded = expanded.split(ECHO_STOP_OUTPUT).first || '' if expanded.include?(ECHO_STOP_OUTPUT)
+                 expanded = expanded[0, prec_int] if prec_int
+                 expanded
                when 'q'
                  # Shell-quoted string (safe for reuse as shell input)
                  shell_quote(arg.to_s)
