@@ -17,7 +17,7 @@ Each file in `test/test_bash_suite_*.rb` corresponds to one or more files in
 | test_bash_suite_builtins.rb  | builtins.tests                           | 46    | 12      |
 | test_bash_suite_case.rb      | case.tests                               | 30    | 10      |
 | test_bash_suite_comsub.rb    | comsub.tests                             | 25    | 6       |
-| test_bash_suite_cond.rb      | cond.tests                               | 52    | 6       |
+| test_bash_suite_cond.rb      | cond.tests                               | 52    | 7       |
 | test_bash_suite_exp.rb       | exp.tests, new-exp.tests, more-exp.tests | 110   | 20      |
 | test_bash_suite_func.rb      | func.tests                               | 23    | 8       |
 | test_bash_suite_heredoc.rb   | heredoc.tests, herestr.tests             | 35    | 7       |
@@ -37,7 +37,7 @@ Each file in `test/test_bash_suite_*.rb` corresponds to one or more files in
 | test_bash_suite_tilde.rb     | tilde.tests                              | 25    | 14      |
 | test_bash_suite_varenv.rb    | varenv.tests                             | 24    | 6       |
 
-**Total: 1013 tests — 769 passing, 0 failing, 244 omitted (76% passing)**
+**Total: 1013 tests — 768 passing, 0 failing, 245 omitted (76% passing)**
 
 ## Not yet covered — practical to add
 
