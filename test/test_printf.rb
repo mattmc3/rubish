@@ -317,26 +317,25 @@ class TestPrintf < Test::Unit::TestCase
   end
 
   def test_printf_q_single_quote
-    omit "printf %q: single quote not escaped with \$'...' syntax"
     output = capture_output { Rubish::Builtins.run('printf', ['%q', "it's"]) }
     # Should escape the single quote using $'...' syntax
     assert_match(/\$'it\\'s'/, output)
   end
 
   def test_printf_q_double_quote
-    omit 'printf %q: special chars not quoted correctly'
+
     output = capture_output { Rubish::Builtins.run('printf', ['%q', 'say "hello"']) }
     assert_equal 'say\ \"hello\"', output
   end
 
   def test_printf_q_special_chars
-    omit 'printf %q: special chars not quoted correctly'
+
     output = capture_output { Rubish::Builtins.run('printf', ['%q', 'a*b?c']) }
     assert_equal 'a\*b\?c', output
   end
 
   def test_printf_q_dollar_sign
-    omit 'printf %q: special chars not quoted correctly'
+
     output = capture_output { Rubish::Builtins.run('printf', ['%q', '$HOME']) }
     assert_equal '\$HOME', output
   end
@@ -387,19 +386,19 @@ class TestPrintf < Test::Unit::TestCase
   end
 
   def test_printf_q_semicolon
-    omit 'printf %q: special chars not quoted correctly'
+
     output = capture_output { Rubish::Builtins.run('printf', ['%q', 'cmd1; cmd2']) }
     assert_equal 'cmd1\;\ cmd2', output
   end
 
   def test_printf_q_pipe
-    omit 'printf %q: special chars not quoted correctly'
+
     output = capture_output { Rubish::Builtins.run('printf', ['%q', 'a|b']) }
     assert_equal 'a\|b', output
   end
 
   def test_printf_q_parentheses
-    omit 'printf %q: special chars not quoted correctly'
+
     output = capture_output { Rubish::Builtins.run('printf', ['%q', '(subshell)']) }
     assert_equal '\(subshell\)', output
   end

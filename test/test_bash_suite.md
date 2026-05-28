@@ -105,31 +105,34 @@ These cover bash features rubish will not implement:
 
 | #   | Feature                                                                                             | Omissions |
 | --- | --------------------------------------------------------------------------------------------------- | --------- |
-| 1   | Posixpat bracket expressions (extglob, CTLESC, dangling backslash)                                  | 20        |
-| 2   | Tilde expansion (all forms: `~`, `~/path`, `~+`, `~-`, `~user`, in assignment/export)              | 14        |
-| 3   | Appendop: `typeset -i` arithmetic, array literal `+=`, command-local `+=` prefix                   | 13        |
-| 4   | Builtins: eval double-expansion, `builtin`/`command` keyword, `declare -p`, alias format           | 12        |
-| 5   | Read builtin: IFS variants, file redirect, readonly-var error, trailing-space stripping             | 10        |
-| 6   | Parameter expansion: var-as-pattern (`${x#$y}`), positional `${#}`, `${#N}`, `${N}` with braces   | 10        |
-| 7   | Brace expansion edge cases (empty braces, lone `}`, escaped braces, var in list)                   | 6         |
-| 8   | Comsub edge cases (inline concat, backtick escapes, exit code)                                      | 6         |
-| 9   | IFS: typeset/env-prefix local IFS, eval split, POSIX mode                                          | 5         |
-| 10  | Case statement edge cases (`;& ` fallthrough, `;;& ` continue, reserved word pattern)              | 4         |
+| 1   | Brace expansion: invalid/edge cases (lone `{}`/`}`, escaped commas, var in list, nested invalid)   | 29        |
+| 2   | Array: indexed compound assignment, array slices, scalar↔array coercion                            | 26        |
+| 3   | Parameter expansion edge cases (exp.tests, new-exp.tests)                                          | 20        |
+| 4   | Posixpat bracket expressions (extglob, CTLESC, dangling backslash)                                 | 20        |
+| 5   | Printf: remaining format string issues (\c, octal in format, %b edge cases)                        | 15        |
+| 6   | Tilde expansion (all forms: `~`, `~/path`, `~+`, `~-`, `~user`, in assignment/export)              | 14        |
+| 7   | Appendop: `typeset -i` arithmetic, array literal `+=`, command-local `+=` prefix                   | 13        |
+| 8   | Builtins: eval double-expansion, `builtin`/`command` keyword, `declare -p`, alias format           | 12        |
+| 9   | Redir: exec FD redirect, `>&2`, block redirect, noclobber exit status                              | 12        |
+| 10  | Case/read: case `;& `/ `;;& ` fallthrough; read IFS variants, file redirect                       | 10        |
 
 ## Common omit reasons
 
-| Reason                                                        | Count |
-| ------------------------------------------------------------- | ----- |
-| posixpat bracket/extglob/CTLESC patterns not handled          | 20    |
-| tilde expansion not yet supported (all forms)                 | 14    |
-| appendop typeset -i arithmetic / array / command-prefix       | 13    |
-| builtin/command keyword, eval double-expansion, declare -p    | 12    |
-| read: IFS variants, file redirect, trailing-space, readonly   | 10    |
-| param expansion: var-as-pattern, ${#}, ${#N}, ${N} with {}   | 10    |
-| quote/nquote: backslash-newline continuation, $'...' in dquot | 9     |
-| heredoc: backslash-newline join, multiple heredocs, dquote    | 7     |
-| brace expansion edge cases                                    | 6     |
-| comsub edge cases (inline concat, backtick escapes, exit)     | 6     |
-| IFS: typeset/env-prefix local IFS, eval split, posix mode    | 5     |
-| case ;& / ;;& fallthrough not yet supported                   | 4     |
-| subshell exit code not propagated to $?                       | 3     |
+| Reason                                                          | Count |
+| --------------------------------------------------------------- | ----- |
+| brace expansion: invalid/edge cases not passed through          | 29    |
+| array: indexed compound assign, slices, scalar coercion         | 26    |
+| posixpat bracket/extglob/CTLESC patterns not handled            | 20    |
+| param expansion edge cases (${x#$y}, ${#N}, ${N} with braces)  | 20    |
+| printf: format-string octal, %b edge cases, %s precision        | 15    |
+| tilde expansion not yet supported (all forms)                   | 14    |
+| appendop typeset -i arithmetic / array / command-prefix         | 13    |
+| builtin/command keyword, eval double-expansion, declare -p      | 12    |
+| redir: exec FD, >&2, block redirect, noclobber exit status      | 12    |
+| case ;& / ;;& fallthrough not yet supported                     | 10    |
+| read: IFS variants, file redirect, trailing-space, readonly     | 10    |
+| quote/nquote: backslash-newline continuation, $'...' in dquot  | 9     |
+| heredoc: backslash-newline join, multiple heredocs, dquote      | 7     |
+| comsub edge cases (inline concat, backtick escapes, exit)       | 6     |
+| IFS: typeset/env-prefix local IFS, eval split, posix mode      | 5     |
+| subshell exit code not propagated to $?                         | 3     |

@@ -82,7 +82,6 @@ class TestAnsiCQuoting < Test::Unit::TestCase
   end
 
   def test_consecutive_escapes
-    omit '$\'...\' ANSI-C quoting: consecutive escapes not all processed'
     execute("echo $'\\n\\n\\n' > #{output_file}")
     assert_equal "\n\n\n\n", File.read(output_file)
   end
@@ -118,7 +117,6 @@ class TestAnsiCQuoting < Test::Unit::TestCase
   end
 
   def test_only_escape
-    omit '$\'...\' ANSI-C quoting: consecutive escapes not all processed'
     execute("echo $'\\n' > #{output_file}")
     assert_equal "\n\n", File.read(output_file)
   end
