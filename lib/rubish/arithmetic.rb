@@ -50,7 +50,66 @@ module Rubish
       result
     end
 
+    # Find the index of the first top-level occurrence of op (not inside parens).
+    # Returns nil if not found.
+    def find_top_level_op(expr, op)
+      depth = 0
+      op_len = op.length
+      i = 0
+      while i <= expr.length - op_len
+        case expr[i]
+        when '(' then depth += 1; i += 1
+        when ')' then depth -= 1; i += 1
+        else
+          if depth == 0 && expr[i, op_len] == op
+            return i
+          end
+          i += 1
+        end
+      end
+      nil
+    end
+
+    # Return the index of the closing paren that matches expr[start] == '('.
+    def find_matching_close(expr, start)
+      depth = 0
+      (start...expr.length).each do |i|
+        case expr[i]
+        when '(' then depth += 1
+        when ')' then depth -= 1; return i if depth == 0
+        end
+      end
+      nil
+    end
+
     def eval_single_arithmetic(expr)
+      expr = expr.strip
+
+      # Strip outer parentheses: (expr) -> expr, but not (a)(b)
+      if expr.start_with?('(')
+        close = find_matching_close(expr, 0)
+        if close == expr.length - 1
+          return eval_single_arithmetic(expr[1...-1])
+        end
+      end
+
+      # Short-circuit ||  (lower precedence than &&)
+      if (pos = find_top_level_op(expr, '||'))
+        left_val = eval_single_arithmetic(expr[0, pos])
+        return left_val != 0 ? left_val : eval_single_arithmetic(expr[pos + 2..])
+      end
+
+      # Short-circuit &&
+      if (pos = find_top_level_op(expr, '&&'))
+        left_val = eval_single_arithmetic(expr[0, pos])
+        return left_val == 0 ? 0 : eval_single_arithmetic(expr[pos + 2..])
+      end
+
+      # Logical not: ! expr  (bash: 0=false, non-zero=true, opposite of Ruby)
+      if expr =~ /\A!\s*(.+)\z/
+        return eval_single_arithmetic($1) == 0 ? 1 : 0
+      end
+
       # Handle pre-increment/decrement: ++var, --var
       if expr =~ /\A\+\+([a-zA-Z_][a-zA-Z0-9_]*)\z/
         var = $1
@@ -111,6 +170,8 @@ module Rubish
       end
 
       # Regular arithmetic expression - evaluate directly to handle booleans
+      # Pre-convert hex literals so their letter chars don't get treated as variables
+      expr = expr.gsub(/0[xX][0-9a-fA-F]+/) { |m| Integer(m).to_s }
       # Expand variables first
       expanded = expr.gsub(/\$\{([^}]+)\}|\$(\d+)|\$([a-zA-Z_][a-zA-Z0-9_]*)|([a-zA-Z_][a-zA-Z0-9_]*)/) do |match|
         if $2 # Positional parameter like $1, $2
