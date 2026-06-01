@@ -6,10 +6,13 @@ class TestHeredoc < Test::Unit::TestCase
   def setup
     @repl = Rubish::REPL.new
     @tempdir = Dir.mktmpdir('rubish_heredoc_test')
+    @original_env = ENV.to_h.dup
   end
 
   def teardown
     FileUtils.rm_rf(@tempdir)
+    ENV.clear
+    @original_env.each { |k, v| ENV[k] = v }
   end
 
   def output_file
