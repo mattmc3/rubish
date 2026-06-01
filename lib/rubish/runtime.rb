@@ -835,6 +835,11 @@ module Rubish
     def __case_match(pattern, word)
       # Shell pattern matching using fnmatch
       # Supports *, ?, [...] patterns
+      if pattern.include?('[:')
+        icase = Builtins.shopt_enabled?('nocasematch')
+        rx = posix_glob_to_regex(pattern, icase: icase)
+        return rx ? rx.match?(word) : false
+      end
       flags = File::FNM_EXTGLOB
       flags |= File::FNM_CASEFOLD if Builtins.shopt_enabled?('nocasematch')
       File.fnmatch(pattern, word, flags)
