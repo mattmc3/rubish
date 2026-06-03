@@ -123,4 +123,26 @@ class TestReturn < Test::Unit::TestCase
     assert_match(/outer_after/, content)
     assert_no_match(/inner_after/, content)
   end
+
+  # Regressions for #29: `return N` from inside a function used to
+  # escape as UncaughtThrowError because call_function only rescued
+  # LocalJumpError. The throw :return now flows through catch(:return)
+  # in call_function and becomes the function's exit status.
+  def test_return_from_function_with_explicit_code
+    output_file = File.join(@tempdir, 'output.txt')
+    execute('f() { return 5; }')
+    execute("f; echo $? > #{output_file}")
+    assert_equal "5\n", File.read(output_file)
+  end
+
+  # Inner function's return code must propagate up through the
+  # caller chain to $? at the outermost call site — exercises the
+  # throw :return / catch(:return) path through two frames.
+  def test_return_propagates_through_nested_function
+    output_file = File.join(@tempdir, 'output.txt')
+    execute('inner() { return 7; }')
+    execute('outer() { inner; }')
+    execute("outer; echo $? > #{output_file}")
+    assert_equal "7\n", File.read(output_file)
+  end
 end

@@ -581,4 +581,17 @@ class TestFunction < Test::Unit::TestCase
     execute('result=`greet`')
     assert_equal 'hello', get_shell_var('result')
   end
+
+  # Regression for #29: `f() { ...; }; f > file` used to crash with
+  # `IOError: closed stream` because __run_cmd returned the Command
+  # after calling the function, so eval_in_context invoked
+  # call_function_with_redirects a second time on a closed file
+  # descriptor. The bug only manifests when def + call live in the
+  # SAME execute() — that drives the runtime path where eval_in_context
+  # reuses the result. Separate execute() calls go through a different
+  # path that wasn't affected.
+  def test_function_definition_and_redirected_call_in_one_statement
+    execute("greet() { echo hello; }; greet > #{output_file}")
+    assert_equal "hello\n", File.read(output_file)
+  end
 end
