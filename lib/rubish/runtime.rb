@@ -848,7 +848,10 @@ module Rubish
       # Only expand if braceexpand option is enabled
       return [pattern] unless Builtins.set_option?('B')
 
-      expand_braces(pattern)
+      # Brace expansion precedes quote removal in bash, so the \, \{ \}
+      # that were escaped to stay literal survive expansion; strip those
+      # backslashes from the final words here.
+      expand_braces(pattern).map { |s| s.gsub(/\\([,{}])/, '\1') }
     end
 
     def __case_match(pattern, word)

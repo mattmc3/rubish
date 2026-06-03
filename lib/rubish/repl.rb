@@ -2033,13 +2033,39 @@ module Rubish
     end
 
     def expand_brace_list(content)
-      # Split on commas, but respect nested braces
+      # Split on top-level commas. A comma that is escaped (\,), quoted,
+      # or inside a nested brace is literal, not a separator.
       items = []
       current = +''
       depth = 0
+      i = 0
+      len = content.length
 
-      content.each_char do |char|
+      while i < len
+        char = content[i]
         case char
+        when '\\'
+          current << char
+          current << content[i + 1] if i + 1 < len
+          i += 2
+          next
+        when "'", '"'
+          q = char
+          current << char
+          i += 1
+          while i < len && content[i] != q
+            if q == '"' && content[i] == '\\'
+              current << content[i]
+              current << content[i + 1] if i + 1 < len
+              i += 2
+            else
+              current << content[i]
+              i += 1
+            end
+          end
+          current << q if i < len
+          i += 1
+          next
         when '{'
           depth += 1
           current << char
@@ -2047,7 +2073,7 @@ module Rubish
           depth -= 1
           current << char
         when ','
-          if depth == 0
+          if depth.zero?
             items << current
             current = +''
           else
@@ -2056,6 +2082,7 @@ module Rubish
         else
           current << char
         end
+        i += 1
       end
       items << current unless current.empty?
 

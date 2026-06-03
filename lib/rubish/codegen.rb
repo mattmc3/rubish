@@ -158,14 +158,100 @@ module Rubish
     end
 
     def has_brace_expansion?(str)
-      # Check for brace expansion patterns: {a,b} or {1..5}
-      # Must have matching braces with either comma or ..
-      # But NOT ${...} which is parameter expansion
+      # Brace expansion needs a {...} group (not ${...}) whose top level
+      # holds a real separator: an unquoted, unescaped comma or a `..`
+      # range. A comma that is quoted ("a,b") or escaped (a\,b) is literal,
+      # so such words fall through to normal quote/escape removal instead.
       return false unless str.include?('{') && str.include?('}')
 
-      # Check for brace expansion, but exclude ${...} parameter expansion
-      # ${var,} or ${var,,} are case modification, not brace expansion
-      str.match?(/(?<!\$)\{[^}]*(?:,|\.\.)[^}]*\}/)
+      i = 0
+      len = str.length
+      while i < len
+        c = str[i]
+        if c == '\\'
+          i += 2
+        elsif c == "'"
+          j = str.index("'", i + 1)
+          break unless j
+          i = j + 1
+        elsif c == '"'
+          i += 1
+          i += str[i] == '\\' ? 2 : 1 while i < len && str[i] != '"'
+          i += 1
+        elsif c == '{' && (i.zero? || str[i - 1] != '$')
+          close = brace_match(str, i)
+          return true if close && brace_group_expandable?(str[(i + 1)...close])
+          i += 1
+        else
+          i += 1
+        end
+      end
+      false
+    end
+
+    # Index of the } matching the { at open_pos, honoring nesting, quotes
+    # and backslash escapes; nil if unmatched.
+    def brace_match(str, open_pos)
+      depth = 0
+      i = open_pos
+      len = str.length
+      while i < len
+        c = str[i]
+        if c == '\\'
+          i += 2
+          next
+        elsif c == "'"
+          j = str.index("'", i + 1)
+          return nil unless j
+          i = j + 1
+          next
+        elsif c == '"'
+          i += 1
+          i += str[i] == '\\' ? 2 : 1 while i < len && str[i] != '"'
+          i += 1
+          next
+        elsif c == '{'
+          depth += 1
+        elsif c == '}'
+          depth -= 1
+          return i if depth.zero?
+        end
+        i += 1
+      end
+      nil
+    end
+
+    # True when brace content has a top-level (unquoted, unescaped,
+    # non-nested) comma, or is a `..` sequence range.
+    def brace_group_expandable?(content)
+      i = 0
+      depth = 0
+      len = content.length
+      while i < len
+        c = content[i]
+        if c == '\\'
+          i += 2
+          next
+        elsif c == "'"
+          j = content.index("'", i + 1)
+          break unless j
+          i = j + 1
+          next
+        elsif c == '"'
+          i += 1
+          i += content[i] == '\\' ? 2 : 1 while i < len && content[i] != '"'
+          i += 1
+          next
+        elsif c == '{'
+          depth += 1
+        elsif c == '}'
+          depth -= 1
+        elsif c == ',' && depth.zero?
+          return true
+        end
+        i += 1
+      end
+      content.match?(/\A-?[a-zA-Z0-9]+\.\.-?[a-zA-Z0-9]+(?:\.\.-?\d+)?\z/)
     end
 
     def generate_string_arg_with_glob(str)
