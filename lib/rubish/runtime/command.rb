@@ -63,7 +63,7 @@ module Rubish
   end
 
   class Command
-    attr_reader :name, :pid, :status
+    attr_reader :name, :pid, :status, :restricted_failed, :noclobber_failed
     attr_accessor :stdin, :stdout, :stderr, :block, :prefix_env
 
     # Class-level accessors for function support in pipelines

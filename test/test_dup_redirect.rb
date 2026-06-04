@@ -132,6 +132,55 @@ class TestDupRedirect < Test::Unit::TestCase
     assert_match(%r{rubish: /no/such/dir/file_xyz:.*No such file}, stderr_output)
   end
 
+  # Builtins go through __run_cmd's fast path which used to bypass
+  # @restricted_failed — so `echo hi > /no/such/dir/file; echo $?` would
+  # both print the error AND then run echo, leaving $? as 0. The
+  # fast-path now checks restricted_failed / noclobber_failed.
+  def test_builtin_skipped_when_output_redirect_fails
+    stdout_output = nil
+    stderr_output = capture_stderr do
+      stdout_output = capture_stdout do
+        execute('echo hi > /no/such/dir/file_xyz')
+      end
+    end
+    assert_not_equal 0, @repl.instance_variable_get(:@last_status)
+    assert_match(%r{rubish: /no/such/dir/file_xyz:.*No such file}, stderr_output)
+    assert_empty stdout_output, 'echo must not run when its redirect target could not be opened'
+  end
+
+  def test_builtin_skipped_when_input_redirect_fails
+    stdout_output = nil
+    stderr_output = capture_stderr do
+      stdout_output = capture_stdout do
+        execute('echo hi < /no/such/file_xyz')
+      end
+    end
+    assert_not_equal 0, @repl.instance_variable_get(:@last_status)
+    assert_match(%r{rubish: /no/such/file_xyz:.*No such file}, stderr_output)
+    assert_empty stdout_output
+  end
+
+  def test_builtin_skipped_when_noclobber_redirect_fails
+    require 'tempfile'
+    tf = Tempfile.create('rubish_noclobber')
+    tf.close
+    begin
+      stdout_output = nil
+      stderr_output = capture_stderr do
+        stdout_output = capture_stdout do
+          execute('set -C')
+          execute("echo hi > #{tf.path}")
+        end
+      end
+      assert_not_equal 0, @repl.instance_variable_get(:@last_status)
+      assert_match(/cannot overwrite existing file/, stderr_output)
+      assert_empty stdout_output
+    ensure
+      execute('set +C')
+      File.unlink(tf.path) if File.exist?(tf.path)
+    end
+  end
+
   # Test Subshell has dup_out/dup_in methods
   def test_subshell_has_dup_out_method
     subshell = Rubish::Subshell.new { true }

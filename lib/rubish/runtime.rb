@@ -1152,7 +1152,17 @@ module Rubish
         ExitStatus.new(@last_status)
       elsif result.is_a?(Command) && Builtins.builtin?(result.name) && !result.stdout && !result.stderr
         # Run builtins without explicit redirects in current process
-        # This allows them to respect $stdout set by __with_redirect for compound commands
+        # This allows them to respect $stdout set by __with_redirect for compound commands.
+        # If a redirect was attempted but its target file couldn't be opened,
+        # the error has already been printed by redirect_*; skip execution so
+        # the builtin doesn't run with the original (unredirected) streams.
+        if result.restricted_failed || result.noclobber_failed
+          @last_status = 1
+          @pipestatus = [@last_status]
+          run_err_trap_if_failed
+          check_errexit
+          return ExitStatus.new(@last_status)
+        end
         success = Builtins.run(result.name, result.args)
         @last_status = success.is_a?(ExitStatus) ? success.exitstatus : (success ? 0 : 1)
         run_err_trap_if_failed
