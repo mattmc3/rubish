@@ -360,7 +360,11 @@ module Rubish
       ensure
         @errexit_suppressed = prev
       end
-      return left unless @last_status == 0
+      unless @last_status == 0
+        # Left failed -> && short-circuits; its status stays exempt from errexit.
+        @errexit_exempt = true
+        return left
+      end
 
       __run_cmd(&right_proc)
     end

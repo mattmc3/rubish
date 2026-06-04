@@ -89,6 +89,21 @@ class TestSetOptions < Test::Unit::TestCase
     assert_false File.exist?(output_file), 'true && false should abort under set -e'
   end
 
+  # false is the non-last operand of &&: it fails and short-circuits, so the
+  # last command (true) never runs and errexit must not fire.
+  # bash -c "set -e; false && true; echo ok" prints "ok".
+  def test_errexit_exempt_for_and_short_circuit
+    catch(:exit) { execute("set -e; false && true; echo ok > #{output_file}") }
+    assert File.exist?(output_file), 'false && true should not abort under set -e'
+  end
+
+  # The exemption only affects errexit, not $?: a short-circuited && still
+  # reports the failing left operand's status (1), like bash.
+  def test_errexit_and_short_circuit_preserves_status
+    catch(:exit) { execute("set -e; false && true; echo $? > #{output_file}") }
+    assert_equal "1\n", File.read(output_file)
+  end
+
   # set -x (xtrace)
   def test_set_minus_x_enables_xtrace
     execute('set -x')
