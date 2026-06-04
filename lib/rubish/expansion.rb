@@ -197,6 +197,15 @@ module Rubish
           if next_char && '$`"\\'.include?(next_char)
             result << next_char
             i += 2
+          elsif next_char == ' '
+            # Backslash-space: consume the backslash so word-quoted
+            # paths like `cd Foo\ Bar/` reach the builtin (and the
+            # external argv) as `Foo Bar/`. Without this, the cd
+            # builtin sees `Foo\ Bar/` and chdir fails. Other `\X`
+            # sequences are left intact so things like `\C-a` in
+            # bind args and `\n` for echo -e still work.
+            result << next_char
+            i += 2
           else
             # Keep the backslash for other characters (like \C-a in bind)
             result << char

@@ -110,4 +110,32 @@ class TestEscapeExpansion < Test::Unit::TestCase
     execute('echo "a\\zb" > ' + output_file)
     assert_equal "a\\zb\n", File.read(output_file)
   end
+
+  # The cd / pushd builtins go through a fast path that bypasses
+  # codegen (repl.rb:1000), so escape-handling has to happen in
+  # expand_args_for_builtin. Without that, `cd ab\ cd/` reaches
+  # chdir as a literal `ab\ cd/` path and fails.
+  def test_cd_into_directory_with_escaped_space
+    FileUtils.mkdir(File.join(@tempdir, 'Foo Bar'))
+
+    execute('cd Foo\\ Bar')
+
+    assert_equal File.realpath(File.join(@tempdir, 'Foo Bar')), File.realpath(Dir.pwd)
+  end
+
+  def test_cd_into_directory_with_escaped_space_and_trailing_slash
+    FileUtils.mkdir(File.join(@tempdir, 'ab cd'))
+
+    execute('cd ab\\ cd/')
+
+    assert_equal File.realpath(File.join(@tempdir, 'ab cd')), File.realpath(Dir.pwd)
+  end
+
+  def test_pushd_into_directory_with_escaped_space
+    FileUtils.mkdir(File.join(@tempdir, 'Foo Bar'))
+
+    execute('pushd Foo\\ Bar')
+
+    assert_equal File.realpath(File.join(@tempdir, 'Foo Bar')), File.realpath(Dir.pwd)
+  end
 end
