@@ -173,6 +173,50 @@ class TestCompleteFullquote < Test::Unit::TestCase
     assert_includes candidates, 'normalfile.txt'
   end
 
+  def complete(input, line:, point: nil)
+    @repl.send(:complete, input, line: line, point: point || line.length)
+  end
+
+  # Built-in completion functions like _filedir push raw paths into
+  # COMPREPLY. Without escaping `cd Foo<TAB>` would produce `cd Foo Bar/`,
+  # which the parser splits into two arguments.
+  def test_function_spec_quotes_directory_with_space
+    FileUtils.mkdir('Foo Bar')
+    Rubish::Builtins.setup_default_completions
+
+    assert_equal ['Foo\\ Bar/'], complete('Foo', line: 'cd Foo')
+    assert_equal ['Foo\\ Bar/'], complete('Foo', line: 'pushd Foo')
+  end
+
+  def test_function_spec_no_quote_when_fullquote_disabled
+    FileUtils.mkdir('Foo Bar')
+    Rubish::Builtins.setup_default_completions
+    execute('shopt -u complete_fullquote')
+
+    assert_equal ['Foo Bar/'], complete('Foo', line: 'cd Foo')
+  end
+
+  # zsh-style {files: true} / {directories: true} specs route through
+  # generate_completions rather than complete_file, so they need the
+  # same escaping.
+  def test_zsh_files_spec_quotes_file_with_space
+    FileUtils.touch('ab cd')
+    Rubish::Builtins.setup_zsh_default_completions
+
+    assert_equal ['ab\\ cd'], complete('ab', line: 'cat ab')
+  end
+
+  def test_zsh_directories_spec_quotes_directory_with_space
+    FileUtils.mkdir('Foo Bar')
+    # cd is already registered by setup_default_completions; clear it
+    # so setup_zsh_default_completions installs the {directories: true}
+    # spec we want to exercise.
+    Rubish::Builtins.current_state.completions.delete('cd')
+    Rubish::Builtins.setup_zsh_default_completions
+
+    assert_equal ['Foo\\ Bar/'], complete('Foo', line: 'cd Foo')
+  end
+
   # Test shopt output
   def test_shopt_print_shows_option
     output = capture_output do

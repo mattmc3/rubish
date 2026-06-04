@@ -310,6 +310,16 @@ module Rubish
               results.reject! { |r| r.start_with?('-') }
             end
 
+            # Built-in completion functions like _filedir push raw
+            # filesystem paths into COMPREPLY, so `cd Foo<TAB>` would
+            # otherwise return `Foo Bar/` and split into two args on
+            # the command line. complete_file (the no-spec fallback)
+            # already escapes; apply the same gate here.
+            if Builtins.builtin_completion_function?(spec[:function]) &&
+               Builtins.shopt_enabled?('complete_fullquote')
+              results.map! { |r| quote_completion_metacharacters(r) }
+            end
+
             # Add prefix/suffix if specified
             if spec[:prefix] || spec[:suffix]
               results.map! { |r| "#{spec[:prefix]}#{r}#{spec[:suffix]}" }
@@ -321,7 +331,12 @@ module Rubish
           end
         elsif spec
           # Use spec without function (wordlist, actions, etc.)
-          return Builtins.generate_completions(spec, input)
+          results = Builtins.generate_completions(spec, input)
+          if (spec[:files] || spec[:directories]) &&
+             Builtins.shopt_enabled?('complete_fullquote')
+            results = results.map { |r| quote_completion_metacharacters(r) }
+          end
+          return results
         else
           # Try auto-completion by parsing --help output (fish-style),
           # then merge with file/path completion. Files first so a
