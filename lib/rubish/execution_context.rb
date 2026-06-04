@@ -60,6 +60,8 @@ module Rubish
       @named_directories = {}
       @builtin_completion_functions = {}
       @disabled_builtins = Set.new
+      @errexit_suppressed = false
+      @errexit_exempt = false
       @dynamic_commands = []
       @call_stack = []
       @comp_words = []
@@ -139,7 +141,10 @@ module Rubish
     end
 
     def check_errexit
-      return if @last_status == 0
+      # Consume the one-shot && short-circuit exemption (set by __and_cmd).
+      exempt = @errexit_exempt
+      @errexit_exempt = false
+      return if @last_status == 0 || @errexit_suppressed || exempt
       throw(:exit, @last_status) if set_option?('e')
     end
 
