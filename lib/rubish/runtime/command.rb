@@ -63,7 +63,7 @@ module Rubish
   end
 
   class Command
-    attr_reader :name, :pid, :status, :restricted_failed, :noclobber_failed
+    attr_reader :name, :pid, :status, :restricted_failed, :noclobber_failed, :fd_redirects
     attr_accessor :stdin, :stdout, :stderr, :block, :prefix_env
 
     # Class-level accessors for function support in pipelines
@@ -92,9 +92,13 @@ module Rubish
     end
 
     # Execute a command with proper error handling for command not found / permission denied
-    def self.safe_exec(cmd_name, cmd_path, *args)
+    def self.safe_exec(cmd_name, cmd_path, *args, fd_options: nil)
       child_pre_exec_hook&.call
-      exec(cmd_path, *args)
+      if fd_options && !fd_options.empty?
+        exec(cmd_path, *args, fd_options)
+      else
+        exec(cmd_path, *args)
+      end
     rescue Errno::ENOENT
       $stderr.puts "rubish: #{cmd_name}: command not found"
       suggestions = suggest_similar_commands(cmd_name)
@@ -156,6 +160,9 @@ module Rubish
       @restricted_failed = false
       @prefix_env = nil
       @status = nil
+      # Redirects for fds >= 3, keyed by source fd. Values are Kernel#exec
+      # redirect specs: `:close`, an Integer (dup), or `[file, mode]`.
+      @fd_redirects = nil
     end
 
     def args
@@ -351,6 +358,31 @@ module Rubish
       end
     end
 
+    # `N>file`, `N>>file`, `N>|file`, `N<file`, `N>&M`, `N<&M`, `N>&-`,
+    # `N<&-` for fds N >= 3. Records the redirect against the source fd;
+    # run_simple applies them via Kernel#exec's redirect-options hash.
+    def fd_redirect(fd, op, target)
+      @fd_redirects ||= {}
+      case op
+      when '>', '>|'
+        @fd_redirects[fd] = [target, 'w']
+      when '>>'
+        @fd_redirects[fd] = [target, 'a']
+      when '<'
+        @fd_redirects[fd] = [target, 'r']
+      when '>&', '<&'
+        if target == '-'
+          @fd_redirects[fd] = :close
+        elsif target =~ /\A\d+\z/
+          @fd_redirects[fd] = target.to_i
+        else
+          # `N>&file` is just `N>file`.
+          @fd_redirects[fd] = [target, op == '>&' ? 'w' : 'r']
+        end
+      end
+      self
+    end
+
     private
 
     def expand_args(args)
@@ -438,7 +470,7 @@ module Rubish
           $stderr.puts "rubish: #{cmd_path}: Is a directory"
           exit(126)
         else
-          Command.safe_exec(name, cmd_path, *cmd_args)
+          Command.safe_exec(name, cmd_path, *cmd_args, fd_options: @fd_redirects)
         end
       end
 
@@ -519,7 +551,7 @@ module Rubish
         # Set prefix environment variables (e.g., FOO=bar cmd)
         @prefix_env&.each { |k, v| ENV[k] = v }
 
-        Command.safe_exec(name, cmd_path, *cmd_args)
+        Command.safe_exec(name, cmd_path, *cmd_args, fd_options: @fd_redirects)
       end
 
       writer.close
@@ -674,6 +706,11 @@ module Rubish
       self
     end
 
+    def fd_redirect(fd, op, target)
+      @commands.last.fd_redirect(fd, op, target)
+      self
+    end
+
     private
 
     def run_simple
@@ -753,7 +790,7 @@ module Rubish
             result = Builtins.run(cmd.name, cmd.args)
             exit(result ? 0 : 1)
           else
-            Command.safe_exec(cmd.name, cmd.name, *cmd.args)
+            Command.safe_exec(cmd.name, cmd.name, *cmd.args, fd_options: cmd.fd_redirects)
           end
         end.tap do |pid|
           # Set up process group in parent (first process becomes leader)
@@ -799,7 +836,7 @@ module Rubish
             pid = fork do
               $stdout.reopen(last_cmd.stdout) if last_cmd.stdout
               $stderr.reopen(last_cmd.stderr) if last_cmd.stderr
-              Command.safe_exec(last_cmd.name, last_cmd.name, *last_cmd.args)
+              Command.safe_exec(last_cmd.name, last_cmd.name, *last_cmd.args, fd_options: last_cmd.fd_redirects)
             end
             Process.wait(pid)
             last_status = $?
@@ -921,7 +958,7 @@ module Rubish
             result = Command.call_function(cmd.name, cmd.args)
             exit(result ? 0 : 1)
           else
-            Command.safe_exec(cmd.name, cmd.name, *cmd.args)
+            Command.safe_exec(cmd.name, cmd.name, *cmd.args, fd_options: cmd.fd_redirects)
           end
         end
       end
@@ -1141,6 +1178,16 @@ module Rubish
       else redirect_err(target)
       end
     end
+
+    # `(cmd) N>file` for N >= 3. Subshell/HeredocCommand currently
+    # accept the call so codegen-emitted .fd_redirect(...) doesn't blow
+    # up, but applying the redirect inside the forked subshell needs
+    # in-process fd manipulation that isn't wired up yet — only the
+    # plain Command case (which uses Kernel#exec's fd_options) honors
+    # N>file. See ast.rb / generate_fd_redirect.
+    def fd_redirect(_fd, _op, _target)
+      self
+    end
   end
 
   # Wrapper for heredoc/herestring that provides content as stdin
@@ -1331,6 +1378,16 @@ module Rubish
       when '-' then @stderr = :closed; self
       else redirect_err(target)
       end
+    end
+
+    # `(cmd) N>file` for N >= 3. Subshell/HeredocCommand currently
+    # accept the call so codegen-emitted .fd_redirect(...) doesn't blow
+    # up, but applying the redirect inside the forked subshell needs
+    # in-process fd manipulation that isn't wired up yet — only the
+    # plain Command case (which uses Kernel#exec's fd_options) honors
+    # N>file. See ast.rb / generate_fd_redirect.
+    def fd_redirect(_fd, _op, _target)
+      self
     end
   end
 end

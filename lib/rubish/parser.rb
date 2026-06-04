@@ -1154,6 +1154,7 @@ module Rubish
       while peek(:REDIRECT_OUT) || peek(:REDIRECT_CLOBBER) || peek(:REDIRECT_APPEND) ||
             peek(:REDIRECT_IN) || peek(:REDIRECT_ERR) || peek(:REDIRECT_ERR_APPEND) ||
             peek(:DUP_OUT) || peek(:DUP_IN) || peek(:DUP_ERR) ||
+            peek(:FD_REDIRECT) ||
             peek(:HEREDOC) || peek(:HEREDOC_INDENT) || peek(:HERESTRING) ||
             peek(:VARNAME_REDIRECT)
         op = consume
@@ -1181,6 +1182,12 @@ module Rubish
           redirect_op = op.value[:operator]
           target = consume(:WORD)&.value
           cmd = AST::VarnameRedirect.new(cmd, varname, redirect_op, target) if target
+        when :FD_REDIRECT
+          # N>file, N>>file, N<file, N>&M, N<&M, etc. for fd N >= 3
+          fd = op.value[:fd]
+          redirect_op = op.value[:op]
+          target = consume(:WORD)&.value
+          cmd = AST::FdRedirect.new(cmd, fd, redirect_op, target) if target
         else
           # Regular redirections (>, >>, <, 2>, >&, <&)
           target = consume(:WORD)&.value

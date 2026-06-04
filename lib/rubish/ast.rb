@@ -34,6 +34,13 @@ module Rubish
     # target: the file or FD number
     VarnameRedirect = Data.define(:command, :varname, :operator, :target)
 
+    # FdRedirect: cmd N>file / N>>file / N<file / N>&M / N<&M / N>&- / N<&-
+    # for fd N >= 3 (fds 0/1/2 use Redirect with the conventional operator).
+    # fd:  the source file descriptor (integer)
+    # op:  the redirection operator (>, >>, >|, <, >&, <&)
+    # target: file path, fd number string, or '-' for close
+    FdRedirect = Data.define(:command, :fd, :op, :target)
+
     # Background: cmd &
     Background = Data.define(:command)
 

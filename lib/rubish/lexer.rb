@@ -72,7 +72,7 @@ module Rubish
       AND OR AMPERSAND NEWLINE LPAREN LBRACE
       REDIRECT_OUT REDIRECT_CLOBBER REDIRECT_APPEND
       REDIRECT_IN REDIRECT_ERR
-      DUP_OUT DUP_IN DUP_ERR REDIRECT_ERR_APPEND
+      DUP_OUT DUP_IN DUP_ERR REDIRECT_ERR_APPEND FD_REDIRECT
       HEREDOC HEREDOC_INDENT HERESTRING
       VARNAME_REDIRECT
     ].freeze
@@ -230,14 +230,25 @@ module Rubish
         @pos += 3
         return Token.new(:REDIRECT_ERR_APPEND, '2>>')
       end
-      # Fd-prefixed redirects: an explicit `1` before an output redirect
-      # or `0` before an input redirect is just a verbose alias for the
-      # bare form. Whitespace would have been skipped before read_token,
-      # so `echo 1 >file` (with the space) still keeps `1` as an arg.
-      if @input[@pos] == '1' && %w[> >> >| >&].any? { |op| @input[@pos + 1, op.length] == op }
-        @pos += 1  # consume the leading '1', let the operator match normally below
-      elsif @input[@pos] == '0' && (@input[@pos + 1] == '<' || @input[@pos + 1, 2] == '<&')
-        @pos += 1
+      # Fd-prefixed redirects. For fds 0 and 1, the digit is just a
+      # verbose alias for the bare form (`1>file` == `>file`). For fds
+      # >= 3, emit a single FD_REDIRECT token carrying the source fd so
+      # the runtime can open / dup / close that specific descriptor.
+      # Whitespace already got skipped before read_token, so `echo 1
+      # >file` (with the space) still keeps `1` as an arg.
+      if (md = @input[@pos..].match(/\A(\d+)(>>|>\||>&|>|<&|<)/))
+        fd_str, op = md[1], md[2]
+        fd = fd_str.to_i
+        if fd == 0 && %w[< <&].include?(op)
+          @pos += fd_str.length  # alias for bare op; fall through to operator match
+        elsif fd == 1 && %w[> >> >| >&].include?(op)
+          @pos += fd_str.length
+        elsif fd >= 3
+          @pos += fd_str.length + op.length
+          return Token.new(:FD_REDIRECT, { fd: fd, op: op })
+        end
+        # fd == 2 with `>`, `>>`, `>&`: already matched by the 2-/3-char
+        # operator checks above before we get here.
       end
       two_char = @input[@pos, 2]  # refresh after possibly consuming a digit prefix
       if %w[>> >| 2> >& <& && || () ;; ;& |&].include?(two_char)

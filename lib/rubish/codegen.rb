@@ -18,6 +18,8 @@ module Rubish
         generate_redirect(node)
       when AST::VarnameRedirect
         generate_varname_redirect(node)
+      when AST::FdRedirect
+        generate_fd_redirect(node)
       when AST::Background
         generate_background(node)
       when AST::And
@@ -791,6 +793,16 @@ module Rubish
       operator = node.operator.inspect
       target = generate_string_arg(node.target)
       "__varname_redirect(#{varname}, #{operator}, #{target}) { #{generate(node.command)} }"
+    end
+
+    def generate_fd_redirect(node)
+      # N>file, N>>file, N<file, N>&M, N<&-, etc. for fd N >= 3
+      target = generate_string_arg(node.target)
+      if compound_command?(node.command)
+        "__with_fd_redirect(#{node.fd}, #{node.op.inspect}, #{target}) { #{generate(node.command)} }"
+      else
+        "#{generate(node.command)}.fd_redirect(#{node.fd}, #{node.op.inspect}, #{target})"
+      end
     end
 
     def generate_background(node)

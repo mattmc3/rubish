@@ -284,4 +284,54 @@ class TestDupRedirect < Test::Unit::TestCase
     execute("echo 1abc 0xyz >#{out}")
     assert_equal "1abc 0xyz\n", File.read(out)
   end
+
+  # Arbitrary fds (>= 3) used to be lexed as a free WORD followed by
+  # the bare redirect — so `echo hi 3>file` wrote `hi 3` to the file
+  # and stdout got redirected. Now the lexer emits an FD_REDIRECT
+  # token carrying the source fd, and Command threads it through
+  # Kernel#exec's redirect-options hash.
+  def test_fd3_open_for_write
+    out = File.join(@tempdir, 'out')
+    # /bin/sh writes "X" to fd 3, which 3>file directs to the file.
+    execute("/bin/sh -c 'printf X >&3' 3>#{out}")
+    assert_equal 'X', File.read(out)
+  end
+
+  def test_fd3_append
+    out = File.join(@tempdir, 'out')
+    File.write(out, "a\n")
+    execute("/bin/sh -c 'printf B >&3' 3>>#{out}")
+    assert_equal "a\nB", File.read(out)
+  end
+
+  def test_fd3_open_for_read
+    src = File.join(@tempdir, 'src')
+    out = File.join(@tempdir, 'out')
+    File.write(src, "fileinput\n")
+    execute("/bin/sh -c 'read line <&3; echo $line' 3<#{src} > #{out}")
+    assert_equal "fileinput\n", File.read(out)
+  end
+
+  def test_fd3_dup_to_stdout
+    out = File.join(@tempdir, 'out')
+    # 3>&1 dups stdout to fd 3, then the inner sh writes to fd 3,
+    # which lands on the outer stdout (redirected to the file).
+    execute("/bin/sh -c 'printf hello >&3' 3>&1 > #{out}")
+    assert_equal 'hello', File.read(out)
+  end
+
+  # Multi-digit fds work too — the lexer doesn't cap the digit count.
+  def test_fd10_open_for_write
+    out = File.join(@tempdir, 'out')
+    execute("/bin/sh -c 'printf via10 >&10' 10>#{out}")
+    assert_equal 'via10', File.read(out)
+  end
+
+  # An fd-redirect on a pipeline attaches to the command immediately
+  # preceding the pipe.
+  def test_fd3_on_pipeline_first_command
+    out = File.join(@tempdir, 'out')
+    execute("/bin/sh -c 'printf to-3 >&3' 3>#{out} | cat")
+    assert_equal 'to-3', File.read(out)
+  end
 end

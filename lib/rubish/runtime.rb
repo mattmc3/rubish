@@ -467,6 +467,13 @@ module Rubish
     end
 
     # Redirect output for compound commands (loops, conditionals, etc.)
+    # `(if/while/for/...) N>file` for N >= 3. Compound commands run
+    # in-process so we'd need to dup the fd at the Ruby level — not
+    # wired up yet. Yield silently for now; the redirect is dropped.
+    def __with_fd_redirect(_fd, _op, _target)
+      yield
+    end
+
     def __with_redirect(operator, target)
       case operator
       when '>'
