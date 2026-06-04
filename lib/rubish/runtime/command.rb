@@ -273,6 +273,21 @@ module Rubish
       self
     end
 
+    def redirect_err_append(file)
+      # 2>>file - append stderr to file
+      if Builtins.restricted_mode?
+        $stderr.puts 'rubish: restricted: cannot redirect output'
+        @restricted_failed = true
+        return self
+      end
+      @stderr = File.open(file, 'a')
+      self
+    rescue Errno::ENOENT, Errno::EACCES => e
+      $stderr.puts "rubish: #{file}: #{e.class.new.message}"
+      @restricted_failed = true
+      self
+    end
+
     def redirect_err_to_out
       # Used for |& - redirect stderr to stdout before piping
       @stderr = :stdout
@@ -631,6 +646,11 @@ module Rubish
 
     def redirect_err(file)
       @commands.last.redirect_err(file)
+      self
+    end
+
+    def redirect_err_append(file)
+      @commands.last.redirect_err_append(file)
       self
     end
 
@@ -1077,6 +1097,20 @@ module Rubish
       self
     end
 
+    def redirect_err_append(file)
+      if Builtins.restricted_mode?
+        $stderr.puts 'rubish: restricted: cannot redirect output'
+        @restricted_failed = true
+        return self
+      end
+      @stderr = File.open(file, 'a')
+      self
+    rescue Errno::ENOENT, Errno::EACCES => e
+      $stderr.puts "rubish: #{file}: #{e.class.new.message}"
+      @restricted_failed = true
+      self
+    end
+
     def redirect_err_to_out
       @stderr = :stdout
       self
@@ -1247,6 +1281,20 @@ module Rubish
         return self
       end
       @stderr = File.open(file, 'w')
+      self
+    rescue Errno::ENOENT, Errno::EACCES => e
+      $stderr.puts "rubish: #{file}: #{e.class.new.message}"
+      @restricted_failed = true
+      self
+    end
+
+    def redirect_err_append(file)
+      if Builtins.restricted_mode?
+        $stderr.puts 'rubish: restricted: cannot redirect output'
+        @restricted_failed = true
+        return self
+      end
+      @stderr = File.open(file, 'a')
       self
     rescue Errno::ENOENT, Errno::EACCES => e
       $stderr.puts "rubish: #{file}: #{e.class.new.message}"

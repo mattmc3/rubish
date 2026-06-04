@@ -97,6 +97,19 @@ class TestDupRedirect < Test::Unit::TestCase
     assert_equal '', File.read(out)
   end
 
+  # `2>>file` used to be lexed as REDIRECT_ERR + REDIRECT_OUT + WORD,
+  # so it silently truncated and *redirected stdout* to the file rather
+  # than appending stderr.
+  def test_redirect_err_append
+    log = File.join(@tempdir, 'log')
+    execute("/bin/ls /no/such/A 2>>#{log}")
+    execute("/bin/ls /no/such/B 2>>#{log}")
+    content = File.read(log)
+    assert_match(/A/, content)
+    assert_match(/B/, content)
+  end
+
+
   # Test Pipeline has dup_out/dup_in methods
   def test_pipeline_has_dup_out_method
     cmd1 = Rubish::Command.new('echo', 'test')

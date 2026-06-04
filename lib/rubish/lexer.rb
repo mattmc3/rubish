@@ -20,6 +20,7 @@ module Rubish
       '<<-' => :HEREDOC_INDENT,  # Here document with indented delimiter
       '<<<' => :HERESTRING,  # Here string
       '2>' => :REDIRECT_ERR,
+      '2>>' => :REDIRECT_ERR_APPEND,  # Append stderr to file
       '>&' => :DUP_OUT,       # Duplicate output FD
       '2>&' => :DUP_ERR,      # Duplicate stderr FD (2>&1, 2>&-, etc.)
       '<&' => :DUP_IN,        # Duplicate input FD
@@ -71,7 +72,7 @@ module Rubish
       AND OR AMPERSAND NEWLINE LPAREN LBRACE
       REDIRECT_OUT REDIRECT_CLOBBER REDIRECT_APPEND
       REDIRECT_IN REDIRECT_ERR
-      DUP_OUT DUP_IN DUP_ERR
+      DUP_OUT DUP_IN DUP_ERR REDIRECT_ERR_APPEND
       HEREDOC HEREDOC_INDENT HERESTRING
       VARNAME_REDIRECT
     ].freeze
@@ -215,7 +216,7 @@ module Rubish
       if two_char == '>('
         return read_process_substitution(:PROC_SUB_OUT)
       end
-      # Check for three-char operators first: ;;& and 2>&
+      # Check for three-char operators first: ;;&, 2>&, 2>>
       three_char_op = @input[@pos, 3]
       if three_char_op == ';;&'
         @pos += 3
@@ -224,6 +225,10 @@ module Rubish
       if three_char_op == '2>&'
         @pos += 3
         return Token.new(:DUP_ERR, '2>&')
+      end
+      if three_char_op == '2>>'
+        @pos += 3
+        return Token.new(:REDIRECT_ERR_APPEND, '2>>')
       end
       if %w[>> >| 2> >& <& && || () ;; ;& |&].include?(two_char)
         @pos += 2
