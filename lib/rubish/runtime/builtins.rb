@@ -715,8 +715,12 @@ module Rubish
         Dir.chdir(target)
         ENV['PWD'] = target
       else
-        Dir.chdir(dir)
-        ENV['PWD'] = Dir.pwd
+        # Logical $PWD (bash default): keep symlinks. Use $PWD as the base only
+        # while it still names the current dir, else the physical cwd.
+        base = ENV['PWD'] && File.identical?(ENV['PWD'], Dir.pwd) ? ENV['PWD'] : Dir.pwd
+        logical = File.expand_path(dir, base)
+        Dir.chdir(logical)
+        ENV['PWD'] = logical
       end
 
       # Print directory when found via CDPATH or cd -
