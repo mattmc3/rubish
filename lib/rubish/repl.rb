@@ -826,7 +826,10 @@ module Rubish
       # onecmd: exit after reading and executing one command
       throw(:exit, @last_status || 0) if Builtins.set_option?('t')
     rescue Interrupt
-      puts
+      # Frontend::Tty's CtrlCEcho prepend already wrote `^C` next to
+      # the user's input and Reline's handle_interrupted already
+      # scrolled the cursor down a line. Nothing to do here — the next
+      # loop iteration paints a clean prompt with an empty buffer.
     rescue Errno::EIO
       # Ignore I/O errors from terminal control issues during job control
     rescue => e
