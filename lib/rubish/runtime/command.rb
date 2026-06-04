@@ -241,7 +241,7 @@ module Rubish
       @stdin = File.open(file, 'r')
       self
     rescue Errno::ENOENT, Errno::EACCES => e
-      $stderr.puts "rubish: #{file}: #{e.message.split(' @ ').first}"
+      $stderr.puts "rubish: #{file}: #{e.class.new.message}"
       @restricted_failed = true
       self
     end
@@ -1007,7 +1007,7 @@ module Rubish
       @stdin = File.open(file, 'r')
       self
     rescue Errno::ENOENT, Errno::EACCES => e
-      $stderr.puts "rubish: #{file}: #{e.message.split(' @ ').first}"
+      $stderr.puts "rubish: #{file}: #{e.class.new.message}"
       @restricted_failed = true
       self
     end
