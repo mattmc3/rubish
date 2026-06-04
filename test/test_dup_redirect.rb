@@ -231,4 +231,57 @@ class TestDupRedirect < Test::Unit::TestCase
     subshell = Rubish::Subshell.new { true }
     assert subshell.respond_to?(:dup_in), 'Subshell should have dup_in method'
   end
+
+  # A digit immediately followed by an output (1) or input (0) redirect
+  # operator is a verbose alias for the bare form. The leading digit
+  # used to be lexed as a standalone WORD, so e.g. `echo hi 1>file`
+  # wrote `hi 1` to the file.
+  def test_fd1_prefix_redirect_out
+    out = File.join(@tempdir, 'out')
+    execute("echo hi 1>#{out}")
+    assert_equal "hi\n", File.read(out)
+  end
+
+  def test_fd1_prefix_redirect_append
+    out = File.join(@tempdir, 'out')
+    execute("echo a 1>#{out}")
+    execute("echo b 1>>#{out}")
+    assert_equal "a\nb\n", File.read(out)
+  end
+
+  def test_fd1_prefix_dup
+    # `1>&2` is a verbose `>&2` — redirect stdout to stderr.
+    # The leading `1` must be consumed as an fd prefix, not surface as
+    # an argument to echo. Check via the AST since DUP_OUT's target
+    # (the `2`) is also a WORD token at lex time.
+    tokens = Rubish::Lexer.new('echo hi 1>&2').tokenize
+    ast = Rubish::Parser.new(tokens).parse
+    cmd = ast.is_a?(Rubish::AST::Redirect) ? ast.command : ast
+    assert_equal 'echo', cmd.name
+    assert_equal %w[hi], cmd.args
+  end
+
+  def test_fd0_prefix_redirect_in
+    src = File.join(@tempdir, 'in')
+    out = File.join(@tempdir, 'out')
+    File.write(src, "hello\n")
+    execute("cat 0<#{src} > #{out}")
+    assert_equal "hello\n", File.read(out)
+  end
+
+  # `echo 1 >file` (whitespace between digit and redirect) still puts
+  # "1" in the file.
+  def test_digit_with_whitespace_before_redirect_is_arg
+    out = File.join(@tempdir, 'out')
+    execute("echo 1 >#{out}")
+    assert_equal "1\n", File.read(out)
+  end
+
+  # Numbers that aren't followed immediately by a redirect operator
+  # stay as plain WORDs.
+  def test_digit_not_followed_by_redirect_stays_a_word
+    out = File.join(@tempdir, 'out')
+    execute("echo 1abc 0xyz >#{out}")
+    assert_equal "1abc 0xyz\n", File.read(out)
+  end
 end

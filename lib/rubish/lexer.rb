@@ -230,6 +230,16 @@ module Rubish
         @pos += 3
         return Token.new(:REDIRECT_ERR_APPEND, '2>>')
       end
+      # Fd-prefixed redirects: an explicit `1` before an output redirect
+      # or `0` before an input redirect is just a verbose alias for the
+      # bare form. Whitespace would have been skipped before read_token,
+      # so `echo 1 >file` (with the space) still keeps `1` as an arg.
+      if @input[@pos] == '1' && %w[> >> >| >&].any? { |op| @input[@pos + 1, op.length] == op }
+        @pos += 1  # consume the leading '1', let the operator match normally below
+      elsif @input[@pos] == '0' && (@input[@pos + 1] == '<' || @input[@pos + 1, 2] == '<&')
+        @pos += 1
+      end
+      two_char = @input[@pos, 2]  # refresh after possibly consuming a digit prefix
       if %w[>> >| 2> >& <& && || () ;; ;& |&].include?(two_char)
         @pos += 2
         return Token.new(OPERATORS[two_char], two_char)
