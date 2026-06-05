@@ -131,6 +131,15 @@ class TestTildeExpansion < Test::Unit::TestCase
     assert_equal '~-', expand_resolved('~-')
   end
 
+  # Bash distinguishes unset OLDPWD (`~-` stays literal) from empty
+  # OLDPWD (`~-` expands to the empty string). The `:-` default in
+  # `${OLDPWD:-~-}` would conflate the two; `${OLDPWD-~-}` (no colon)
+  # matches bash.
+  def test_tilde_minus_empty_oldpwd_expands_to_empty
+    ENV['OLDPWD'] = ''
+    assert_equal '', expand_resolved('~-')
+  end
+
   def test_tilde_plus_in_command
     ENV['PWD'] = '/current'
     assert_equal 'ls /current', expand_resolved('ls ~+')

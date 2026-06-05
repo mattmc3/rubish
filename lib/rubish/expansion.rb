@@ -780,8 +780,12 @@ module Rubish
         # Defer to $PWD so it resolves at command-execution time, after any cd.
         return ['$PWD', 2] if line[i + 2].nil? || line[i + 2] =~ %r{[\s/]}
       when '-'
-        # Defer to $OLDPWD; the :- default keeps bash's "unset -> literal ~-".
-        return ['${OLDPWD:-~-}', 2] if line[i + 2].nil? || line[i + 2] =~ %r{[\s/]}
+        # Defer to $OLDPWD; the `-` (no colon) default keeps bash's
+        # semantics: literal `~-` only when OLDPWD is *unset*. An
+        # explicitly-empty OLDPWD (`OLDPWD=; echo ~-`) expands to the
+        # empty string, like bash. `${OLDPWD:-~-}` (colon-dash) would
+        # incorrectly print `~-` for the empty case.
+        return ['${OLDPWD-~-}', 2] if line[i + 2].nil? || line[i + 2] =~ %r{[\s/]}
       end
 
       j = i + 1
