@@ -138,4 +138,34 @@ class TestEscapeExpansion < Test::Unit::TestCase
 
     assert_equal File.realpath(File.join(@tempdir, 'Foo Bar')), File.realpath(Dir.pwd)
   end
+
+  # Adjacent quoted segments are concatenated into one word (bash/POSIX behavior).
+  # eg. 'foo''bar' is two adjacent single-quoted tokens forming the word "foobar".
+
+  def test_adjacent_single_quoted_segments_concatenate
+    execute("echo 'two single-quoted pa''rts in one token' > #{output_file}")
+    assert_equal "two single-quoted parts in one token\n", File.read(output_file)
+  end
+
+  def test_unquoted_adjacent_to_single_quoted_concatenates
+    execute("echo unquoted' and single-quoted' > #{output_file}")
+    assert_equal "unquoted and single-quoted\n", File.read(output_file)
+  end
+
+  def test_mixed_quote_styles_in_one_word_concatenate
+    execute("echo unquoted'  single-quoted'\"  double-quoted  \"unquoted > #{output_file}")
+    assert_equal "unquoted  single-quoted  double-quoted  unquoted\n", File.read(output_file)
+  end
+
+  # A "$(...)"/`...` segment that itself contains " must not end the double-quoted
+  # segment early when the token has adjacent segments (the cmdsub must still run).
+  def test_double_quoted_command_substitution_with_inner_quotes_in_multi_segment_word
+    execute('echo "$(printf "%s" hi)"_tail > ' + output_file)
+    assert_equal "hi_tail\n", File.read(output_file)
+  end
+
+  def test_double_quoted_backtick_with_inner_quotes_in_multi_segment_word
+    execute('echo "`echo "x"`"_tail > ' + output_file)
+    assert_equal "x_tail\n", File.read(output_file)
+  end
 end
