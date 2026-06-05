@@ -163,14 +163,12 @@ class TestBash_Printf < Test::Unit::TestCase
 
   # printf "\045"  ->  %  (octal escape 045 = 0x25 = '%')
   def test_printf_octal_045
-    omit 'octal escapes in format string not supported'
     execute("printf '\\045' > #{outf}")
     assert_equal "%", File.read(outf)
   end
 
   # printf "\045d\n"  ->  %d\n
   def test_printf_octal_045d
-    omit 'octal escapes in format string not supported'
     execute("printf '\\045d\\n' > #{outf}")
     assert_equal "%d\n", File.read(outf)
   end

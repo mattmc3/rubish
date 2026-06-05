@@ -523,7 +523,6 @@ class TestBash_Exp < Test::Unit::TestCase
 
   # exp.tests: null string concat with single-quoted empty -- abcd''efgh -> abcdefgh
   def test_null_string_concat_single_quoted
-    omit 'null-string concat (adjacent quoted segments) needs unmerged word-parsing fix'
     execute("echo abcd''efgh > #{outf}")
     assert_equal "abcdefgh\n", File.read(outf)
   end
@@ -613,7 +612,6 @@ class TestBash_Exp < Test::Unit::TestCase
   # new-exp.tests: negative length means offset from end (bash-4.2+)
   # var=abc; c=${var:0:-2}; echo $c  ->  a
   def test_param_substr_negative_length
-    omit 'negative length in ${var:offset:-N} not yet supported'
     execute("var=abc; echo ${var:0:-2} > #{outf}")
     assert_equal "a\n", File.read(outf)
   end

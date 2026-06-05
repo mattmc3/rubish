@@ -151,7 +151,6 @@ class TestBash_Posixpat < Test::Unit::TestCase
   # case a in [[:alpha:]\]) echo oops;; *) echo ok;; esac  ->  ok 21
   # dangling backslash inside bracket expression should not match
   def test_posixpat_dangling_backslash_in_bracket
-    omit 'dangling backslash in bracket expression not handled'
     execute("case a in ([[:alpha:]\\]) echo bad > #{outf};; (*) echo ok > #{outf};; esac")
     assert_equal "ok\n", File.read(outf)
   end
@@ -246,7 +245,6 @@ class TestBash_Posixpat < Test::Unit::TestCase
 
   # case ' ' in [[.grave-accent.]]) -> ok 6 (no match, grave-accent is not space)
   def test_posixpat_collating_grave_no_match_space
-    omit 'collating symbols [.x.] not implemented'
     execute("case ' ' in ([[.grave-accent.]]) echo bad > #{outf};; (*) echo ok > #{outf};; esac")
     assert_equal "ok\n", File.read(outf)
   end
@@ -260,7 +258,6 @@ class TestBash_Posixpat < Test::Unit::TestCase
 
   # case 'c' in [[.yyz.]-[.z.]]) -> ok 8 (invalid symbol, no match)
   def test_posixpat_collating_invalid_range_no_match
-    omit 'collating symbols [.x.] not implemented'
     execute("case c in ([[.yyz.]-[.z.]]) echo bad > #{outf};; (*) echo ok > #{outf};; esac")
     assert_equal "ok\n", File.read(outf)
   end
@@ -281,7 +278,6 @@ class TestBash_Posixpat < Test::Unit::TestCase
 
   # case 'p' in [[.a.]-[.Z.]]) -> ok 11 (no match, bad range a-Z)
   def test_posixpat_collating_bad_range_a_Z
-    omit 'collating symbols [.x.] not implemented'
     execute("case p in ([[.a.]-[.Z.]]) echo bad > #{outf};; (*) echo ok > #{outf};; esac")
     assert_equal "ok\n", File.read(outf)
   end
@@ -332,14 +328,12 @@ class TestBash_Posixpat < Test::Unit::TestCase
 
   # case "abc" in [[:alpha:]][[=B=]][[:ascii:]]) -> ok 2 (B != b, no match)
   def test_posixpat_equiv_class_B_no_match_b
-    omit 'equivalence classes [=x=] not implemented'
     execute("case abc in ([[:alpha:]][[=B=]][[:ascii:]]) echo bad > #{outf};; (*) echo ok > #{outf};; esac")
     assert_equal "ok\n", File.read(outf)
   end
 
   # case a in [[=b=]) -> ok 3 (incomplete equiv class, no match)
   def test_posixpat_incomplete_equiv_class_no_match
-    omit 'equivalence classes [=x=] not implemented'
     execute("case a in ([[=b=]) echo bad > #{outf};; (*) echo ok > #{outf};; esac")
     assert_equal "ok\n", File.read(outf)
   end

@@ -58,7 +58,6 @@ class TestBash_Array < Test::Unit::TestCase
 
   # a=(1 2 3); for x in ${a[@]}; do echo $x; done  ->  1\n2\n3
   def test_array_for_loop
-    omit '${a[@]} expansion in for loop not yet working'
     execute("a=(1 2 3); for x in ${a[@]}; do echo $x >> #{outf}; done")
     assert_equal "1\n2\n3\n", File.read(outf)
   end

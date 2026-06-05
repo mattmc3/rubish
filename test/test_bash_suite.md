@@ -7,14 +7,14 @@ Each file in `test/test_bash_suite_*.rb` corresponds to one or more files in
 
 | Test file                    | Bash source                              | Tests | Omitted |
 | ---------------------------- | ---------------------------------------- | ----- | ------- |
-| test_bash_suite_appendop.rb  | appendop.tests                           | 19    | 13      |
+| test_bash_suite_appendop.rb  | appendop.tests                           | 19    | 10      |
 | test_bash_suite_arith.rb     | arith.tests                              | 63    | 1       |
 | test_bash_suite_arith_for.rb | arith-for.tests                          | 20    | 5       |
-| test_bash_suite_array.rb     | array.tests                              | 47    | 26      |
+| test_bash_suite_array.rb     | array.tests                              | 47    | 25      |
 | test_bash_suite_braces.rb    | braces.tests                             | 89    | 29      |
 | test_bash_suite_builtins.rb  | builtins.tests                           | 46    | 12      |
-| test_bash_suite_case.rb      | case.tests                               | 30    | 10      |
-| test_bash_suite_comsub.rb    | comsub.tests                             | 25    | 6       |
+| test_bash_suite_case.rb      | case.tests                               | 30    | 11      |
+| test_bash_suite_comsub.rb    | comsub.tests                             | 25    | 8       |
 | test_bash_suite_cond.rb      | cond.tests                               | 52    | 7       |
 | test_bash_suite_exp.rb       | exp.tests, new-exp.tests, more-exp.tests | 110   | 20      |
 | test_bash_suite_func.rb      | func.tests                               | 23    | 8       |
@@ -22,20 +22,20 @@ Each file in `test/test_bash_suite_*.rb` corresponds to one or more files in
 | test_bash_suite_ifs.rb       | ifs.tests                                | 15    | 5       |
 | test_bash_suite_invert.rb    | invert.tests                             | 6     | 0       |
 | test_bash_suite_loops.rb     | (while/until, no direct bash file)       | 8     | 0       |
-| test_bash_suite_nquote.rb    | nquote.tests                             | 18    | 3       |
-| test_bash_suite_posixpat.rb  | posixpat.tests                           | 49    | 20      |
-| test_bash_suite_posixpipe.rb | posixpipe.tests                          | 16    | 3       |
-| test_bash_suite_printf.rb    | printf.tests                             | 132   | 15      |
+| test_bash_suite_nquote.rb    | nquote.tests                             | 18    | 2       |
+| test_bash_suite_posixpat.rb  | posixpat.tests                           | 49    | 14      |
+| test_bash_suite_posixpipe.rb | posixpipe.tests                          | 16    | 2       |
+| test_bash_suite_printf.rb    | printf.tests                             | 132   | 20      |
 | test_bash_suite_quote.rb     | quote.tests                              | 26    | 7       |
 | test_bash_suite_read.rb      | read.tests                               | 22    | 10      |
-| test_bash_suite_redir.rb     | redir.tests                              | 18    | 12      |
+| test_bash_suite_redir.rb     | redir.tests                              | 18    | 11      |
 | test_bash_suite_strip.rb     | strip.tests                              | 10    | 1       |
 | test_bash_suite_subshell.rb  | (subshell, no direct bash file)          | 6     | 1       |
 | test_bash_suite_test.rb      | test.tests                               | 79    | 4       |
 | test_bash_suite_tilde.rb     | tilde.tests                              | 25    | 14      |
 | test_bash_suite_varenv.rb    | varenv.tests                             | 24    | 6       |
 
-**Total: 1013 tests — 768 passing, 0 failing, 245 omitted (76% passing)**
+**Total: 1013 tests — 773 passing, 0 failing, 240 omitted (76% passing)**
 
 ## Not yet covered — practical to add
 
@@ -104,33 +104,34 @@ These cover bash features rubish will not implement:
 | #   | Feature                                                                                          | Omissions |
 | --- | ------------------------------------------------------------------------------------------------ | --------- |
 | 1   | Brace expansion: invalid/edge cases (lone `{}`/`}`, escaped commas, var in list, nested invalid) | 29        |
-| 2   | Array: indexed compound assignment, array slices, scalar↔array coercion                          | 26        |
+| 2   | Array: indexed compound assignment, array slices, scalar↔array coercion                          | 25        |
 | 3   | Parameter expansion edge cases (exp.tests, new-exp.tests)                                        | 20        |
-| 4   | Posixpat bracket expressions (extglob, CTLESC, dangling backslash)                               | 20        |
-| 5   | Printf: remaining format string issues (\c, octal in format, %b edge cases)                      | 15        |
+| 4   | Printf: format-string octal, `\c`/`\x`, %b edge cases, %s precision, %q (unmerged)               | 20        |
+| 5   | Posixpat brackets: collating `[.x.]` / equivalence `[=x=]` (unmerged), dangling backslash        | 14        |
 | 6   | Tilde expansion (all forms: `~`, `~/path`, `~+`, `~-`, `~user`, in assignment/export)            | 14        |
-| 7   | Appendop: `typeset -i` arithmetic, array literal `+=`, command-local `+=` prefix                 | 13        |
-| 8   | Builtins: eval double-expansion, `builtin`/`command` keyword, `declare -p`, alias format         | 12        |
-| 9   | Redir: exec FD redirect, `>&2`, block redirect, noclobber exit status                            | 12        |
-| 10  | Case/read: case `;& `/ `;;& ` fallthrough; read IFS variants, file redirect                      | 10        |
+| 7   | Builtins: eval double-expansion, `builtin`/`command` keyword, `declare -p`/`-f`/`-F`, alias      | 12        |
+| 8   | Case: `;&` / `;;&` fallthrough, reserved-word patterns, empty-pattern (case fix unmerged)        | 11        |
+| 9   | Redir: exec FD redirect, `>&2`, block redirect, noclobber exit status                            | 11        |
+| 10  | Read: IFS variants, file redirect, trailing-space, readonly                                      | 10        |
 
 ## Common omit reasons
 
 | Reason                                                        | Count |
 | ------------------------------------------------------------- | ----- |
 | brace expansion: invalid/edge cases not passed through        | 29    |
-| array: indexed compound assign, slices, scalar coercion       | 26    |
-| posixpat bracket/extglob/CTLESC patterns not handled          | 20    |
+| array: indexed compound assign, slices, scalar coercion       | 25    |
 | param expansion edge cases (${x#$y}, ${#N}, ${N} with braces) | 20    |
-| printf: format-string octal, %b edge cases, %s precision      | 15    |
+| printf: format octal/`\c`/`\x`, %b edge cases, %s prec, %q    | 20    |
+| posixpat collating `[.x.]` / equivalence `[=x=]` (unmerged)   | 14    |
 | tilde expansion not yet supported (all forms)                 | 14    |
-| appendop typeset -i arithmetic / array / command-prefix       | 13    |
-| builtin/command keyword, eval double-expansion, declare -p    | 12    |
-| redir: exec FD, >&2, block redirect, noclobber exit status    | 12    |
-| case ;& / ;;& fallthrough not yet supported                   | 10    |
+| builtin/command keyword, eval double-expansion, declare -p/-f | 12    |
+| case `;&` / `;;&` fallthrough, reserved-word patterns         | 11    |
+| redir: exec FD, >&2, block redirect, noclobber exit status    | 11    |
+| appendop typeset -i arithmetic / array / command-prefix       | 10    |
 | read: IFS variants, file redirect, trailing-space, readonly   | 10    |
+| comsub edge cases (inline concat, backtick escapes, strip)    | 8     |
 | quote/nquote: backslash-newline continuation, $'...' in dquot | 9     |
 | heredoc: backslash-newline join, multiple heredocs, dquote    | 7     |
-| comsub edge cases (inline concat, backtick escapes, exit)     | 6     |
+| cond/test: [[ ]] arithmetic operands, -ef, -ot, ! chaining    | 7     |
 | IFS: typeset/env-prefix local IFS, eval split, posix mode     | 5     |
-| subshell exit code not propagated to $?                       | 3     |
+| func: $FUNCNAME, body-level redirect, return in pipeline      | 8     |

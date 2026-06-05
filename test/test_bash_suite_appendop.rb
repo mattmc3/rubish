@@ -60,7 +60,6 @@ class TestBash_Appendop < Test::Unit::TestCase
 
   # after command-local a+=5, shell var a is unchanged
   def test_appendop_command_env_prefix_unchanged
-    omit 'command-local += env prefix not yet supported'
     execute("a=1; a+=4; a+=5 printenv a > /dev/null; echo $a > #{outf}")
     assert_equal "14\n", File.read(outf)
   end
@@ -73,14 +72,12 @@ class TestBash_Appendop < Test::Unit::TestCase
 
   # b=4+1; typeset -i b -> 5; b+=37 -> 5+37=42
   def test_appendop_integer_arith
-    omit 'integer += arithmetic not yet supported'
     execute("b=4+1; typeset -i b; b+=37; echo $b > #{outf}")
     assert_equal "42\n", File.read(outf)
   end
 
   # typeset -i x; x=(1 2 3 4 5); x[4]+=7 -> 5+7=12
   def test_appendop_integer_array_element
-    omit 'integer array element += not yet supported'
     execute("unset x; x=(1 2 3 4 5); typeset -i x; x[4]+=7; echo ${x[@]} > #{outf}")
     assert_equal "1 2 3 4 12\n", File.read(outf)
   end

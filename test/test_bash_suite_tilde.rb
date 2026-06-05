@@ -8,9 +8,11 @@ class TestBash_Tilde < Test::Unit::TestCase
     @repl = Rubish::REPL.new
     @tempdir = Dir.mktmpdir('rubish_bash_suite_test')
     @saved_env = ENV.to_h
+    @orig_cwd = Dir.pwd
   end
 
   def teardown
+    Dir.chdir(@orig_cwd) if @orig_cwd && File.directory?(@orig_cwd)
     FileUtils.rm_rf(@tempdir)
     ENV.clear
     @saved_env.each { |k, v| ENV[k] = v }
@@ -114,14 +116,12 @@ class TestBash_Tilde < Test::Unit::TestCase
 
   # cd /usr; cd /tmp; echo ~-  ->  /usr  (OLDPWD expansion)
   def test_tilde_minus_oldpwd
-    omit 'cd does not update OLDPWD correctly'
     execute("cd /usr; cd /tmp; echo ~- > #{outf}")
     assert_equal "/usr\n", File.read(outf)
   end
 
   # cd /usr; cd /tmp; echo ~+  ->  /tmp  (PWD expansion)
   def test_tilde_plus_pwd
-    omit 'cd does not update PWD correctly'
     execute("cd /usr; cd /tmp; echo ~+ > #{outf}")
     assert_equal "/tmp\n", File.read(outf)
   end

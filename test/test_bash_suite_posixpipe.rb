@@ -77,7 +77,6 @@ class TestBash_Posixpipe < Test::Unit::TestCase
 
   # ! ! true; echo $?  ->  0  (double negation)
   def test_bang_double_negation
-    omit 'rubish emits error for chained ! but gives correct exit'
     execute("! ! true; echo $? > #{outf}")
     assert_equal "0\n", File.read(outf)
   end

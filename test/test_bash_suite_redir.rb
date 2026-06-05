@@ -66,7 +66,6 @@ class TestBash_Redir < Test::Unit::TestCase
 
   # noclobber: > on existing file fails, >| overrides
   def test_redir_noclobber
-    omit 'noclobber does not return non-zero exit status on failure'
     execute("echo first > #{outf}")
     execute('set -o noclobber')
     execute("echo second > #{outf} 2>/dev/null; echo $? >> #{outf}")

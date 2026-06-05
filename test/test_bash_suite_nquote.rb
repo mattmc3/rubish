@@ -28,7 +28,6 @@ execute("echo $'abc' > #{outf}")
 
   # echo $'\n\n\n'  ->  (3 newlines)
   def test_nquote_newlines
-    omit "$'...' trailing newlines are stripped incorrectly"
     execute("echo $'\\n\\n\\n' > #{outf}")
     assert_equal "\n\n\n\n", File.read(outf)
   end
