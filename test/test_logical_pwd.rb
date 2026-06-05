@@ -50,4 +50,26 @@ class TestLogicalPwd < Test::Unit::TestCase
       assert_equal "#{real}\n", out
     end
   end
+
+  # `cd ..` from a symlinked directory should go to the logical parent
+  # (the parent of the symlink, not the parent of its target). This
+  # exercises the File.expand_path('..', logical_base) path.
+  def test_cd_dotdot_from_symlink_is_logical_parent
+    with_symlink do |_real, link, _out|
+      parent = File.dirname(link)
+      out = capture_output { execute("cd #{link}; cd ..; pwd") }
+      assert_equal "#{parent}\n", out
+    end
+  end
+
+  # `~+` resolves to $PWD at command-execution time (PR #38) and $PWD
+  # is now logical (PR #39) — together that should make `echo ~+`
+  # from a symlinked directory report the symlink, not the target.
+  # Lock the cross-PR interaction in with a regression test.
+  def test_tilde_plus_is_logical_after_cd_symlink
+    with_symlink do |_real, link, out|
+      execute("cd #{link}; echo ~+ > #{out}")
+      assert_equal "#{link}\n", File.read(out)
+    end
+  end
 end
