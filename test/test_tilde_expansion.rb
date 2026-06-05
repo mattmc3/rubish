@@ -221,4 +221,50 @@ class TestTildeExpansion < Test::Unit::TestCase
       end
     end
   end
+
+  # Tildes inside single or double quotes are literal in bash. The
+  # current tilde preprocessor already honors quoted context; lock
+  # that in so a refactor of `expand_tilde` can't accidentally start
+  # rewriting `~+` / `~-` inside quotes.
+  def test_tilde_plus_in_single_quotes_stays_literal
+    Dir.mktmpdir do |d|
+      dir = File.realpath(d)
+      out = File.join(dir, 'out')
+      execute("cd #{dir}; echo '~+' > #{out}")
+      assert_equal "~+\n", File.read(out)
+    end
+  end
+
+  def test_tilde_plus_in_double_quotes_stays_literal
+    Dir.mktmpdir do |d|
+      dir = File.realpath(d)
+      out = File.join(dir, 'out')
+      execute(%(cd #{dir}; echo "~+" > #{out}))
+      assert_equal "~+\n", File.read(out)
+    end
+  end
+
+  def test_tilde_minus_in_single_quotes_stays_literal
+    Dir.mktmpdir do |d1|
+      Dir.mktmpdir do |d2|
+        old = File.realpath(d1)
+        cur = File.realpath(d2)
+        out = File.join(cur, 'out')
+        execute("cd #{old}; cd #{cur}; echo '~-' > #{out}")
+        assert_equal "~-\n", File.read(out)
+      end
+    end
+  end
+
+  def test_tilde_minus_in_double_quotes_stays_literal
+    Dir.mktmpdir do |d1|
+      Dir.mktmpdir do |d2|
+        old = File.realpath(d1)
+        cur = File.realpath(d2)
+        out = File.join(cur, 'out')
+        execute(%(cd #{old}; cd #{cur}; echo "~-" > #{out}))
+        assert_equal "~-\n", File.read(out)
+      end
+    end
+  end
 end
