@@ -7,8 +7,6 @@ Each file in `test/test_bash_suite_*.rb` corresponds to one or more files in
 
 | Test file                    | Bash source                              | Tests | Omitted |
 | ---------------------------- | ---------------------------------------- | ----- | ------- |
-| Test file                    | Bash source                              | Tests | Omitted |
-| ---------------------------- | ---------------------------------------- | ----- | ------- |
 | test_bash_suite_appendop.rb  | appendop.tests                           | 19    | 13      |
 | test_bash_suite_arith.rb     | arith.tests                              | 63    | 1       |
 | test_bash_suite_arith_for.rb | arith-for.tests                          | 20    | 5       |
@@ -103,36 +101,36 @@ These cover bash features rubish will not implement:
 
 ## Top 10 features to fix (by omissions unblocked)
 
-| #   | Feature                                                                                             | Omissions |
-| --- | --------------------------------------------------------------------------------------------------- | --------- |
-| 1   | Brace expansion: invalid/edge cases (lone `{}`/`}`, escaped commas, var in list, nested invalid)   | 29        |
-| 2   | Array: indexed compound assignment, array slices, scalar↔array coercion                            | 26        |
-| 3   | Parameter expansion edge cases (exp.tests, new-exp.tests)                                          | 20        |
-| 4   | Posixpat bracket expressions (extglob, CTLESC, dangling backslash)                                 | 20        |
-| 5   | Printf: remaining format string issues (\c, octal in format, %b edge cases)                        | 15        |
-| 6   | Tilde expansion (all forms: `~`, `~/path`, `~+`, `~-`, `~user`, in assignment/export)              | 14        |
-| 7   | Appendop: `typeset -i` arithmetic, array literal `+=`, command-local `+=` prefix                   | 13        |
-| 8   | Builtins: eval double-expansion, `builtin`/`command` keyword, `declare -p`, alias format           | 12        |
-| 9   | Redir: exec FD redirect, `>&2`, block redirect, noclobber exit status                              | 12        |
-| 10  | Case/read: case `;& `/ `;;& ` fallthrough; read IFS variants, file redirect                       | 10        |
+| #   | Feature                                                                                          | Omissions |
+| --- | ------------------------------------------------------------------------------------------------ | --------- |
+| 1   | Brace expansion: invalid/edge cases (lone `{}`/`}`, escaped commas, var in list, nested invalid) | 29        |
+| 2   | Array: indexed compound assignment, array slices, scalar↔array coercion                          | 26        |
+| 3   | Parameter expansion edge cases (exp.tests, new-exp.tests)                                        | 20        |
+| 4   | Posixpat bracket expressions (extglob, CTLESC, dangling backslash)                               | 20        |
+| 5   | Printf: remaining format string issues (\c, octal in format, %b edge cases)                      | 15        |
+| 6   | Tilde expansion (all forms: `~`, `~/path`, `~+`, `~-`, `~user`, in assignment/export)            | 14        |
+| 7   | Appendop: `typeset -i` arithmetic, array literal `+=`, command-local `+=` prefix                 | 13        |
+| 8   | Builtins: eval double-expansion, `builtin`/`command` keyword, `declare -p`, alias format         | 12        |
+| 9   | Redir: exec FD redirect, `>&2`, block redirect, noclobber exit status                            | 12        |
+| 10  | Case/read: case `;& `/ `;;& ` fallthrough; read IFS variants, file redirect                      | 10        |
 
 ## Common omit reasons
 
-| Reason                                                          | Count |
-| --------------------------------------------------------------- | ----- |
-| brace expansion: invalid/edge cases not passed through          | 29    |
-| array: indexed compound assign, slices, scalar coercion         | 26    |
-| posixpat bracket/extglob/CTLESC patterns not handled            | 20    |
-| param expansion edge cases (${x#$y}, ${#N}, ${N} with braces)  | 20    |
-| printf: format-string octal, %b edge cases, %s precision        | 15    |
-| tilde expansion not yet supported (all forms)                   | 14    |
-| appendop typeset -i arithmetic / array / command-prefix         | 13    |
-| builtin/command keyword, eval double-expansion, declare -p      | 12    |
-| redir: exec FD, >&2, block redirect, noclobber exit status      | 12    |
-| case ;& / ;;& fallthrough not yet supported                     | 10    |
-| read: IFS variants, file redirect, trailing-space, readonly     | 10    |
-| quote/nquote: backslash-newline continuation, $'...' in dquot  | 9     |
-| heredoc: backslash-newline join, multiple heredocs, dquote      | 7     |
-| comsub edge cases (inline concat, backtick escapes, exit)       | 6     |
-| IFS: typeset/env-prefix local IFS, eval split, posix mode      | 5     |
-| subshell exit code not propagated to $?                         | 3     |
+| Reason                                                        | Count |
+| ------------------------------------------------------------- | ----- |
+| brace expansion: invalid/edge cases not passed through        | 29    |
+| array: indexed compound assign, slices, scalar coercion       | 26    |
+| posixpat bracket/extglob/CTLESC patterns not handled          | 20    |
+| param expansion edge cases (${x#$y}, ${#N}, ${N} with braces) | 20    |
+| printf: format-string octal, %b edge cases, %s precision      | 15    |
+| tilde expansion not yet supported (all forms)                 | 14    |
+| appendop typeset -i arithmetic / array / command-prefix       | 13    |
+| builtin/command keyword, eval double-expansion, declare -p    | 12    |
+| redir: exec FD, >&2, block redirect, noclobber exit status    | 12    |
+| case ;& / ;;& fallthrough not yet supported                   | 10    |
+| read: IFS variants, file redirect, trailing-space, readonly   | 10    |
+| quote/nquote: backslash-newline continuation, $'...' in dquot | 9     |
+| heredoc: backslash-newline join, multiple heredocs, dquote    | 7     |
+| comsub edge cases (inline concat, backtick escapes, exit)     | 6     |
+| IFS: typeset/env-prefix local IFS, eval split, posix mode     | 5     |
+| subshell exit code not propagated to $?                       | 3     |
