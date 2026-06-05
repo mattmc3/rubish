@@ -502,10 +502,11 @@ module Rubish
       COLLATING_SYMBOLS[name]
     end
 
-    # Escape a char for safe inclusion inside a regex character class. `-` is
-    # left raw so collating endpoints still form ranges ([[.a.]-[.z.]] -> [a-z]).
+    # Escape a char for safe inclusion inside a regex character class. Ranges
+    # like [[.a.]-[.z.]] still work: the range operator is the user-typed `-`
+    # between two escaped outputs, never the escaped char itself.
     def class_escape(ch)
-      [']', '\\', '^'].include?(ch) ? "\\#{ch}" : ch
+      [']', '\\', '^', '-'].include?(ch) ? "\\#{ch}" : ch
     end
 
     def apply_globignore(matches)
