@@ -20,6 +20,12 @@ module Rubish
       result
     end
 
+    def resolve_array_element(name, subscript)
+      idx = eval_single_arithmetic(subscript)
+      elem = Builtins.get_array_element(name, idx)
+      elem.to_s.empty? ? '0' : elem.to_s
+    end
+
     def split_arithmetic_expressions(expr)
       # Split by comma, but not inside parentheses
       result = []
@@ -172,13 +178,28 @@ module Rubish
       # Regular arithmetic expression - evaluate directly to handle booleans
       # Pre-convert hex literals so their letter chars don't get treated as variables
       expr = expr.gsub(/0[xX][0-9a-fA-F]+/) { |m| Integer(m).to_s }
-      # Expand variables first
-      expanded = expr.gsub(/\$\{([^}]+)\}|\$(\d+)|\$([a-zA-Z_][a-zA-Z0-9_]*)|([a-zA-Z_][a-zA-Z0-9_]*)/) do |match|
+      # Expand variables first. `arr[expr]` / `${arr[expr]}` / `$arr[expr]`
+      # all refer to an indexed array element — recursively evaluate the
+      # subscript, then look up the element. Bash uses the same rule
+      # inside `(( ))` and `$(( ))`.
+      expanded = expr.gsub(/\$\{([^}]+)\}|\$(\d+)|\$?([a-zA-Z_][a-zA-Z0-9_]*)(\[[^\]]+\])?/) do |match|
         if $2 # Positional parameter like $1, $2
           n = $2.to_i
           (@positional_params[n - 1] || '0')
-        elsif (var_name = $1 || $3 || $4)
-          get_special_var(var_name) || Builtins.get_var(var_name) || '0'
+        elsif (braced = $1)
+          # ${var} or ${arr[expr]} (the latter only — already stripped by [^}]+)
+          if braced =~ /\A([a-zA-Z_][a-zA-Z0-9_]*)\[(.+)\]\z/
+            resolve_array_element($1, $2)
+          else
+            get_special_var(braced) || Builtins.get_var(braced) || '0'
+          end
+        elsif (var_name = $3)
+          subscript = $4
+          if subscript
+            resolve_array_element(var_name, subscript[1...-1])
+          else
+            get_special_var(var_name) || Builtins.get_var(var_name) || '0'
+          end
         else
           match
         end

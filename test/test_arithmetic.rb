@@ -225,4 +225,37 @@ class TestArithmetic < Test::Unit::TestCase
     execute("echo $((0x100 | 007)) > #{output_file}")
     assert_equal "263\n", File.read(output_file)
   end
+
+  # Array element references inside arithmetic. Bash allows `arr[i]`
+  # (with or without `$`, with or without `${...}`) as a subexpression
+  # inside `(( ))` and `$(( ))`. rubish's evaluator used to match the
+  # bare `arr` identifier, look it up as a scalar (empty), and eval
+  # `0[0]*2`, which Ruby happily computed as 0.
+  def test_arith_array_element_bare_reference
+    execute("arr[0]=5; arr[1]=7; echo $((arr[0]+arr[1])) > #{output_file}")
+    assert_equal "12\n", File.read(output_file)
+  end
+
+  def test_arith_array_element_braced_reference
+    execute("arr[0]=5; arr[1]=7; echo $((${arr[0]}+${arr[1]})) > #{output_file}")
+    assert_equal "12\n", File.read(output_file)
+  end
+
+  def test_arith_array_subscript_is_an_expression
+    # `arr[i+1]` evaluates the subscript itself before lookup.
+    execute("arr=(10 20 30); i=1; echo $((arr[i+1])) > #{output_file}")
+    assert_equal "30\n", File.read(output_file)
+  end
+
+  def test_arith_array_missing_element_is_zero
+    execute("arr=(); echo $((arr[0]+5)) > #{output_file}")
+    assert_equal "5\n", File.read(output_file)
+  end
+
+  # Combined with PR #41 (typeset -i): a[0] reference in an
+  # integer-attributed array element assignment now resolves.
+  def test_arith_integer_array_element_assignment_with_arr_ref
+    execute("declare -i a; a[0]=5; a[1]=a[0]*2; echo \"${a[1]}\" > #{output_file}")
+    assert_equal "10\n", File.read(output_file)
+  end
 end
