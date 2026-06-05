@@ -645,4 +645,23 @@ class TestPrintf < Test::Unit::TestCase
     output = capture_output { Rubish::Builtins.run('printf', ['%6.2f', "'s"]) }
     assert_equal '115.00', output
   end
+
+  # Bash reapplies the format until all arguments are consumed:
+  # `printf '%d\n' a b c` -> three lines, not one.
+  def test_printf_format_cycles_over_remaining_args
+    output = capture_output { Rubish::Builtins.run('printf', ['%d\n', "'A", "'B", "'C"]) }
+    assert_equal "65\n66\n67\n", output
+  end
+
+  def test_printf_format_with_multiple_specifiers_per_cycle
+    output = capture_output { Rubish::Builtins.run('printf', ['%s=%s\n', 'a', '1', 'b', '2']) }
+    assert_equal "a=1\nb=2\n", output
+  end
+
+  # A format that consumes no args from a non-empty arg list must not loop
+  # forever — bash prints it once and stops.
+  def test_printf_zero_conversion_format_does_not_loop
+    output = capture_output { Rubish::Builtins.run('printf', ['hi\n', 'a', 'b', 'c']) }
+    assert_equal "hi\n", output
+  end
 end
