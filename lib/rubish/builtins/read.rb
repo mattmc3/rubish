@@ -76,17 +76,20 @@ module Rubish
         line = process_read_escapes(line)
       end
 
-      # Store in array or variables
+      # Array and -N modes always succeed; only scalar assignment can fail
+      # (a readonly target), so it returns the read's success directly.
       if opts[:array_name]
         store_read_array(opts[:array_name], line)
-      elsif opts[:nchars_exact]
-        # -N mode: store raw content without splitting
-        vars.each { |var| ENV[var] = line }
-      else
-        store_read_variables(vars, line)
+        return true
       end
 
-      true
+      if opts[:nchars_exact]
+        # -N mode: store raw content without splitting
+        vars.each { |var| ENV[var] = line }
+        return true
+      end
+
+      store_read_variables(vars, line)
     end
 
     def read_input_line(opts)
@@ -278,22 +281,32 @@ module Rubish
     end
 
     def store_read_variables(vars, line)
-      # If only one variable, assign the whole line (with IFS whitespace trimmed)
       if vars.length == 1
+        # Single variable: assign the whole line (IFS whitespace trimmed)
+        return false if readonly_read_error(vars[0])
         ws_chars = ifs_whitespace
         escaped = Regexp.escape(ws_chars)
-        trimmed = ws_chars.empty? ? line : line.gsub(/\A[#{escaped}]+|[#{escaped}]+\z/, '')
-        ENV[vars[0]] = trimmed
-        return
+        ENV[vars[0]] = ws_chars.empty? ? line : line.gsub(/\A[#{escaped}]+|[#{escaped}]+\z/, '')
+      else
+        # Split into at most N parts (last var keeps the remaining delimiters).
+        # bash assigns left-to-right and stops at the first readonly target,
+        # leaving it and any later vars unchanged.
+        words = split_by_ifs_n(line, vars.length)
+        vars.each_with_index do |var, idx|
+          return false if readonly_read_error(var)
+          ENV[var] = words[idx]&.strip || ''
+        end
       end
 
-      # Split into at most N parts where N = number of variables
-      # This preserves delimiters in the last variable
-      words = split_by_ifs_n(line, vars.length)
+      true
+    end
 
-      vars.each_with_index do |var, idx|
-        ENV[var] = words[idx]&.strip || ''
-      end
+    # bash: assigning a readonly var via read prints an error and makes read
+    # fail; the variable keeps its value. Returns true if var is readonly.
+    def readonly_read_error(var)
+      return false unless readonly?(var)
+      $stderr.puts "rubish: read: #{var}: readonly variable"
+      true
     end
   end
 end

@@ -534,7 +534,7 @@ module Rubish
       result = block.call
       if result.is_a?(Command) && Builtins.builtin?(result.name)
         # Run builtin directly and check its return value
-        Builtins.run(result.name, result.args)
+        run_builtin_with_prefix(result)
       else
         result.run if result.is_a?(Command) || result.is_a?(Pipeline)
         result.success?
@@ -1161,6 +1161,22 @@ module Rubish
     # Builtins that must run in current process (affect shell state)
     PROCESS_BUILTINS = %w[cd export set shift source . return exit break continue local unset readonly declare typeset let eval command builtin shopt alias unalias trap].freeze
 
+    # Run a builtin in-process, applying its prefix env (e.g. `IFS= read`)
+    # temporarily and restoring it after. Externals get this via fork+ENV;
+    # in-process builtins need it set/restored around the call.
+    def run_builtin_with_prefix(cmd)
+      env = cmd.respond_to?(:prefix_env) ? cmd.prefix_env : nil
+      return Builtins.run(cmd.name, cmd.args) if env.nil? || env.empty?
+
+      saved = env.keys.to_h { |k| [k, ENV.key?(k) ? ENV[k] : :__unset] }
+      env.each { |k, v| ENV[k] = v }
+      begin
+        Builtins.run(cmd.name, cmd.args)
+      ensure
+        saved.each { |k, v| v == :__unset ? ENV.delete(k) : ENV[k] = v }
+      end
+    end
+
     def __run_cmd(&block)
       result = block.call
 
@@ -1192,7 +1208,7 @@ module Rubish
           check_errexit
           return ExitStatus.new(@last_status)
         end
-        success = Builtins.run(result.name, result.args)
+        success = run_builtin_with_prefix(result)
         @last_status = success.is_a?(ExitStatus) ? success.exitstatus : (success ? 0 : 1)
         run_err_trap_if_failed
         check_errexit
