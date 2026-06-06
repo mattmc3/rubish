@@ -26,9 +26,9 @@ echo empty=$?
 
 command -v for
 echo $?'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '002 command -v executable, builtin' {
@@ -40,9 +40,9 @@ echo
 
 command -v true
 command -v eval'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '003 command -v with multiple names' {
@@ -54,9 +54,9 @@ command -v eval'
 myfunc() { echo x; }
 command -v echo myfunc ZZZ for
 echo status=$?'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '004 command -v doesn'\''t find non-executable file' {
@@ -72,9 +72,9 @@ echo status=$?
 
 command -v _tmp/executable
 echo status=$?'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '005 command -v doesn'\''t find executable dir' {
@@ -86,9 +86,9 @@ command -v _tmp/cat
 echo status=$?
 command -v cat
 echo status=$?'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '006 command -V' {
@@ -113,18 +113,18 @@ echo status=$?
 
 command -V for
 echo status=$?'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '007 command -V nonexistent' {
   local cmd='command -V nonexistent 2>err.txt
 echo status=$?
 fgrep -o '\''nonexistent: not found'\'' err.txt || true'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '008 command skips function lookup' {
@@ -137,16 +137,16 @@ command seq 3
 # subshell shouldn'\''t fork another process (but we don'\''t have a good way of
 # testing it)
 ( command seq 3 )'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '009 command command seq 3' {
   local cmd='command command seq 3'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '010 command command -v seq' {
@@ -154,9 +154,9 @@ command seq 3
   echo 3
 }
 command command -v seq'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '011 command -p (override existing program)' {
@@ -169,9 +169,9 @@ PATH="$TMP/bin:$PATH"
 echo aaa | tr "a" "b"
 echo aaa | command -p tr "a" "b"
 rm $TMP/bin/tr'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '012 command -p (hide tool in custom path)' {
@@ -180,17 +180,17 @@ echo "echo hello" > $TMP/bin/hello
 chmod +x $TMP/bin/hello
 export PATH=$TMP/bin
 command -p hello'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '013 command -p (find hidden tool in default path)' {
   local cmd='export PATH='\'''\''
 command -p ls'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '014 (command type ls)' {
@@ -199,9 +199,9 @@ type
 s=$(command type echo)
 echo $s | grep builtin > /dev/null
 echo status=$?'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '015 builtin' {
@@ -209,16 +209,16 @@ echo status=$?'
 cd
 builtin cd / && pwd
 unset -f cd'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '016 builtin ls not found' {
   local cmd='builtin ls'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '017 builtin usage' {
@@ -230,15 +230,15 @@ echo status=$?
 
 builtin -- false
 echo status=$?'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '018 builtin command echo hi' {
   local cmd='builtin command echo hi'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 

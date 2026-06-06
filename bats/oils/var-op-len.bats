@@ -13,25 +13,25 @@ setup() { cd "$BATS_TEST_TMPDIR" || return 1; export HOME="$BATS_TEST_TMPDIR"; P
 @test '001 String length' {
   local cmd='v=foo
 echo ${#v}'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '002 Unicode string length (UTF-8)' {
   local cmd='v=$'\''_\u03bc_'\''
 echo ${#v}'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '003 Unicode string length (spec/testdata/utf8-chars.txt)' {
   local cmd='v=$(cat $REPO_ROOT/spec/testdata/utf8-chars.txt)
 echo ${#v}'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '004 String length with incomplete utf-8' {
@@ -42,9 +42,9 @@ done 2> $TMP/err.txt
 
 grep '\''warning:'\'' $TMP/err.txt
 true  # exit 0'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '005 String length with invalid utf-8 continuation bytes' {
@@ -55,24 +55,24 @@ done 2> $TMP/err.txt
 
 grep '\''warning:'\'' $TMP/err.txt
 true'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '006 Length of undefined variable' {
   local cmd='echo ${#undef}'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '007 Length of undefined variable with nounset' {
   local cmd='set -o nounset
 echo ${#undef}'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '008 Length operator can'\''t be followed by test operator' {
@@ -83,9 +83,9 @@ echo ${#x-default}
 
 x='\''foo'\''
 echo ${#x-default}'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '009 {#s} respects LC_ALL - length in bytes or code points' {
@@ -114,8 +114,8 @@ for s in $'\''\u03bc'\'' $'\''\U00010000'\''; do
 
   echo
 done'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 

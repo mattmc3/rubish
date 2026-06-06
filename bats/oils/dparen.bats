@@ -13,25 +13,25 @@ setup() { cd "$BATS_TEST_TMPDIR" || return 1; export HOME="$BATS_TEST_TMPDIR"; P
 @test '001 (( )) result' {
   local cmd='(( 1 )) && echo True
 (( 0 )) || echo False'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '002 negative number is true' {
   local cmd='(( -1 )) && echo True'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '003 (( )) in if statement' {
   local cmd='if (( 3 > 2)); then
   echo True
 fi'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '004 (( ))' {
@@ -39,18 +39,18 @@ fi'
 (( x = 1 ))
 (( y = x + 2 ))
 echo $x $y'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '005 (( )) with arrays' {
   local cmd='a=(4 5 6)
 (( sum = a[0] + a[1] + a[2] ))
 echo $sum'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '006 (( )) with error' {
@@ -58,9 +58,9 @@ echo $sum'
 (( b = 1 )) && echo true
 (( c = -1 )) && echo true
 echo $((a + b + c))'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '007 bash and mksh: V in (( a[K] = V )) gets coerced to integer' {
@@ -75,9 +75,9 @@ echo a[\"key\"]=${a[$K]}
 
 echo keys = ${!a[@]}
 echo values = ${a[@]}'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '008 bash: K in (( A[K] = V )) is a constant string' {
@@ -89,9 +89,9 @@ typeset -A A
 echo A["5"]=${A["5"]}
 echo keys = ${!A[@]}
 echo values = ${A[@]}'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '009 BUG: (( V = A[K] )) doesn'\''t retrieve the right value' {
@@ -106,9 +106,9 @@ A[K]=oops2
 (( V = A[K] ))
 
 echo V=$V'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '010 bash: V in (( A[K] = V )) gets coerced to integer' {
@@ -123,9 +123,9 @@ echo A[\"key\"]=${A[$K]}
 
 echo keys = ${!A[@]}
 echo values = ${A[@]}'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '011 literal strings inside (( ))' {
@@ -134,9 +134,9 @@ A['\''x'\'']=42
 (( x = A['\''x'\''] ))
 (( A['\''y'\''] = '\''y'\'' ))  # y is a variable, gets coerced to 0
 echo $x ${A['\''y'\'']}'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '012 (( )) with redirect' {
@@ -144,9 +144,9 @@ echo $x ${A['\''y'\'']}'
 echo $a
 echo --
 cat $TMP/x.txt'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '013 Assigning whole raray (( b = a ))' {
@@ -157,18 +157,18 @@ echo "${a[@]}"
 
 # OSH doesn'\''t like this
 echo "${b[@]}"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '014 set associative array' {
   local cmd='declare -A A=(['\''foo'\'']=bar ['\''spam'\'']=42)
 (( x = A['\''spam'\''] ))
 echo $x'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '015 Example of incrementing associative array entry with var key (ble.sh)' {
@@ -181,8 +181,8 @@ set -- 1 2
 (( A[$key] += $2 ))
 
 echo foo=${A['\''foo'\'']}'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 

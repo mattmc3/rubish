@@ -20,9 +20,9 @@ echo kill=$?
 
 wait $pid
 echo wait=$?  # 143 is 128 + SIGTERM'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '002 kill -KILL kills the process with SIGKILL' {
@@ -33,9 +33,9 @@ echo kill=$?
 
 wait $pid
 echo wait=$?  # 137 is 128 + SIGKILL'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '003 kill -n 9 specifies the signal number' {
@@ -48,9 +48,9 @@ echo kill=$?
 
 wait $pid
 echo wait=$?'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '004 kill -s TERM specifies the signal name' {
@@ -61,9 +61,9 @@ echo kill=$?
 
 wait $pid
 echo wait=$?'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '005 kill -terM -SigterM isn'\''t case sensitive' {
@@ -82,9 +82,9 @@ kill -terM $pid
 echo kill=$?
 wait $pid
 echo wait=$?'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '006 kill HUP pid gives the correct error' {
@@ -92,9 +92,9 @@ echo wait=$?'
 sleep 0.1 &
 builtin kill HUP $pid
 echo $?'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '007 kill -l shows signals' {
@@ -105,9 +105,9 @@ echo $?'
 
 builtin kill -l | grep HUP > /dev/null
 echo $?'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '008 kill -L also shows signals' {
@@ -115,9 +115,9 @@ echo $?'
 
 builtin kill -L | grep HUP > /dev/null
 echo $?'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '009 kill -l 10 TERM translates between names and numbers' {
@@ -135,9 +135,9 @@ echo
 builtin kill -l 10 SIGSEGV 12
 echo status=$?
 echo'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '010 kill -L checks for invalid input' {
@@ -150,16 +150,16 @@ echo
 builtin kill -L USR1 9999 USR2
 echo status=$?
 echo'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '011 kill -l with exit code' {
   local cmd='kill -l 134 # 128 + 6 (ABRT)'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '012 kill -l with 128 is invalid' {
@@ -167,23 +167,23 @@ echo'
 if [ $? -ne 0 ]; then
     echo "invalid"
 fi'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '013 kill -l 0 returns EXIT' {
   local cmd='kill -l 0'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '014 kill -l 0 INT lists both signals' {
   local cmd='kill -l 0 INT'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '015 kill -9999 is an invalid signal' {
@@ -195,9 +195,9 @@ echo kill=$?
 
 wait $pid
 echo wait=$?'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '016 kill -15 %% kills current job' {
@@ -214,9 +214,9 @@ echo wait=$?
 # no such job
 wait %%
 echo wait=$?'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '017 kill -15 %- kills previous job' {
@@ -234,9 +234,9 @@ echo wait=$?
 # what does bash define here as the previous job?  May be a bug
 #wait %-
 #echo wait=$?'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '018 kill multiple pids at once' {
@@ -249,9 +249,9 @@ pid3=$!
 
 kill $pid1 $pid2 $pid3
 echo $?'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '019 kill pid and job at once' {
@@ -260,9 +260,9 @@ pid=$!
 sleep 0.1 &
 kill %2 $pid
 echo $?'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '020 Numeric signal out of range - OSH may send it anyway' {
@@ -276,8 +276,8 @@ echo kill=$?
 
 wait
 echo wait=$?'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 

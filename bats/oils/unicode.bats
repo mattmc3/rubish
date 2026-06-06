@@ -36,9 +36,9 @@ sed '\''s/\xce//g'\'' unicode.sh > not-unicode.sh
 
 echo --
 $SH not-unicode.sh | od -A n -t x1'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '002 Unicode escapes u03bc U000003bc in '\'''\'', echo -e, printf' {
@@ -49,9 +49,9 @@ echo $'\''\u03bc \U000003bc'\''
 echo -e '\''\u03bc \U000003bc'\''
 
 printf '\''\u03bc \U000003bc\n'\'''
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '003 Max code point U+10ffff can escaped with '\'''\''  printf  echo -e' {
@@ -64,9 +64,9 @@ py-repr() {
 py-repr $'\''\U0010ffff'\''
 py-repr $(echo -e '\''\U0010ffff'\'')
 py-repr $(printf '\''\U0010ffff'\'')'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '004 '\'''\'' does NOT check that 0x110000 is too big at parse time' {
@@ -75,9 +75,9 @@ py-repr $(printf '\''\U0010ffff'\'')'
 }
 
 py-repr $'\''\U00110000'\'''
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '005 '\'''\'' does not check for surrogate range at parse time' {
@@ -88,9 +88,9 @@ py-repr $'\''\U00110000'\'''
 py-repr $'\''\udc00'\''
 
 py-repr $'\''\U0000dc00'\'' '
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '006 printf / echo -e do NOT check max code point at runtime' {
@@ -107,9 +107,9 @@ py-repr "$e"
 p="$(printf '\''\U00110000'\'')"
 echo status=$?
 py-repr "$p"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '007 printf / echo -e do NOT check surrogates at runtime' {
@@ -134,8 +134,8 @@ py-repr "$p"
 p="$(printf '\''\U0000dc00'\'')"
 echo status=$?
 py-repr "$p"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 

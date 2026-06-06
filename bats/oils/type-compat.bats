@@ -20,9 +20,9 @@ shopt -s ignore_flags_not_impl
 declare -i bar=2+3
 echo status=$?
 echo bar=$bar'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '002 declare -i with +=' {
@@ -41,9 +41,9 @@ j+='\'' 2 '\''  # arith add
 echo "[$s]"
 echo [$i]
 echo [$j]'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '003 declare -i with arithmetic inside strings (Nix, issue 864)' {
@@ -58,9 +58,9 @@ declare -a array=(1 2 3)
 declare -i item
 item='\''array[1+1]'\''
 echo item=$item'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '004 append in arith context' {
@@ -74,9 +74,9 @@ declare -i j
 (( j='\''x '\'' ))  # treated like zero
 (( j+='\'' 2 '\'' ))
 echo "$s|$i|$j"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '005 declare array vs. string: mixing -a +a and () '\'''\''' {
@@ -86,9 +86,9 @@ declare +a '\''xyz2=(2 3)'\''
 declare -a '\''xyz3=4'\''
 declare -a '\''xyz4=(5 6)'\''
 argv.py "${xyz1}" "${xyz2}" "${xyz3[@]}" "${xyz4[@]}"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '006 declare array vs. associative array' {
@@ -98,9 +98,9 @@ declare -a '\''array=([a]=b [c]=d)'\''
 declare -A '\''assoc=([a]=b [c]=d)'\''
 argv.py "${#array[@]}" "${!array[@]}" "${array[@]}"
 argv.py "${#assoc[@]}" "${!assoc[@]}" "${assoc[@]}"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '007 declare -l -u' {
@@ -113,8 +113,8 @@ echo $upper
 # other:
 # -t trace
 # -I inherit attributes'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 

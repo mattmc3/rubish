@@ -49,9 +49,9 @@ echo unset
 unset -v '\''sp[11]'\''
 echo subst: "${sp[@]}"
 echo keys: "${!sp[@]}"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '002 test length' {
@@ -64,9 +64,9 @@ echo len=${#sp[@]}
 sp[10]=z
 
 echo len=${#sp[@]}'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '003 test declare -p sp' {
@@ -84,9 +84,9 @@ bash|mksh)
 esac
 
 declare -p a0 a1 a2 a'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '004 +=' {
@@ -96,9 +96,9 @@ sp1[99]=c
 typeset -p sp1 | sed '\''s/"//g'\''
 sp1+=(1 2 3)
 typeset -p sp1 | sed '\''s/"//g'\'''
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '005 a[i]=v' {
@@ -110,9 +110,9 @@ sp1[10]=X
 sp1[25]=Y
 sp1[90]=Z
 typeset -p sp1 | sed '\''s/"//g'\'''
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '006 Negative index with a[i]=v' {
@@ -126,9 +126,9 @@ sp1[-4]=B
 sp1[-8]=C
 sp1[-10]=D
 typeset -p sp1 | sed '\''s/"//g'\'''
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '007 a[i]=v with BigInt' {
@@ -145,9 +145,9 @@ sp1[0x7FFFFFFFFFFFFFFE]=b
 echo "${#sp1[@]}"
 sp1[0x7FFFFFFFFFFFFFFD]=c
 echo "${#sp1[@]}"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '008 Negative out-of-bound index with a[i]=v (1/2)' {
@@ -156,9 +156,9 @@ echo "${#sp1[@]}"'
 sp1[9]=x
 sp1[-11]=E
 declare -p sp1'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '009 Negative out-of-bound index with a[i]=v (2/2)' {
@@ -168,9 +168,9 @@ sp1[9]=x
 
 sp1[-21]=F
 declare -p sp1'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '010 xtrace a+=()' {
@@ -179,9 +179,9 @@ declare -p sp1'
 sp1=(1)
 set -x
 sp1+=(2)'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '011 unset -v a[i]' {
@@ -193,9 +193,9 @@ unset -v "a[9]"
 typeset -p a
 unset -v "a[0]"
 typeset -p a'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '012 unset -v a[i] with out-of-bound negative index' {
@@ -205,9 +205,9 @@ a=(1)
 
 unset -v "a[-2]"
 unset -v "a[-3]"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '013 unset -v a[i] for max index' {
@@ -220,9 +220,9 @@ declare -p a
 unset -v '\''a[-1]'\''
 a[-1]=x
 declare -p a'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '014 [[ -v a[i] ]]' {
@@ -250,9 +250,9 @@ unset -v '\''sp3[4]'\''
 [[ -v sp3[-5] ]]; echo "$? (expect 1)"
 [[ -v sp3[-6] ]]; echo "$? (expect 0)"
 [[ -v sp3[-9] ]]; echo "$? (expect 0)"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '015 [[ -v a[i] ]] with invalid negative index' {
@@ -265,9 +265,9 @@ sp2=({1..9})
 sp3=({1..9})
 unset -v '\''sp3[4]'\''
 ([[ -v sp3[-10] ]]; echo "$? (expect 1)")'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '016 ((sp[i])) and ((sp[i]++))' {
@@ -294,9 +294,9 @@ echo $((a[1] = 100, a[1]))
 echo $((a[2] = 100, a[2]))
 echo $((a[3] = 100, a[3]))
 echo $((a[7] = 100, a[7]))'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '017 ((sp[i])) and ((sp[i]++)) with invalid negative index' {
@@ -306,9 +306,9 @@ a=({1..9})
 unset -v '\''a[2]'\'' '\''a[3]'\'' '\''a[7]'\''
 
 echo $((a[-10]))'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '018 {sp[i]}' {
@@ -331,9 +331,9 @@ echo "sp[-2]: '\''${sp[-2]}'\''."
 echo "sp[-3]: '\''${sp[-3]}'\''."
 echo "sp[-4]: '\''${sp[-4]}'\''."
 echo "sp[-9]: '\''${sp[-9]}'\''."'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '019 {sp[i]} with negative invalid index' {
@@ -347,9 +347,9 @@ unset -v '\''sp[7]'\''
 echo "sp[-10]: '\''${sp[-10]}'\''."
 echo "sp[-11]: '\''${sp[-11]}'\''."
 echo "sp[-19]: '\''${sp[-19]}'\''."'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '020 {a[@]:offset:length}' {
@@ -388,9 +388,9 @@ echo "[${a[@]:5:0}][${a[*]:5:0}]"
 echo "[${a[@]:9:1}][${a[*]:9:1}]"
 echo "[${a[@]:9:2}][${a[*]:9:2}]"
 echo "[${a[@]:10:1}][${a[*]:10:1}]"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '021 {@:offset:length}' {
@@ -416,9 +416,9 @@ set -- v{1..9}
   echo "[${*: -10:4}][${*: -10:4}]"
   echo "[${*: -11:4}][${*: -11:4}]"
 } | sed "s:$SH:\$SH:g;s:${SH##*/}:\$SH:g"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '022 {a[@]:BigInt}' {
@@ -461,9 +461,9 @@ echo "[${a[@]: -1}][${a[*]: -1}]"
 echo "[${a[@]: -2}][${a[*]: -2}]"
 echo "[${a[@]: -3}][${a[*]: -3}]"
 echo "[${a[@]: -4}][${a[*]: -4}]"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '023 {a[@]}' {
@@ -472,9 +472,9 @@ unset -v '\''a[2]'\'' '\''a[3]'\'' '\''a[4]'\'' '\''a[7]'\''
 
 argv.py "${a[@]}"
 argv.py "abc${a[@]}xyz"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '024 {a[@]#...}' {
@@ -488,9 +488,9 @@ argv.py "abc${a[@]#v}xyz"
 argv.py "${a[@]%[0-5]}"
 argv.py "abc${a[@]%[0-5]}xyz"
 argv.py "${a[@]#v?}"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '025 {a[@]/pat/rep}' {
@@ -508,9 +508,9 @@ argv.py "${a[@]/v/x}"
 argv.py "${a[@]//v/x}"
 argv.py "${a[@]/[0-5]/D}"
 argv.py "${a[@]//[!0-5]/_}"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '026 {a[@]@P}, {a[@]@Q}, and {a[@]@a}' {
@@ -525,9 +525,9 @@ argv.py "${a[@]@Q}"
 argv.py "${a[*]@Q}"
 argv.py "${a[@]@a}"
 argv.py "${a[*]@a}"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '027 {a[@]-unset}, {a[@]:-empty}, etc.' {
@@ -541,9 +541,9 @@ echo "a2 unset: [${a2[@]-unset}]"
 echo "a2 empty: [${a2[@]:-empty}]"
 echo "a3 unset: [${a3[@]-unset}]"
 echo "a3 empty: [${a3[@]:-empty}]"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '028 {a-}' {
@@ -554,9 +554,9 @@ a3=(foo bar)
 echo "$a1, ${a1-(unset)}, ${a1:-(empty)};"
 echo "$a2, ${a2-(unset)}, ${a2:-(empty)};"
 echo "$a3, ${a3-(unset)}, ${a3:-(empty)};"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '029 {!a[0]}' {
@@ -566,9 +566,9 @@ v1=hello v2=world
 a=(v1 v2)
 
 echo "${!a[0]}, ${!a[1]}"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '030 {!a[@]}' {
@@ -578,9 +578,9 @@ a=(v{0..9})
 unset -v '\''a[3]'\'' '\''a[4]'\'' '\''a[7]'\'' '\''a[9]'\''
 
 argv.py "${!a[@]}"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '031 {a[*]}' {
@@ -592,9 +592,9 @@ IFS=
 echo "${a[*]}"
 IFS=/
 echo "${a[*]}"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '032 compgen -F _set_COMPREPLY' {
@@ -606,9 +606,9 @@ _set_COMPREPLY() {
 }
 
 compgen -F _set_COMPREPLY'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '033 compadjust' {
@@ -618,9 +618,9 @@ COMP_ARGV=(echo '\''Hello,'\'' '\''Bash'\'' '\''world!'\'')
 compadjust cur prev words cword
 argv.py "$cur" "$prev" "$cword"
 argv.py "${words[@]}"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '034 (YSH) @[sp] and @sp' {
@@ -632,9 +632,9 @@ unset -v '\''a[1]'\'' '\''a[2]'\'' '\''a[4]'\''
 shopt -s parse_at
 argv.py @[a]
 argv.py @a'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '035 (YSH) [a1 === a2]' {
@@ -657,9 +657,9 @@ echo $[a1 === a4]
 echo $[a2 === a1]
 echo $[a3 === a1]
 echo $[a4 === a1]'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '036 (YSH) append v1 v2... (a)' {
@@ -669,9 +669,9 @@ a=(1 2 3)
 unset -v '\''a[1]'\''
 append '\''x'\'' '\''y'\'' '\''z'\'' (a)
 = a'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '037 (YSH) [bool(a)]' {
@@ -689,9 +689,9 @@ echo $[bool(a1)]
 echo $[bool(a2)]
 echo $[bool(a3)]
 echo $[bool(a4)]'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '038 crash dump' {
@@ -700,18 +700,18 @@ echo $[bool(a4)]'
 OILS_CRASH_DUMP_DIR=$TMP $SH -ec '\''a=({0..3}); unset -v "a[2]"; false'\''
 json read (&crash_dump) < $TMP/*.json
 json write (crash_dump.var_stack[0].a)'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '039 Regression: a[-1]=1' {
   local cmd='case $SH in mksh) exit 99 ;; esac
 
 a[-1]=1'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '040 Initializing indexed array with ([index]=value)' {
@@ -719,8 +719,8 @@ a[-1]=1'
 declare -a a=([xx]=1 [yy]=2 [zz]=3)
 echo status=$?
 argv.py "${a[@]}"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 

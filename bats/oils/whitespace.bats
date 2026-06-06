@@ -22,9 +22,9 @@ $SH -c "$tab"
 $SH -c "$cr"
 $SH -c "$vert"
 $SH -c "$ff"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '002 r in arith expression is allowed by some shells, but not most!' {
@@ -40,9 +40,9 @@ $SH -c "$arith_cr"
 if test $? -ne 0; then
   echo '\''failed'\''
 fi'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '003 whitespace in string to integer conversion' {
@@ -58,9 +58,9 @@ $SH -c '\''echo $(( $1 + 1 ))'\'' dummy0 "$cr"
 if test $? -ne 0; then
   echo '\''failed'\''
 fi'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '004 r at end of line is not special' {
@@ -69,9 +69,9 @@ fi'
 cr=$(python2 -c '\''print "argv.py -\r"'\'')
 
 $SH -c "$cr"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '005 Default IFS does not include r v f' {
@@ -85,8 +85,8 @@ $SH -c '\''argv.py $1'\'' dummy0 "$tab"
 $SH -c '\''argv.py $1'\'' dummy0 "$cr"
 $SH -c '\''argv.py $1'\'' dummy0 "$vert"
 $SH -c '\''argv.py $1'\'' dummy0 "$ff"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 

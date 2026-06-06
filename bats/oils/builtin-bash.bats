@@ -17,9 +17,9 @@ help help
 echo status=$? >&2
 help -- help
 echo status=$? >&2'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '002 bad help topic' {
@@ -27,9 +27,9 @@ echo status=$? >&2'
 echo "help=$?"
 cat $TMP/err.txt | grep -i '\''no help topics'\'' >/dev/null
 echo "grep=$?"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '003 mapfile' {
@@ -39,9 +39,9 @@ printf '\''%s\n'\'' {1..5..2} | {
   echo "n=${#MAPFILE[@]}"
   printf '\''[%s]\n'\'' "${MAPFILE[@]}"
 }'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '004 readarray (synonym for mapfile)' {
@@ -51,9 +51,9 @@ printf '\''%s\n'\'' {1..5..2} | {
   echo "n=${#MAPFILE[@]}"
   printf '\''[%s]\n'\'' "${MAPFILE[@]}"
 }'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '005 mapfile (array name): arr' {
@@ -63,9 +63,9 @@ printf '\''%s\n'\'' {1..5..2} | {
   echo "n=${#arr[@]}"
   printf '\''[%s]\n'\'' "${arr[@]}"
 }'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '006 mapfile (delimiter): -d delim' {
@@ -76,9 +76,9 @@ printf '\''%s:'\'' {1..5..2} | {
   echo "n=${#arr[@]}"
   printf '\''[%s]\n'\'' "${arr[@]}"
 }'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '007 mapfile (delimiter): -d '\'''\'' (null-separated)' {
@@ -89,9 +89,9 @@ printf '\''%s\0'\'' {1..5..2} | {
   echo "n=${#arr[@]}"
   printf '\''[%s]\n'\'' "${arr[@]}"
 }'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '008 mapfile (truncate delim): -t' {
@@ -101,9 +101,9 @@ printf '\''%s\n'\'' {1..5..2} | {
   echo "n=${#arr[@]}"
   printf '\''[%s]\n'\'' "${arr[@]}"
 }'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '009 mapfile -t doesn'\''t remove r' {
@@ -112,9 +112,9 @@ printf '\''%s\r\n'\'' {1..5..2} | {
   mapfile -t arr
   argv.py "${arr[@]}"
 }'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '010 mapfile -t bugs (ble.sh)' {
@@ -132,9 +132,9 @@ echo len=${#lines[@]}
 mapfile -t lines <<< $'\''hello\n'\''
 echo len=${#lines[@]}
 #declare -p lines'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '011 mapfile (store position): -O start' {
@@ -145,9 +145,9 @@ printf '\''%s\n'\'' a{0..2} | {
   echo "n=${#arr[@]}"
   printf '\''[%s]\n'\'' "${arr[@]}"
 }'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '012 mapfile (input range): -s start -n count' {
@@ -157,9 +157,9 @@ printf '\''%s\n'\'' a{0..10} | {
   echo "n=${#arr[@]}"
   printf '\''[%s]\n'\'' "${arr[@]}"
 }'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '013 mapfile / readarray stdin  TODO: Fix me.' {
@@ -169,8 +169,8 @@ seq 2 | mapfile m
 seq 3 | readarray r
 echo ${#m[@]}
 echo ${#r[@]}'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 

@@ -19,9 +19,9 @@ mkdir -p c/subdir
 touch {leaf.md,c/leaf.md,c/subdir/leaf.md}
 
 echo **/*.* | sort'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '002 each occurrence of ** recurses through all depths' {
@@ -33,9 +33,9 @@ touch {leaf.md,c/leaf.md,c/subdir/leaf.md}
 echo **/*.* | tr '\'' '\'' '\''\n'\'' | sort
 echo
 echo **/**/*.* | tr '\'' '\'' '\''\n'\'' | sort'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '003 within braces, globstar works when there is a comma' {
@@ -45,9 +45,9 @@ mkdir -p c/subdir
 touch c/subdir/leaf.md
 
 echo {**/*.*,} | sort | sed '\''s/[[:space:]]*$//'\'''
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '004 ** behaves like * if adjacent to anything other than /' {
@@ -62,9 +62,9 @@ echo directory/**/*.md | sort
 echo d**/*.md | sort
 echo **y/*.md | sort
 echo d**y/*.md | sort'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '005 in zsh, ***/ follows symlinked directories, while **/ does not' {
@@ -77,8 +77,8 @@ ln -s -T ../directory-2 directory-1/symlink
 
 echo **/*.* | sort
 echo ***/*.* | sort'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 

@@ -15,9 +15,9 @@ setup() { cd "$BATS_TEST_TMPDIR" || return 1; export HOME="$BATS_TEST_TMPDIR"; P
 a=([2]=~ [4]=~:~:~)
 echo "${a[2]}"
 echo "${a[4]}"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '002 Tilde expansions in RHS of [k]=v (BashAssoc)' {
@@ -28,9 +28,9 @@ declare -A a
 declare -A a=(['\''home'\'']=~ ['\''hello'\'']=~:~:~)
 echo "${a['\''home'\'']}"
 echo "${a['\''hello'\'']}"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '003 index increments without [k]= (BashArray)' {
@@ -40,9 +40,9 @@ printf '\''vals: '\''; argv.py "${a[@]}"
 a=([100]=1 2 3 4 [5]=a b c d)
 printf '\''keys: '\''; argv.py "${!a[@]}"
 printf '\''vals: '\''; argv.py "${a[@]}"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '004 [k]=v and [k]=@ (BashArray)' {
@@ -65,9 +65,9 @@ printf '\''vals: '\''; argv.py "${a[@]}"
 a=($v [i]=${x[@]})
 printf '\''keys: '\''; argv.py "${!a[@]}"
 printf '\''vals: '\''; argv.py "${a[@]}"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '005 [k]=v and [k]=@ (BashAssoc)' {
@@ -91,9 +91,9 @@ printf '\''vals: '\''; argv.py "${a[@]}"
 a=([i]=${x[@]})
 printf '\''keys: '\''; argv.py "${!a[@]}"
 printf '\''vals: '\''; argv.py "${a[@]}"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '006 append to element (BashArray)' {
@@ -104,9 +104,9 @@ printf '\''vals: '\''; argv.py "${a[@]}"
 a+=([hello]+=:34 [hello]+=:56)
 printf '\''keys: '\''; argv.py "${!a[@]}"
 printf '\''vals: '\''; argv.py "${a[@]}"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '007 append to element (BashAssoc)' {
@@ -118,9 +118,9 @@ printf '\''vals: '\''; argv.py "${a[@]}"
 a+=([hello]+=:34 [hello]+=:56)
 printf '\''keys: '\''; argv.py "${!a[@]}"
 printf '\''vals: '\''; argv.py "${a[@]}"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '008 non-index forms of element (BashAssoc)' {
@@ -129,9 +129,9 @@ a=([j]=1 2 3 4)
 echo "status=$?"
 printf '\''keys: '\''; argv.py "${!a[@]}"
 printf '\''vals: '\''; argv.py "${a[@]}"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '009 Evaluation order (1)' {
@@ -141,9 +141,9 @@ i=1
 a=([100+i++]=$((i++)) [200+i++]=$((i++)) [300+i++]=$((i++)))
 printf '\''keys: '\''; argv.py "${!a[@]}"
 printf '\''vals: '\''; argv.py "${a[@]}"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '010 Evaluation order (2)' {
@@ -152,9 +152,9 @@ printf '\''vals: '\''; argv.py "${a[@]}"'
 a=([0]=1+2+3 [a[0]]=10 [a[6]]=hello)
 printf '\''keys: '\''; argv.py "${!a[@]}"
 printf '\''vals: '\''; argv.py "${a[@]}"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '011 Evaluation order (3)' {
@@ -169,9 +169,9 @@ new1=201 new2=202 new3=203
 a+=([0]=new1 [1]=new2 [2]=new3 [5]="${a[2]}" [a[0]]="${a[0]}" [a[1]]="${a[1]}")
 printf '\''keys: '\''; argv.py "${!a[@]}"
 printf '\''vals: '\''; argv.py "${a[@]}"'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '012 [k1]=v1 (BashArray)' {
@@ -182,9 +182,9 @@ printf '\''vals: '\''; argv.py "${a[@]}"'
 a=([k1]=v1 [k2]=v2)
 echo ${a["k1"]}
 echo ${a["k2"]}'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '013 [k1]=v1 (BashAssoc)' {
@@ -192,26 +192,26 @@ echo ${a["k2"]}'
 a=([k1]=v1 [k2]=v2)
 echo ${a["k1"]}
 echo ${a["k2"]}'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '014 [k1]=v1 looking like brace expansions (BashAssoc)' {
   local cmd='declare -A a
 a=([k2]=-{a,b}-)
 echo ${a["k2"]}'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '015 [k1]=v1 looking like brace expansions (BashArray)' {
   local cmd='a=([k2]=-{a,b}-)
 echo ${a["k2"]}'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '016 BashArray cannot be changed to BashAssoc and vice versa' {
@@ -224,9 +224,9 @@ declare -A A=([a]=x [b]=y [c]=z)
 eval '\''declare -a A=(1 2 3 4)'\''
 echo status=$?
 argv.py $(printf '\''%s\n'\'' "${A[@]}" | sort)'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '017 (strict_array) s+=()' {
@@ -243,9 +243,9 @@ declare -p s1
 eval '\''s2+=(1 2 3 4)'\''
 echo status=$?
 declare -p s2'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '018 (strict_array) declare -A s+=()' {
@@ -262,9 +262,9 @@ declare -p s1
 eval '\''declare -A s2+=([a]=x [b]=y)'\''
 echo status=$?
 declare -p s2'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '019 (strict_array) assoc=(key value ...) is not allowed' {
@@ -273,8 +273,8 @@ declare -p s2'
 declare -A a=([a]=b)
 eval "a=(1 2 3 4)"
 declare -p a'
-  expected=$(bash -c "$cmd" 2>/dev/null)
-  actual=$($RUBISH -c "$cmd" 2>/dev/null)
-  [ "$actual" = "$expected" ]
+  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
