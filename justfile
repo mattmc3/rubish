@@ -1,4 +1,4 @@
-# Run a bats bash-compat suite in parallel and snapshot TAP to bats/results/.
+# Run a bats bash-compat suite in parallel and snapshot the TAP to bats/.
 # suite: bash | oils | all (default). Needs bats-core and GNU parallel.
 test suite="all" jobs="12":
     #!/usr/bin/env bash
