@@ -338,4 +338,37 @@ class TestRead < Test::Unit::TestCase
     assert_equal 'one', ENV['A']
     assert_equal 'two   three', ENV['B']
   end
+
+  # `IFS= read` (temp env prefix) must apply IFS='' to the read builtin, so
+  # leading/trailing whitespace is preserved. The prefix env was only applied
+  # to forked externals, not to in-process builtins.
+  def test_read_ifs_empty_prefix_preserves_whitespace
+    with_stdin(" foo \n") { execute('IFS= read line') }
+    assert_equal ' foo ', get_shell_var('line')
+  ensure
+    Rubish::Builtins.delete_var('line')
+  end
+
+  # A normal `read line` (default IFS) still strips surrounding whitespace.
+  def test_read_without_ifs_prefix_still_strips
+    with_stdin(" foo \n") { execute('read line') }
+    assert_equal 'foo', get_shell_var('line')
+  ensure
+    Rubish::Builtins.delete_var('line')
+  end
+
+  # read must not assign a readonly variable: it errors, leaves the var
+  # unchanged, and returns non-zero (bash leaves later vars and exits 1+).
+  def test_read_into_readonly_var_errors
+    execute('readonly RO=keep')
+    out = capture_output { with_stdin("x y z\n") { execute('read A RO C') } }
+    assert_equal 'x', get_shell_var('A')
+    assert_equal 'keep', get_shell_var('RO')
+    assert_match(/readonly/, out)
+  ensure
+    Rubish::Builtins.clear_readonly_vars
+    Rubish::Builtins.delete_var('RO')
+    Rubish::Builtins.delete_var('A')
+    Rubish::Builtins.delete_var('C')
+  end
 end

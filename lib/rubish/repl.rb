@@ -879,6 +879,25 @@ module Rubish
       # Redraw the prompt - Reline will handle this when we return
     end
 
+    # Apply prefix env assignments (e.g. `IFS= read`) to ENV for the duration of
+    # the block, restoring after. Lets in-process builtins see the temp env.
+    def with_prefix_env(env_assignments)
+      return yield if env_assignments.nil? || env_assignments.empty?
+
+      saved = {}
+      env_assignments.each do |assignment|
+        k, v = assignment.split('=', 2)
+        v ||= ''
+        saved[k] = ENV.key?(k) ? ENV[k] : :__unset
+        ENV[k] = expand_assignment_value(v)
+      end
+      begin
+        yield
+      ensure
+        saved.each { |k, v| v == :__unset ? ENV.delete(k) : ENV[k] = v }
+      end
+    end
+
     def execute(line, skip_history_expansion: false)
       # verbose: print input lines as read (before any processing)
       $stderr.puts line if Builtins.set_option?('v')
@@ -1005,7 +1024,8 @@ module Rubish
 
           # Expand variables in args for builtins
           expanded_args = expand_args_for_builtin(ast.args)
-          result = Builtins.run(builtin_name, expanded_args)
+          # Temp env prefix (e.g. `IFS= read`) must reach in-process builtins.
+          result = with_prefix_env(ast.env) { Builtins.run(builtin_name, expanded_args) }
           @last_status = result ? 0 : 1
           @pipestatus = [@last_status]
           run_err_trap_if_failed
