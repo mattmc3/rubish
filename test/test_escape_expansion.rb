@@ -193,4 +193,33 @@ class TestEscapeExpansion < Test::Unit::TestCase
     execute('echo "`echo "x"`"_tail > ' + output_file)
     assert_equal "x_tail\n", File.read(output_file)
   end
+
+  # PR #45 fixed `\'` through the codegen path (used when the command has a
+  # redirect). The REPL's builtin fast path goes through expand_string_content
+  # instead, whose special-set didn't include `'`. Without a redirect, `echo
+  # \'` printed `\'` while bash prints `'`. The `quoted: false` arg now lets
+  # the unquoted path consume the backslash without affecting DQ context.
+  def test_echo_escaped_single_quote_no_redirect
+    out = capture_output { execute("echo \\'") }
+    assert_equal "'\n", out
+  end
+
+  def test_echo_escaped_single_quote_midword_no_redirect
+    out = capture_output { execute("echo a\\'b\\'c") }
+    assert_equal "a'b'c\n", out
+  end
+
+  # DQ regression: `"\ "` should preserve the backslash (bash literal `\ `).
+  # An earlier `\<space>` fix made expand_string_content always drop the
+  # backslash, including inside double quotes. The new `quoted:` parameter
+  # restores the DQ behavior.
+  def test_double_quoted_backslash_space_is_preserved
+    execute('echo "\ " > ' + output_file)
+    assert_equal "\\ \n", File.read(output_file)
+  end
+
+  def test_double_quoted_backslash_single_quote_is_preserved
+    execute(%(echo "\\'" > #{output_file}))
+    assert_equal "\\'\n", File.read(output_file)
+  end
 end

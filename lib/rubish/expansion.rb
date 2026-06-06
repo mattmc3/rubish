@@ -184,9 +184,18 @@ module Rubish
       expand_string_content(arg)
     end
 
-    # Expand variables and command substitution in a string
-    # In double quotes, only \$, \`, \", \\, and \newline are special escape sequences
-    def expand_string_content(str)
+    # Expand variables and command substitution in a string.
+    #
+    # `quoted:` selects bash's two backslash regimes:
+    #   - Inside `"..."` (quoted: true): backslash is only special before
+    #     $, `, ", \, or newline. Every other `\X` (incl. `\ ` and `\'`)
+    #     is preserved verbatim.
+    #   - Unquoted (quoted: false): additionally consume `\<space>` (so
+    #     `cd Foo\ Bar/` works) and `\'` (so `echo \'` prints `'`).
+    # Other `\X` sequences are still preserved in both regimes — rubish's
+    # `echo -e hello\nworld` tests rely on `\n` flowing through, and bind
+    # accepts `\C-a` from unquoted args.
+    def expand_string_content(str, quoted: false)
       result = +''
       i = 0
 
@@ -194,22 +203,16 @@ module Rubish
         char = str[i]
 
         if char == '\\'
-          # Escape sequence - only consume backslash for special characters
           next_char = str[i + 1]
           if next_char && '$`"\\'.include?(next_char)
             result << next_char
             i += 2
-          elsif next_char == ' '
-            # Backslash-space: consume the backslash so word-quoted
-            # paths like `cd Foo\ Bar/` reach the builtin (and the
-            # external argv) as `Foo Bar/`. Without this, the cd
-            # builtin sees `Foo\ Bar/` and chdir fails. Other `\X`
-            # sequences are left intact so things like `\C-a` in
-            # bind args and `\n` for echo -e still work.
+          elsif !quoted && (next_char == ' ' || next_char == "'")
             result << next_char
             i += 2
           else
-            # Keep the backslash for other characters (like \C-a in bind)
+            # Keep the backslash for other characters (like \C-a in bind,
+            # \n inside a DQ string, or any \X in DQ context).
             result << char
             i += 1
           end
@@ -247,7 +250,7 @@ module Rubish
               if quote_char == "'"
                 result << Builtins.process_escape_sequences(content)
               else
-                result << __translate(expand_string_content(content))
+                result << __translate(expand_string_content(content, quoted: true))
               end
               i = end_pos + 1
               next
@@ -636,7 +639,7 @@ module Rubish
       elsif value.start_with?("'") && value.end_with?("'")
         value[1...-1]
       elsif value.start_with?('"') && value.end_with?('"')
-        expand_string_content(value[1...-1])
+        expand_string_content(value[1...-1], quoted: true)
       else
         yield  # Return nil or call the block for unquoted handling
       end
@@ -648,7 +651,8 @@ module Rubish
         parts << case type
                  when :single then content
                  when :ansi_c then Builtins.process_escape_sequences(content)
-                 when :double, :bare then expand_string_content(content)
+                 when :double then expand_string_content(content, quoted: true)
+                 when :bare then expand_string_content(content)
                  end
       end
       parts.join

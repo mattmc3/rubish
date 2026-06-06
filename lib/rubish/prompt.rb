@@ -409,9 +409,11 @@ module Rubish
         end
       end
 
-      # promptvars (bash) / prompt_subst (zsh): if enabled, perform variable and command substitution
+      # promptvars (bash) / prompt_subst (zsh): if enabled, perform variable and command substitution.
+      # PS1's own `\X` escapes (\u, \h, …) were already processed above; any
+      # surviving `\X` should stay literal — DQ-style backslash rules.
       if Builtins.shopt_enabled?('promptvars') || Builtins.zsh_option_enabled?('prompt_subst')
-        result = expand_string_content(result)
+        result = expand_string_content(result, quoted: true)
       end
 
       result
