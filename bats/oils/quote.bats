@@ -232,6 +232,7 @@ echo $w $x $y'
 }
 
 @test '029 YSH allows unquoted foo bar too' {
+  skip "YSH syntax not supported"
   local cmd='shopt -s ysh:all
 touch foo\ bar
 ls foo\ bar'

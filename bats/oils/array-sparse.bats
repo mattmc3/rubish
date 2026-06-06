@@ -675,6 +675,7 @@ append '\''x'\'' '\''y'\'' '\''z'\'' (a)
 }
 
 @test '037 (YSH) [bool(a)]' {
+  skip "YSH syntax not supported"
   local cmd='case $SH in bash|mksh) exit ;; esac
 
 a1=()

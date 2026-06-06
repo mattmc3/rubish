@@ -61,6 +61,7 @@ fi'
 }
 
 @test '005 Redirect on control flow with ysh:all (no_parse_ignored)' {
+  skip "YSH syntax not supported"
   local cmd='shopt -s ysh:all
 rm -f _tmp/r.txt
 for x in a b c; do

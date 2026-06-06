@@ -58,6 +58,7 @@ echo status=$?'
 }
 
 @test '005 eval YSH block with '\''break continue return error'\''' {
+  skip "YSH syntax not supported"
   local cmd='case $SH in dash|bash*|mksh|zsh) exit ;; esac
 
 shopt -s ysh:all

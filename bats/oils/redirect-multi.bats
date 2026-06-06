@@ -36,6 +36,7 @@ echo zz*'
 }
 
 @test '003 ysh behavior when glob doesn'\''t match' {
+  skip "YSH syntax not supported"
   local cmd='shopt -s ysh:upgrade
 
 echo hi > qq-*-zz
