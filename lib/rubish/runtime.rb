@@ -89,7 +89,7 @@ module Rubish
       end
 
       writer.close
-      output = reader.read.chomp
+      output = reader.read.sub(/\n+\z/, '')
       reader.close
 
       Process.wait(pid)
