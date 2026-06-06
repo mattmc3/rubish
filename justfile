@@ -9,7 +9,6 @@ test suite="all" jobs="12":
       all)  files=(bats/bash/*.bats bats/oils/*.bats) ;;
       *) echo "unknown suite '{{suite}}' (use: bash | oils | all)" >&2; exit 2 ;;
     esac
-    mkdir -p bats/results
-    out="bats/results/$(date +%Y-%m-%dT%H-%M-%S)-{{suite}}.tap"
+    out="bats/$(date +%Y-%m-%dT%H-%M-%S)-{{suite}}.tap"
     LC_ALL=C bats --jobs {{jobs}} --tap "${files[@]}" | tee "$out"
     echo "wrote $out"
