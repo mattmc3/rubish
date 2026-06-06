@@ -2,7 +2,9 @@
 # Generated from oils-for-unix spec/redirect-command.test.sh
 # Live bash vs rubish (bash/OSH layer); oils' own expected output is not used.
 
-RUBISH="bundle exec exe/rubish"
+_repo="$(git -C "$BATS_TEST_DIRNAME" rev-parse --show-toplevel)"
+export BUNDLE_GEMFILE="$_repo/Gemfile"
+RUBISH="bundle exec $_repo/exe/rubish"
 
 setup_file() { export BATS_TEST_TIMEOUT=2; }
 

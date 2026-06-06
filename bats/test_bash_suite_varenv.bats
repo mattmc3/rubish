@@ -1,6 +1,8 @@
 #!/usr/bin/env bats
 
-RUBISH="bundle exec exe/rubish"
+_repo="$(git -C "$BATS_TEST_DIRNAME" rev-parse --show-toplevel)"
+export BUNDLE_GEMFILE="$_repo/Gemfile"
+RUBISH="bundle exec $_repo/exe/rubish"
 
 setup_file() {
   export BATS_TEST_TIMEOUT=2
