@@ -21,3 +21,5 @@ vendor/bundle
 # Test artifacts
 coverage
 tmp
+bats/*.tap
+bats/*-parts

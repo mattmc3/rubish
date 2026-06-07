@@ -1,44 +1,31 @@
-# Runs the oils bats compat suite in a disposable container.
-# The container IS the sandbox: $HOME, cwd, and /tmp are all throwaway, so
-# the suite can never touch the host. Never run these bats files on the host.
+# Runs the oils bats compat suite in a throwaway container so it can never
+# touch the host. The container is the sandbox: $HOME, cwd, and /tmp are all
+# disposable. Never run these bats files on the host.
 #
 #   container build -f Dockerfile.oils -t rubish-oils .
-#   container run --rm rubish-oils
+#
+#   # default (one safe file, quick check):
+#   container run --rm -v "$PWD/bats:/out" -e OUT_DIR=/out rubish-oils
+#   # full sweep:
+#   container run --rm -v "$PWD/bats:/out" -e OUT_DIR=/out -e SUITE='bats/oils/*.bats' rubish-oils
 ARG RUBY_VERSION=4.0
 FROM ruby:${RUBY_VERSION}-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential git libffi-dev bash bats parallel python3 \
+    build-essential git libffi-dev bash bats python3 procps \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY . .
 
-# .git is excluded by .dockerignore, but the oils bats files locate the repo
-# via `git rev-parse --show-toplevel`; a throwaway init makes that resolve to /app.
+# The bats files locate the repo via `git rev-parse --show-toplevel`; .git is
+# excluded by .dockerignore, so a throwaway init makes that resolve to /app.
 RUN git init -q . && bundle install
 
-# Run the oils suite (or a subset) and write a timestamped TAP to $OUT_DIR.
-# $SUITE defaults to one safe, side-effect-free file (arith.bats) for a fast
-# validation run; override to the full glob for the real sweep.
-#   # validate (single safe file, matches a local `bats bats/oils/arith.bats`):
-#   container run --rm -v "$PWD/bats:/out" -e OUT_DIR=/out rubish-oils
-#   # full sweep:
-#   container run --rm -v "$PWD/bats:/out" -e OUT_DIR=/out -e SUITE='bats/oils/*.bats' rubish-oils
+# Override SUITE for more files; PJOBS files run at once, each file's tests
+# serial. FILE_TIMEOUT bounds a runaway file. See run-oils.sh.
 ENV OUT_DIR=/tmp
-ENV SUITE=bats/oils/arith.bats
-# Parallelize at the FILE level (not bats --jobs, which uses GNU parallel and
-# exhausts the container's pids). PJOBS files run concurrently, each file's
-# tests serial. Each file is wrapped in `timeout` so a runaway grandchild (e.g.
-# rubish looping inside $(...), which bats's own timeout can't reap) bounds the
-# whole file instead of stalling the suite.
+ENV SUITE=bats/oils/quote.bats
 ENV PJOBS=4
 ENV FILE_TIMEOUT=120
-CMD ["bash", "-lc", "ulimit -u \"$(ulimit -Hu)\" 2>/dev/null || true; \
-  ts=$(date +%Y-%m-%dT%H-%M-%S); tap=\"$OUT_DIR/${ts}-oils.tap\"; pd=\"$OUT_DIR/${ts}-parts\"; mkdir -p \"$pd\"; \
-  ls $SUITE | xargs -P \"$PJOBS\" -I{} sh -c 'f=\"$1\"; b=$(basename \"$f\" .bats); \
-    LC_ALL=C timeout \"$FILE_TIMEOUT\" bats --tap \"$f\" > \"$2/$b.tap\" 2>&1 \
-    || echo \"not ok FILE_TIMEOUT_OR_ERR $b (exit $?)\" >> \"$2/$b.tap\"' _ {} \"$pd\"; \
-  cat \"$pd\"/*.tap > \"$tap\"; rm -rf \"$pd\"; \
-  ok=$(grep -c '^ok ' \"$tap\"); sk=$(grep -c '# skip' \"$tap\"); nf=$(grep -c '^not ok ' \"$tap\"); \
-  echo \"SUMMARY real_pass=$((ok-sk)) skipped=$sk real_fail=$nf  ->  $tap\""]
+CMD ["bash", "run-oils.sh"]
