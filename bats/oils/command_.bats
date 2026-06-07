@@ -55,8 +55,8 @@ echo status=$?'
 echo '\''echo hi'\'' > $TMP/no-shebang
 chmod +x $TMP/no-shebang
 $SH -c '\''$TMP/no-shebang'\'''
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -65,8 +65,8 @@ $SH -c '\''$TMP/no-shebang'\'''
 echo '\''echo hi'\'' > no-shebang
 chmod +x no-shebang
 "$SH" -c '\''./no-shebang'\'''
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -76,8 +76,8 @@ mkdir -p test-no-shebang
 echo '\''echo hi'\'' > test-no-shebang/script
 chmod +x test-no-shebang/script
 "$SH" -c '\''test-no-shebang/script'\'''
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 

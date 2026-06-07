@@ -163,9 +163,7 @@ fun 2>&1'
 }
 
 @test '014 redirect bash extensions:   [[  ((  for ((' {
-  local cmd='case $SH in dash|mksh) exit ;; esac
-
-rm -f dbracket dparen for-expr
+  local cmd='rm -f dbracket dparen for-expr
 
 [[ x = x ]] > dbracket
 

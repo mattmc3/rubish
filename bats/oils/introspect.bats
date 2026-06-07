@@ -26,6 +26,7 @@ f'
 }
 
 @test '002 FUNCNAME with source (scalar or array)' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='cd $REPO_ROOT
 
 # Comments on bash quirk:
@@ -47,22 +48,14 @@ echo -----
 argv.py "${FUNCNAME[@]}"
 
 # Show bash inconsistency.  FUNCNAME doesn'\''t behave like a normal array.
-case $SH in 
-  (bash)
-    echo -----
-    a=('\''A'\'')
-    argv.py '\''  @'\'' "${a[@]}"
-    argv.py '\''  0'\'' "${a[0]}"
-    argv.py '\''${}'\'' "${a}"
-    argv.py '\''  $'\'' "$a"
-    ;;
-esac'
+'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
   rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '003 BASH_SOURCE and BASH_LINENO scalar or array (e.g. for virtualenv)' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='cd $REPO_ROOT
 
 # https://github.com/pypa/virtualenv/blob/master/virtualenv_embedded/activate.sh
@@ -125,6 +118,7 @@ check'
 }
 
 @test '008 {BASH_SOURCE[@]} with source and function name' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='cd $REPO_ROOT
 
 argv.py "${BASH_SOURCE[@]}"
@@ -136,11 +130,12 @@ f'
 }
 
 @test '009 {BASH_SOURCE[@]} with line numbers' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='cd $REPO_ROOT
 
 $SH spec/testdata/bash-source.sh'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -162,15 +157,17 @@ f  # line 9'
 }
 
 @test '011 Locations with temp frame' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='cd $REPO_ROOT
 
 $SH spec/testdata/bash-source-pushtemp.sh'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '012 Locations when sourcing' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='cd $REPO_ROOT
 
 # like above test case, but we source
@@ -182,17 +179,18 @@ $SH spec/testdata/bash-source-pushtemp.sh'
 
 $SH -c '\''true;
 source spec/testdata/bash-source-pushtemp.sh'\'''
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '013 Sourcing inside function grows the debug stack' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='cd $REPO_ROOT
 
 $SH spec/testdata/bash-source-source.sh'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 

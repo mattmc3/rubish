@@ -230,9 +230,7 @@ argv.py $(printf '\''%s\n'\'' "${A[@]}" | sort)'
 }
 
 @test '017 (strict_array) s+=()' {
-  local cmd='case $SH in bash) ;; *) shopt --set strict_array ;; esac
-
-s1=hello
+  local cmd='s1=hello
 s2=world
 
 # Overwriting Str with a new BashArray is allowed
@@ -249,9 +247,7 @@ declare -p s2'
 }
 
 @test '018 (strict_array) declare -A s+=()' {
-  local cmd='case $SH in bash) ;; *) shopt --set strict_array ;; esac
-
-s1=hello
+  local cmd='s1=hello
 s2=world
 
 # Overwriting Str with a new BashAssoc is allowed
@@ -268,9 +264,7 @@ declare -p s2'
 }
 
 @test '019 (strict_array) assoc=(key value ...) is not allowed' {
-  local cmd='case $SH in bash) ;; *) shopt --set strict_array ;; esac
-
-declare -A a=([a]=b)
+  local cmd='declare -A a=([a]=b)
 eval "a=(1 2 3 4)"
 declare -p a'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?

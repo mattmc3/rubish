@@ -12,8 +12,8 @@ setup() { cd "$BATS_TEST_TMPDIR" || return 1; export HOME="$BATS_TEST_TMPDIR"; P
 
 @test '001 Normal and braced' {
   local cmd='$SH -c '\''echo $0 $1 ${2}'\'' a b c d'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -29,22 +29,22 @@ myfunc a b c d'
 
 @test '003 0 with -c' {
   local cmd='$SH -c '\''echo $0'\'' | grep -o '\''sh$'\'''
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '004 0 with stdin' {
   local cmd='echo '\''echo $0'\'' | $SH | grep -o '\''sh$'\'''
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '005 0 with -i' {
   local cmd='echo '\''echo $0'\'' | $SH -i | grep -o '\''sh$'\'''
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -53,8 +53,8 @@ myfunc a b c d'
 echo '\''echo $0'\'' > $s
 chmod +x $s
 $SH $s'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -63,8 +63,8 @@ $SH $s'
 echo '\''echo $@'\'' > $s
 chmod +x $s
 $SH $s a b c'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 

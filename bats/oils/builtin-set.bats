@@ -72,8 +72,8 @@ $SH -i -c '\''set -u; echo before; echo $x; echo after'\''
 if test $? -ne 0; then
   echo OK
 fi'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -95,8 +95,8 @@ echo line2
 if test $? -ne 0; then
   echo OK
 fi'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -118,8 +118,8 @@ echo after
 if test $? -ne 0; then
   echo OK
 fi'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -185,8 +185,8 @@ test "$_whitespace" = $'\''[\t\r\n]'\'' && echo OK
 test "$_sq" = "'\''single quotes'\''" && echo OK
 test "$_backslash_dq" = "\\ \"" && echo OK
 test "$_unicode" = $'\''[\u03bc]'\'' && echo OK'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -240,9 +240,7 @@ echo "$@"'
 }
 
 @test '016 set - stops option processing like set --' {
-  local cmd='case $SH in zsh) exit ;; esac
-
-show_options() {
+  local cmd='show_options() {
   case $- in
     *v*) echo verbose-on ;;
   esac
@@ -261,9 +259,7 @@ echo argv "$@"'
 }
 
 @test '017 A single + is an ignored flag; not an argument' {
-  local cmd='case $SH in zsh) exit ;; esac
-
-show_options() {
+  local cmd='show_options() {
   case $- in
     *v*) echo verbose-on ;;
   esac

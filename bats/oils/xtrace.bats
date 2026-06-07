@@ -11,9 +11,7 @@ setup_file() { export BATS_TEST_TIMEOUT=2; }
 setup() { cd "$BATS_TEST_TMPDIR" || return 1; export HOME="$BATS_TEST_TMPDIR"; PATH="$BATS_TEST_DIRNAME/bin:$PATH"; }
 
 @test '001 unset PS4' {
-  local cmd='case $SH in dash) echo '\''weird bug'\''; exit ;; esac
-
-set -x
+  local cmd='set -x
 echo 1
 unset PS4
 echo 2'
@@ -34,9 +32,7 @@ echo $(echo $y)'
 }
 
 @test '003 xtrace with unprintable chars' {
-  local cmd='case $SH in dash) exit ;; esac
-
-$SH >stdout 2>stderr <<'\''EOF'\''
+  local cmd='$SH >stdout 2>stderr <<'\''EOF'\''
 
 s=$'\''a\x03b\004c\x00d'\''
 set -o xtrace
@@ -51,15 +47,13 @@ echo
 
 echo STDERR
 grep '\''echo'\'' stderr '
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '004 xtrace with unicode chars' {
-  local cmd='case $SH in dash) exit ;; esac
-
-mu1='\''[μ]'\''
+  local cmd='mu1='\''[μ]'\''
 mu2=$'\''[\u03bc]'\''
 
 set -o xtrace
@@ -78,9 +72,7 @@ echo my-dir/my_file.cc'
 }
 
 @test '006 xtrace with tabs' {
-  local cmd='case $SH in dash) exit ;; esac
-
-set -o xtrace
+  local cmd='set -o xtrace
 echo $'\''[\t]'\'''
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
   rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
@@ -123,9 +115,7 @@ x=1 x=2; echo $x; readonly x=3'
 }
 
 @test '011 [[ ]]' {
-  local cmd='case $SH in dash|mksh) exit ;; esac
-
-set -x
+  local cmd='set -x
 
 dir=/
 if [[ -d $dir ]]; then
@@ -209,9 +199,7 @@ echo ok'
 }
 
 @test '018 Regression: xtrace for declare -a a+=(v)' {
-  local cmd='case $SH in dash|mksh) exit ;; esac
-
-a=(1)
+  local cmd='a=(1)
 set -x
 declare a+=(2)'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
@@ -220,9 +208,7 @@ declare a+=(2)'
 }
 
 @test '019 Regression: xtrace for a+=(v)' {
-  local cmd='case $SH in dash|mksh) exit ;; esac
-
-a=(1)
+  local cmd='a=(1)
 set -x
 a+=(2)'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?

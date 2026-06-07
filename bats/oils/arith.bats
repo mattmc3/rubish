@@ -131,8 +131,8 @@ check '\''$(( 0x1X ))'\''
 check '\''$(( 09 ))'\''
 check '\''$(( 2#A ))'\''
 check '\''$(( 02#0110 ))'\'''
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -401,9 +401,7 @@ echo "max positive = $(( x + y ))"
 }
 
 @test '043 More 64-bit ops' {
-  local cmd='case $SH in dash) exit ;; esac
-
-#shopt -s strict_arith
+  local cmd='#shopt -s strict_arith
 
 # This overflows - the extra 9 puts it above 2**31
 #echo $(( 12345678909 ))
@@ -657,8 +655,8 @@ echo status=$?
 # regression
 echo $((a + 42x))
 echo status=$?'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -711,15 +709,13 @@ echo $(( 16 >> 0 ))
 $SH -c '\''echo $(( 16 >> -1 ))'\''  # not sure why this is zero
 $SH -c '\''echo $(( 16 >> -2 ))'\''  # also 0
 echo ---'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '070 undef[0]' {
-  local cmd='case $SH in dash) exit ;; esac
-
-echo ARITH $(( undef[0] ))
+  local cmd='echo ARITH $(( undef[0] ))
 echo status=$?
 echo
 
@@ -735,9 +731,7 @@ echo status=$?'
 }
 
 @test '071 undef[0] with nounset' {
-  local cmd='case $SH in dash) exit ;; esac
-
-set -o nounset
+  local cmd='set -o nounset
 echo UNSET $(( undef[0] ))
 echo status=$?'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
@@ -746,9 +740,7 @@ echo status=$?'
 }
 
 @test '072 s[0] with string abc' {
-  local cmd='case $SH in dash) exit ;; esac
-
-s='\''abc'\''
+  local cmd='s='\''abc'\''
 echo abc $(( s[0] )) $(( s[1] ))
 echo status=$?
 echo
@@ -762,9 +754,7 @@ echo'
 }
 
 @test '073 s[0] with string 42' {
-  local cmd='case $SH in dash) exit ;; esac
-
-s='\''42'\''
+  local cmd='s='\''42'\''
 echo 42 $(( s[0] )) $(( s[1] ))
 echo status=$?'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?

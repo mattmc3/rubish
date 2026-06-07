@@ -45,9 +45,6 @@ foo=$(/bin/echo -e '\''a\nb\x01c'\''\'\''d)
 
 # All are very inconsistent.
 
-case $SH in dash|mksh|zsh) return ;; esac
-
-
 set | grep -A1 foo
 
 # Will print multi-line and binary data literally!
@@ -63,8 +60,6 @@ echo '\''@Q '\'' ${foo@Q}'
 
 @test '003 Print shell strings with normal chars: set and printf %q and {x@Q}' {
   local cmd='# There are variations on whether quotes are printed
-
-case $SH in dash|zsh) return ;; esac
 
 foo=spam
 

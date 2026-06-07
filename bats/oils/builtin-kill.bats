@@ -11,9 +11,7 @@ setup_file() { export BATS_TEST_TIMEOUT=2; }
 setup() { cd "$BATS_TEST_TMPDIR" || return 1; export HOME="$BATS_TEST_TMPDIR"; PATH="$BATS_TEST_DIRNAME/bin:$PATH"; }
 
 @test '001 kill -15 kills the process with SIGTERM' {
-  local cmd='case $SH in mksh) exit ;; esac  # mksh is flaky
-
-sleep 0.1 &
+  local cmd='sleep 0.1 &
 pid=$!
 kill -15 $pid
 echo kill=$?
@@ -39,8 +37,7 @@ echo wait=$?  # 137 is 128 + SIGKILL'
 }
 
 @test '003 kill -n 9 specifies the signal number' {
-  local cmd='#case $SH in mksh|dash) exit ;; esac
-
+  local cmd='#
 sleep 0.1 &
 pid=$!
 kill -n 9 $pid
@@ -67,9 +64,7 @@ echo wait=$?'
 }
 
 @test '005 kill -terM -SigterM isn'\''t case sensitive' {
-  local cmd='case $SH in mksh|dash|zsh) exit ;; esac
-
-sleep 0.1 &
+  local cmd='sleep 0.1 &
 pid=$!
 kill -SigterM $pid
 echo kill=$?
@@ -88,8 +83,7 @@ echo wait=$?'
 }
 
 @test '006 kill HUP pid gives the correct error' {
-  local cmd='case $SH in dash) exit ;; esac
-sleep 0.1 &
+  local cmd='sleep 0.1 &
 builtin kill HUP $pid
 echo $?'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
@@ -98,9 +92,7 @@ echo $?'
 }
 
 @test '007 kill -l shows signals' {
-  local cmd='case $SH in dash) exit ;; esac
-
-# Check if at least the HUP flag is reported.  The output format of all shells
+  local cmd='# Check if at least the HUP flag is reported.  The output format of all shells
 # is different and the available signals may depend on your environment
 
 builtin kill -l | grep HUP > /dev/null
@@ -111,9 +103,7 @@ echo $?'
 }
 
 @test '008 kill -L also shows signals' {
-  local cmd='case $SH in mksh|dash|zsh) exit ;; esac
-
-builtin kill -L | grep HUP > /dev/null
+  local cmd='builtin kill -L | grep HUP > /dev/null
 echo $?'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
   rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
@@ -121,9 +111,7 @@ echo $?'
 }
 
 @test '009 kill -l 10 TERM translates between names and numbers' {
-  local cmd='case $SH in mksh|dash) exit ;; esac
-
-builtin kill -l 10 11 12
+  local cmd='builtin kill -l 10 11 12
 echo status=$?
 echo
 
@@ -141,9 +129,7 @@ echo'
 }
 
 @test '010 kill -L checks for invalid input' {
-  local cmd='case $SH in mksh|dash) exit ;; esac
-
-builtin kill -L 10 BAD 12
+  local cmd='builtin kill -L 10 BAD 12
 echo status=$?
 echo
 
@@ -187,8 +173,7 @@ fi'
 }
 
 @test '015 kill -9999 is an invalid signal' {
-  local cmd='case $SH in dash)  exit ;; esac
-sleep 0.1 &
+  local cmd='sleep 0.1 &
 pid=$!
 kill -9999 $pid > /dev/null
 echo kill=$?
@@ -201,8 +186,7 @@ echo wait=$?'
 }
 
 @test '016 kill -15 %% kills current job' {
-  local cmd='#case $SH in mksh|dash) exit ;; esac
-
+  local cmd='#
 sleep 0.5 &
 pid=$!
 kill -15 %%
@@ -220,8 +204,7 @@ echo wait=$?'
 }
 
 @test '017 kill -15 %- kills previous job' {
-  local cmd='#case $SH in mksh|dash) exit ;; esac
-
+  local cmd='#
 sleep 0.1 &  # previous job
 sleep 0.2 &  # current job
 

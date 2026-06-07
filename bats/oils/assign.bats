@@ -492,9 +492,7 @@ echo done'
 }
 
 @test '042 redirect after declare -p' {
-  local cmd='case $SH in *dash) exit 99 ;; esac  # stderr unpredictable
-
-foo=bar
+  local cmd='foo=bar
 typeset -p foo 1>&2
 
 # zsh and mksh agree on exact output, which we don'\''t really care about'
@@ -504,9 +502,7 @@ typeset -p foo 1>&2
 }
 
 @test '043 declare -a arr does not remove existing arrays (OSH regression)' {
-  local cmd='case $SH in dash) exit 99 ;; esac # dash does not support arrays
-
-declare -a arr
+  local cmd='declare -a arr
 arr=(foo bar baz)
 declare -a arr
 echo arr:${#arr[@]}'
@@ -516,9 +512,7 @@ echo arr:${#arr[@]}'
 }
 
 @test '044 declare -A dict does not remove existing arrays (OSH regression)' {
-  local cmd='case $SH in dash|mksh) exit 99 ;; esac # dash/mksh does not support associative arrays
-
-declare -A dict
+  local cmd='declare -A dict
 dict['\''foo'\'']=hello
 dict['\''bar'\'']=oil
 dict['\''baz'\'']=world
@@ -532,7 +526,6 @@ echo dict:${#dict[@]}'
 @test '045 readonly -a arr and readonly -A dict should not not remove existing arrays' {
   local cmd='# mksh'\''s readonly does not support the -a option.
 # dash/mksh does not support associative arrays.
-case $SH in dash|mksh) exit 99 ;; esac
 
 declare -a arr
 arr=(foo bar baz)
@@ -551,9 +544,7 @@ echo dict:${#dict[@]}'
 }
 
 @test '046 declare -a arr and readonly -a a creates an empty array (OSH)' {
-  local cmd='case $SH in dash|mksh) exit 99 ;; esac # dash/mksh does not support associative arrays
-
-declare -a arr1
+  local cmd='declare -a arr1
 readonly -a arr2
 declare -A dict1
 readonly -A dict2
@@ -565,9 +556,7 @@ declare -p arr1 arr2 dict1 dict2'
 }
 
 @test '047 var d = {}; declare -p d does not print anything (OSH)' {
-  local cmd='case $SH in bash-4.4|dash|mksh|zsh) exit 99 ;; esac
-
-# We pretend that the variable does not exist when the variable is not
+  local cmd='# We pretend that the variable does not exist when the variable is not
 # representable with the "declare -p" format.
 
 var d = {}
@@ -578,9 +567,7 @@ declare -p d'
 }
 
 @test '048 readonly array should not be modified by a+=(1)' {
-  local cmd='case $SH in dash) exit 99 ;; esac # dash/mksh does not support associative arrays
-
-a=(1 2 3)
+  local cmd='a=(1 2 3)
 readonly -a a
 eval '\''a+=(4)'\''
 argv.py "${a[@]}"

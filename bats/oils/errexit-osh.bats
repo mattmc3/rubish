@@ -55,16 +55,14 @@ echo ---'
 }
 
 @test '004 strict_errexit and command sub in export / readonly' {
-  local cmd='case $SH in dash|bash|mksh|ash) exit ;; esac
-
-$SH -o errexit -O strict_errexit -c '\''echo a; export x=$(might-fail); echo b'\''
+  local cmd='$SH -o errexit -O strict_errexit -c '\''echo a; export x=$(might-fail); echo b'\''
 echo status=$?
 $SH -o errexit -O strict_errexit -c '\''echo a; readonly x=$(might-fail); echo b'\''
 echo status=$?
 $SH -o errexit -O strict_errexit -c '\''echo a; x=$(true); echo b'\''
 echo status=$?'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -172,9 +170,7 @@ fi'
 }
 
 @test '011 strict_errexit and errexit disabled' {
-  local cmd='case $SH in dash|bash|mksh|ash) exit ;; esac
-
-shopt -s parse_brace strict_errexit || true
+  local cmd='shopt -s parse_brace strict_errexit || true
 
 p() {
   echo before
@@ -207,9 +203,7 @@ echo parent status=$?'
 }
 
 @test '013 command_sub_errexit stops at first error' {
-  local cmd='case $SH in dash|bash|mksh|ash) exit ;; esac
-
-set -o errexit
+  local cmd='set -o errexit
 shopt --set parse_brace command_sub_errexit verbose_errexit || true
 
 rm -f BAD
@@ -394,8 +388,8 @@ echo --
 $SH -c "$prelude; until fun; do echo until; exit; done"
 echo until=$?
 echo --'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -494,9 +488,7 @@ myproc'
 }
 
 @test '031 command_sub_errexit and command sub in array' {
-  local cmd='case $SH in dash|ash|mksh) exit ;; esac
-
-set -o errexit
+  local cmd='set -o errexit
 shopt -s inherit_errexit || true
 #shopt -s strict_errexit || true
 shopt -s command_sub_errexit || true
@@ -536,9 +528,7 @@ cat tmp'
 }
 
 @test '034 Regression' {
-  local cmd='case $SH in bash|dash|ash|mksh) exit ;; esac
-
-shopt --set oil:upgrade
+  local cmd='shopt --set oil:upgrade
 
 shopt --unset errexit {
   echo hi

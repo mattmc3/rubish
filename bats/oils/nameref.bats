@@ -196,9 +196,7 @@ echo ref=$ref'
 }
 
 @test '012 assign to invalid ref with strict_nameref' {
-  local cmd='case $SH in *bash|*mksh) exit ;; esac
-
-shopt -s strict_nameref
+  local cmd='shopt -s strict_nameref
 
 ref=1
 

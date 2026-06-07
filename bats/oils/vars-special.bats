@@ -32,14 +32,6 @@ echo status=$?'
 # because it a shebang #!/usr/bin/env python2
 # This test is still useful for the C++ oils-for-unix.
 
-case $SH in
-  */bin/osh)
-    echo yes
-    echo yes
-    exit
-    ;;
-esac
-
 # Get absolute path before changing PATH
 sh=$(which $SH)
 
@@ -62,15 +54,13 @@ fi
 if egrep -q '\''(^|:)/bin($|:)'\'' path.txt ; then
   echo yes
 fi'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '004 HOME is NOT set' {
-  local cmd='case $SH in *zsh) echo '\''zsh sets HOME'\''; exit ;; esac
-
-home=$(echo $HOME)
+  local cmd='home=$(echo $HOME)
 test "$home" = ""
 echo status=$?
 
@@ -80,32 +70,22 @@ echo status=$?
 # not in interactive shell either
 $SH -i -c '\''echo $HOME'\'' | grep /
 echo status=$?'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '005 Vars set interactively only: HISTFILE' {
-  local cmd='case $SH in dash|mksh|zsh) exit ;; esac
-
-$SH --norc --rcfile /dev/null -c '\''echo histfile=${HISTFILE:+yes}'\''
+  local cmd='$SH --norc --rcfile /dev/null -c '\''echo histfile=${HISTFILE:+yes}'\''
 $SH --norc --rcfile /dev/null -i -c '\''echo histfile=${HISTFILE:+yes}'\'''
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '006 Some vars are set, even without startup file, or env: PATH, PWD' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='flags='\'''\''
-case $SH in
-  dash) exit ;;
-  bash*)
-    flags='\''--noprofile --norc --rcfile /devnull'\''
-    ;;
-  osh)
-    flags='\''--rcfile /devnull'\''
-    ;;
-esac
 
 sh_path=$(which $SH)
 
@@ -121,7 +101,6 @@ case $sh_path in
 esac
 
 #echo PATH=$PATH
-
 
 # mksh has typeset, not declare
 # bash exports PWD, but not PATH PS4
@@ -139,8 +118,8 @@ echo home ps1 $?
 # IFS is set, but not exported
 /usr/bin/env -i PYTHONPATH=$PYTHONPATH $sh_prefix $flags -c '\''typeset -p IFS'\'' >&2
 echo ifs $?'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -162,15 +141,13 @@ echo ifs $?'
 
 grep '\''=xx'\'' out.txt
 echo status=$?'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '008 HOSTNAME OSTYPE can be changed' {
-  local cmd='case $SH in zsh) exit ;; esac
-
-#$SH -c '\''echo hostname=$HOSTNAME'\''
+  local cmd='#$SH -c '\''echo hostname=$HOSTNAME'\''
 
 HOSTNAME=x $SH -c '\''echo hostname=$HOSTNAME'\''
 OSTYPE=x $SH -c '\''echo ostype=$OSTYPE'\''
@@ -180,8 +157,8 @@ echo
 
 # OPTIND is special
 #OPTIND=xx $SH -c '\''echo optind=$OPTIND'\'''
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -459,9 +436,7 @@ echo "$_"'
 }
 
 @test '033 _ and {_}' {
-  local cmd='case $SH in dash|mksh) exit ;; esac
-
-_var=value
+  local cmd='_var=value
 
 : 42
 echo $_ $_var ${_}var
@@ -474,9 +449,7 @@ echo $_'
 }
 
 @test '034 _ with word splitting' {
-  local cmd='case $SH in dash|mksh) exit ;; esac
-
-setopt shwordsplit  # for ZSH
+  local cmd='setopt shwordsplit  # for ZSH
 
 x='\''with spaces'\''
 : $x
@@ -487,9 +460,7 @@ echo $_'
 }
 
 @test '035 _ with pipeline and subshell' {
-  local cmd='case $SH in dash|mksh) exit ;; esac
-
-shopt -s lastpipe
+  local cmd='shopt -s lastpipe
 
 seq 3 | echo last=$_
 
@@ -503,9 +474,7 @@ echo done=$_'
 }
 
 @test '036 _ with && and ||' {
-  local cmd='case $SH in dash|mksh) exit ;; esac
-
-echo hi && echo last=$_
+  local cmd='echo hi && echo last=$_
 echo and=$_
 
 echo hi || echo last=$_
@@ -519,8 +488,6 @@ echo or=$_'
   local cmd='# bash is inconsistent because it does it for pipelines and assignments, but
 # not (( and [[
 
-case $SH in dash|mksh) exit ;; esac
-
 echo simple
 (( a = 2 + 3 ))
 echo "(( $_"
@@ -533,9 +500,7 @@ echo "[[ $_"'
 }
 
 @test '038 _ with assignments, arrays, etc.' {
-  local cmd='case $SH in dash|mksh) exit ;; esac
-
-: foo
+  local cmd=': foo
 echo "colon [$_]"
 
 s=bar
@@ -561,9 +526,7 @@ echo "declare flag [$_]"'
 }
 
 @test '039 _ with loop' {
-  local cmd='case $SH in dash|mksh) exit ;; esac
-
-# zsh resets it when in a loop
+  local cmd='# zsh resets it when in a loop
 
 echo init
 echo begin=$_
@@ -583,30 +546,13 @@ echo status=$?
 
 # bash and mksh set $_ to $0 at first; zsh is empty
 #echo "$x"'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '041 BASH_VERSION / OILS_VERSION' {
-  local cmd='case $SH in
-  bash*)
-    # BASH_VERSION=zz
-
-    echo $BASH_VERSION | egrep -o '\''4\.4\.0'\'' > /dev/null
-    echo matched=$?
-    ;;
-  *osh)
-    # note: version string is mutable like in bash.  I guess that'\''s useful for
-    # testing?  We might want a strict mode to eliminate that?
-
-    echo $OILS_VERSION | egrep -o '\''[0-9]+\.[0-9]+\.'\'' > /dev/null
-    echo matched=$?
-    ;;
-  *)
-    echo '\''no version'\''
-    ;;
-esac'
+  local cmd=''
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
   rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]

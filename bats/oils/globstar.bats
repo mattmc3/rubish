@@ -11,9 +11,7 @@ setup_file() { export BATS_TEST_TIMEOUT=2; }
 setup() { cd "$BATS_TEST_TMPDIR" || return 1; export HOME="$BATS_TEST_TMPDIR"; PATH="$BATS_TEST_DIRNAME/bin:$PATH"; }
 
 @test '001 globstar is off -> ** is treated like *' {
-  local cmd='case $SH in zsh) exit ;; esac
-
-shopt -u globstar
+  local cmd='shopt -u globstar
 
 mkdir -p c/subdir
 touch {leaf.md,c/leaf.md,c/subdir/leaf.md}
@@ -68,9 +66,7 @@ echo d**y/*.md | sort'
 }
 
 @test '005 in zsh, ***/ follows symlinked directories, while **/ does not' {
-  local cmd='case $SH in bash) exit ;; esac
-
-mkdir directory-1
+  local cmd='mkdir directory-1
 mkdir directory-2
 touch directory-2/leaf-2.md
 ln -s -T ../directory-2 directory-1/symlink

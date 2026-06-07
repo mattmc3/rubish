@@ -26,11 +26,12 @@ echo '\''to stderr'\'''
 }
 
 @test '003 exec builtin with here doc' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='# This has in a separate file because both code and data can be read from
 # stdin.
 $SH $REPO_ROOT/spec/bin/builtins-exec-here-doc-helper.sh'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -104,8 +105,8 @@ match( $0, /\.([0-9]+)/, m) {
 }
 END { if (ok) { print "non-zero" } }
 '\'' $err'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -171,9 +172,7 @@ fi'
 }
 
 @test '015 ulimit -a doesn'\''t take arg' {
-  local cmd='case $SH in bash) exit ;; esac
-
-ulimit -a 42
+  local cmd='ulimit -a 42
 if test $? -ne 0; then
   echo '\''failure that was expected'\''
 fi'
@@ -208,9 +207,7 @@ echo status=$?'
 }
 
 @test '017 YSH readability: ulimit --all the same as ulimit -a' {
-  local cmd='case $SH in bash|dash|mksh|zsh) exit ;; esac
-
-ulimit -a > short.txt
+  local cmd='ulimit -a > short.txt
 ulimit --all > long.txt
 
 wc -l short.txt long.txt
@@ -241,11 +238,9 @@ done'
 @test '019 ulimit of 2**32, 2**31 (int overflow)' {
   local cmd='echo -n '\''one '\''; ulimit -f
 
-
 ulimit -f $(( 1 << 32 ))
 
 echo -n '\''two '\''; ulimit -f
-
 
 # mksh fails because it overflows signed int, turning into negative number
 ulimit -f $(( 1 << 31 ))
@@ -258,7 +253,6 @@ echo -n '\''three '\''; ulimit -f'
 
 @test '020 ulimit that is 64 bits' {
   local cmd='# no 64-bit integers
-case $SH in mksh) exit ;; esac
 
 echo -n '\''before '\''; ulimit -f
 
@@ -280,7 +274,6 @@ echo -n '\''after '\''; ulimit -f'
 
 @test '021 arg that would overflow 64 bits is detected' {
   local cmd='# no 64-bit integers
-case $SH in mksh) exit ;; esac
 
 echo -n '\''before '\''; ulimit -f
 
@@ -347,15 +340,13 @@ cat err.txt'
 
 $SH big.sh
 echo outer=$?'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '024 ulimit -S for soft limit (default), -H for hard limit' {
-  local cmd='case $SH in dash|zsh) exit ;; esac
-
-# Note: ulimit -n -S 1111 is OK in osh/dash/mksh, but not bash/zsh
+  local cmd='# Note: ulimit -n -S 1111 is OK in osh/dash/mksh, but not bash/zsh
 # Mus be ulimit -S -n 1111
 
 show_state() {
@@ -390,8 +381,6 @@ echo -n '\''  '\''; ulimit -H -t'
 
 @test '025 Changing resource limit is denied' {
   local cmd='# Not sure why these don'\''t work
-case $SH in dash|mksh) exit ;; esac
-
 
 flag=-t
 
@@ -431,8 +420,8 @@ echo status=$?
 
 $SH -c '\''ulimit -n 0; echo hi >out'\''
 echo status=$?'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 

@@ -257,8 +257,7 @@ echo "${e[@]}"'
 }
 
 @test '020 Type mismatching of lhs+=rhs should not cause a crash' {
-  local cmd='case $SH in mksh|zsh) exit ;; esac
-s=
+  local cmd='s=
 a=()
 declare -A d=([lemon]=yellow)
 

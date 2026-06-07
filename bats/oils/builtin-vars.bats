@@ -410,9 +410,7 @@ echo status=$?'
 }
 
 @test '033 Unset wrong type' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-declare undef
+  local cmd='declare undef
 unset -v '\''undef[1]'\''
 echo undef $?
 unset -v '\''undef["key"]'\''
@@ -439,9 +437,7 @@ echo assoc $?'
 }
 
 @test '034 unset -v assoc (related to issue #661)' {
-  local cmd='case $SH in dash|mksh|zsh) return ;; esac
-
-declare -A dict=()
+  local cmd='declare -A dict=()
 key=1],a[1
 dict["$key"]=foo
 echo ${#dict[@]}
@@ -458,9 +454,7 @@ echo vals=${dict[@]}'
 }
 
 @test '035 unset assoc errors' {
-  local cmd='case $SH in dash|mksh) return ;; esac
-
-declare -A assoc=(['\''key'\'']=value)
+  local cmd='declare -A assoc=(['\''key'\'']=value)
 unset '\''assoc["nonexistent"]'\''
 echo status=$?'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
@@ -517,9 +511,7 @@ echo y=$y'
 }
 
 @test '040 unset a[-1] (bf.bash regression)' {
-  local cmd='case $SH in dash|zsh) exit ;; esac
-
-a=(1 2 3)
+  local cmd='a=(1 2 3)
 unset a[-1]
 echo len=${#a[@]}
 
@@ -535,9 +527,7 @@ echo "${a[@]}"'
 }
 
 @test '041 unset a[-1] in sparse array (bf.bash regression)' {
-  local cmd='case $SH in dash|zsh) exit ;; esac
-
-a=(0 1 2 3 4)
+  local cmd='a=(0 1 2 3 4)
 unset a[1]
 unset a[4]
 echo len=${#a[@]} a=${a[@]}

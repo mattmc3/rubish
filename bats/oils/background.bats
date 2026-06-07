@@ -18,9 +18,7 @@ setup() { cd "$BATS_TEST_TMPDIR" || return 1; export HOME="$BATS_TEST_TMPDIR"; P
 }
 
 @test '002 wait -n with arguments - arguments are respected' {
-  local cmd='case $SH in dash|mksh) exit ;; esac
-
-echo x &
+  local cmd='echo x &
 
 # here, you can'\''t tell if it'\''s -n or the other
 wait -n $!
@@ -150,9 +148,7 @@ fi'
 }
 
 @test '012 Start background pipeline, wait %job_spec' {
-  local cmd='case $SH in mksh) exit ;; esac  # flakiness?
-
-echo hi | { exit 99; } &
+  local cmd='echo hi | { exit 99; } &
 echo status=$?
 wait %1
 echo status=$?'
@@ -244,9 +240,7 @@ echo "status=$?"  # third job I think'
 }
 
 @test '018 wait -n' {
-  local cmd='case $SH in dash|mksh) return ;; esac
-
-{ sleep 0.09; exit 9; } &
+  local cmd='{ sleep 0.09; exit 9; } &
 { sleep 0.03; exit 3; } &
 wait -n
 echo "status=$?"
@@ -329,9 +323,7 @@ wait'
 }
 
 @test '025 YSH wait --all' {
-  local cmd='case $SH in dash|bash|mksh) exit ;; esac
-
-sleep 0.01 &
+  local cmd='sleep 0.01 &
 (exit 55) &
 true &
 wait
@@ -348,9 +340,7 @@ echo wait --all $?'
 }
 
 @test '026 YSH wait --verbose' {
-  local cmd='case $SH in dash|bash|mksh) exit ;; esac
-
-sleep 0.01 &
+  local cmd='sleep 0.01 &
 (exit 55) &
 wait --verbose
 echo wait $?
@@ -365,9 +355,7 @@ echo wait --all $?'
 }
 
 @test '027 Signal message for killed background job' {
-  local cmd='case $SH in dash|mksh) exit ;; esac
-
-sleep 1 &
+  local cmd='sleep 1 &
 kill -HUP $!
 wait $! 2>err.txt
 echo status=$?

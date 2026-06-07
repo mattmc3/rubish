@@ -421,9 +421,7 @@ echo fnmatch=$?'
 }
 
 @test '045 tilde expansion with =~ (confusing)' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-HOME=foo
+  local cmd='HOME=foo
 [[ ~ =~ $HOME ]]
 echo regex=$?
 [[ $HOME =~ ~ ]]

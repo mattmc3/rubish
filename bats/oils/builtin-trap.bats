@@ -98,8 +98,7 @@ trap'
 }
 
 @test '008 trap -p is like trap: it prints the handlers and full signal names' {
-  local cmd='case $SH in dash) exit ;; esac
-trap "echo INT" INT
+  local cmd='trap "echo INT" INT
 trap "echo EXIT" EXIT
 trap -p'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
@@ -344,6 +343,7 @@ echo "wait status $?"
 }
 
 @test '027 trap USR1, sleep, SIGINT: non-interactively' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='$REPO_ROOT/spec/testdata/builtin-trap-usr1.sh'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
   rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
@@ -351,9 +351,9 @@ echo "wait status $?"
 }
 
 @test '028 trap INT, sleep, SIGINT: non-interactively' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='# mksh behaves differently in CI -- maybe when it'\''s not connected to a
 # terminal?
-case $SH in mksh) echo mksh; exit ;; esac
 
 $REPO_ROOT/spec/testdata/builtin-trap-int.sh'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
@@ -362,6 +362,7 @@ $REPO_ROOT/spec/testdata/builtin-trap-int.sh'
 }
 
 @test '029 trap EXIT, sleep, SIGINT: non-interactively' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='$REPO_ROOT/spec/testdata/builtin-trap-exit.sh'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
   rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
@@ -399,8 +400,8 @@ echo bad
 if test $? -ne 0; then
   echo failure
 fi'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -425,8 +426,8 @@ trap'
 @test '033 trap with command.NoOp - check internal invariant' {
   local cmd='$SH -c '\''trap "> zz" EXIT'\''
 wc -l zz  # should exist'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 

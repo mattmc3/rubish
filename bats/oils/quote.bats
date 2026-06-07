@@ -220,9 +220,7 @@ echo -n $'\''\001'\'' $'\''\377'\'' | od -A n -c | sed '\''s/ \+/ /g'\'''
 }
 
 @test '028 OSH allows invalid backslashes' {
-  local cmd='case $SH in dash|mksh) exit ;; esac
-
-w=$'\''\uZ'\''
+  local cmd='w=$'\''\uZ'\''
 x=$'\''\u{03bc'\''
 y=$'\''\z'\''
 echo $w $x $y'
@@ -261,8 +259,6 @@ printf "c1\tc2\nc3\tc4\n"'
 @test '032 '\'''\'' supports cA escape for Ctrl-A - mask with 0x1f' {
   local cmd='# note: AT&T ksh supports this too
 
-case $SH in dash|ash) exit ;; esac
-
 show_bytes() {
   # -A n - no file offset
   od -A n -t c -t x1
@@ -290,8 +286,6 @@ echo -n $'\''\c-\c+\c"'\'' | show_bytes'
 
 @test '033 c'\'' is an escape, unlike bash' {
   local cmd='# mksh and ksh agree this is an esacpe
-
-case $SH in dash|ash) exit ;; esac
 
 show_bytes() {
   # -A n - no file offset

@@ -11,6 +11,7 @@ setup_file() { export BATS_TEST_TIMEOUT=2; }
 setup() { cd "$BATS_TEST_TMPDIR" || return 1; export HOME="$BATS_TEST_TMPDIR"; PATH="$BATS_TEST_DIRNAME/bin:$PATH"; }
 
 @test '001 bind -l should report readline functions' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='# This test depends on the exact version
 # bind -l | sort > _tmp/this-shell-bind-l.txt
 # comm -23 $REPO_ROOT/spec/testdata/bind/bind_l_function_list.txt _tmp/this-shell-bind-l.txt

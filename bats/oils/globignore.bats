@@ -204,9 +204,7 @@ echo nullglob *t'
 }
 
 @test '017 When GLOBIGNORE is set, no_dash_glob isn'\''t respected' {
-  local cmd='case $SH in bash) exit ;; esac
-
-touch -- foo.txt -foo.txt
+  local cmd='touch -- foo.txt -foo.txt
 
 shopt -s no_dash_glob  # YSH option
 

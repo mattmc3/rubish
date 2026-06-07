@@ -121,9 +121,7 @@ echo v=${v+foo}'
 }
 
 @test '013 {array[@]} with set -u (bash is outlier)' {
-  local cmd='case $SH in dash) exit ;; esac
-
-set -u
+  local cmd='set -u
 
 typeset -a empty
 empty=()
@@ -136,9 +134,7 @@ echo undefined /"${undefined[@]}"/'
 }
 
 @test '014 {undefined[@]+foo} and {undefined[@]:+foo}, with set -u' {
-  local cmd='case $SH in dash) exit ;; esac
-
-set -u
+  local cmd='set -u
 
 echo plus /"${array[@]+foo}"/
 echo plus colon /"${array[@]:+foo}"/'
@@ -148,9 +144,7 @@ echo plus colon /"${array[@]:+foo}"/'
 }
 
 @test '015 {a[@]+foo} and {a[@]:+foo} - operators are equivalent on arrays?' {
-  local cmd='case $SH in dash) exit ;; esac
-
-echo '\''+ '\'' /"${array[@]+foo}"/
+  local cmd='echo '\''+ '\'' /"${array[@]+foo}"/
 echo '\''+:'\'' /"${array[@]:+foo}"/
 echo
 
@@ -178,9 +172,7 @@ echo'
 }
 
 @test '016 Nix idiom {!hooksSlice+{!hooksSlice}} - was workaround for obsolete bash 4.3 bug' {
-  local cmd='case $SH in dash|mksh|zsh) exit ;; esac
-
-# https://oilshell.zulipchat.com/#narrow/stream/307442-nix/topic/Replacing.20bash.20with.20osh.20in.20Nixpkgs.20stdenv
+  local cmd='# https://oilshell.zulipchat.com/#narrow/stream/307442-nix/topic/Replacing.20bash.20with.20osh.20in.20Nixpkgs.20stdenv
 
 (argv.py ${!hooksSlice+"${!hooksSlice}"})
 
@@ -217,9 +209,7 @@ echo v=${v-foo}'
 }
 
 @test '018 array and - and +' {
-  local cmd='case $SH in dash) exit ;; esac
-
-shopt -s compat_array  # to refer to array as scalar
+  local cmd='shopt -s compat_array  # to refer to array as scalar
 
 empty=()
 a1=('\'''\'')
@@ -318,9 +308,7 @@ echo "argv=${*:+plus}"'
 }
 
 @test '024 assoc array and - and +' {
-  local cmd='case $SH in dash|mksh) exit ;; esac
-
-declare -A empty=()
+  local cmd='declare -A empty=()
 declare -A assoc=(['\''k'\'']=v)
 
 echo empty=${empty[@]-minus}
@@ -418,9 +406,7 @@ echo "${undef-\\}"'
 }
 
 @test '033 op-test for {a} and {a[0]}' {
-  local cmd='case $SH in dash) exit ;; esac
-
-test-hyphen() {
+  local cmd='test-hyphen() {
   echo "a   : '\''${a-no-colon}'\'' '\''${a:-with-colon}'\''"
   echo "a[0]: '\''${a[0]-no-colon}'\'' '\''${a[0]:-with-colon}'\''"
 }
@@ -439,9 +425,7 @@ test-hyphen'
 }
 
 @test '034 op-test for {a[@]} and {a[*]}' {
-  local cmd='case $SH in dash) exit ;; esac
-
-test-hyphen() {
+  local cmd='test-hyphen() {
   echo "a[@]: '\''${a[@]-no-colon}'\'' '\''${a[@]:-with-colon}'\''"
   echo "a[*]: '\''${a[*]-no-colon}'\'' '\''${a[*]:-with-colon}'\''"
 }
@@ -460,9 +444,7 @@ test-hyphen'
 }
 
 @test '035 op-test for {!array} with array=a and array=a[0]' {
-  local cmd='case $SH in dash|mksh|zsh) exit ;; esac
-
-test-hyphen() {
+  local cmd='test-hyphen() {
   ref='\''a'\''
   echo "ref=a   : '\''${!ref-no-colon}'\'' '\''${!ref:-with-colon}'\''"
   ref='\''a[0]'\''
@@ -483,9 +465,7 @@ test-hyphen'
 }
 
 @test '036 op-test for {!array} with array=a[@] or array=a[*]' {
-  local cmd='case $SH in dash|mksh|zsh) exit ;; esac
-
-test-hyphen() {
+  local cmd='test-hyphen() {
   ref='\''a[@]'\''
   echo "ref=a[@]: '\''${!ref-no-colon}'\'' '\''${!ref:-with-colon}'\''"
   ref='\''a[*]'\''
@@ -506,9 +486,7 @@ test-hyphen'
 }
 
 @test '037 op-test for unquoted {a[*]:-empty} with IFS=' {
-  local cmd='case $SH in dash) exit ;; esac
-
-IFS=
+  local cmd='IFS=
 a=("" "")
 argv.py ${a[*]:-empty}'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?

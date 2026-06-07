@@ -374,9 +374,7 @@ EOF'
 }
 
 @test '033 Multiple here docs in pipeline' {
-  local cmd='case $SH in *osh) exit ;; esac
-
-# The second instance reads its stdin from the pipe, and fd 5 from a here doc.
+  local cmd='# The second instance reads its stdin from the pipe, and fd 5 from a here doc.
 read_from_fd.py 3 3<<EOF3 | read_from_fd.py 0 5 5<<EOF5
 fd3
 EOF3
@@ -390,9 +388,7 @@ echo ok'
 }
 
 @test '034 Multiple here docs in pipeline on multiple lines' {
-  local cmd='case $SH in *osh) exit ;; esac
-
-# SKIPPED: hangs with osh on Debian
+  local cmd='# SKIPPED: hangs with osh on Debian
 # The second instance reads its stdin from the pipe, and fd 5 from a here doc.
 read_from_fd.py 3 3<<EOF3 |
 fd3

@@ -173,7 +173,6 @@ echo ${v/$x/_}'
 
 @test '018 Substitute glob characters in pattern, quoted and unquoted' {
   local cmd='# INFINITE LOOP in ash!
-case $SH in ash) exit ;; esac
 
 g='\''*'\''
 v='\''a*b'\''
@@ -298,9 +297,7 @@ echo ${x//$foo$bar/bar}'
 }
 
 @test '027 Chromium from http://www.oilshell.org/blog/2016/11/07.html' {
-  local cmd='case $SH in zsh) exit ;; esac
-
-HOST_PATH=/foo/bar/baz
+  local cmd='HOST_PATH=/foo/bar/baz
 echo ${HOST_PATH////\\/}
 
 # The way bash parses it

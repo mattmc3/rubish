@@ -11,9 +11,8 @@ setup_file() { export BATS_TEST_TIMEOUT=2; }
 setup() { cd "$BATS_TEST_TMPDIR" || return 1; export HOME="$BATS_TEST_TMPDIR"; PATH="$BATS_TEST_DIRNAME/bin:$PATH"; }
 
 @test '001 More eval '\''local v='\''' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-set -u
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
+  local cmd='set -u
 
 f() {
   # The temp env messes it up
@@ -106,9 +105,6 @@ shadow
 
 echo ---
 
-case $SH in
-  bash) set -o posix ;;
-esac
 shadow
 
 # Now shadow

@@ -11,9 +11,7 @@ setup_file() { export BATS_TEST_TIMEOUT=2; }
 setup() { cd "$BATS_TEST_TMPDIR" || return 1; export HOME="$BATS_TEST_TMPDIR"; PATH="$BATS_TEST_DIRNAME/bin:$PATH"; }
 
 @test '001 builtin declare a=(x y) is allowed' {
-  local cmd='case $SH in dash|zsh|mksh|ash) exit ;; esac
-
-$SH -c '\''declare a=(x y); declare -p a'\''
+  local cmd='$SH -c '\''declare a=(x y); declare -p a'\''
 if test $? -ne 0; then
   echo '\''fail'\''
 fi
@@ -27,15 +25,13 @@ $SH -c '\''builtin declare -a a=(x y); declare -p a'\''
 if test $? -ne 0; then
   echo '\''fail'\''
 fi'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '002 command export,readonly' {
-  local cmd='case $SH in zsh) exit ;; esac
-
-# dash doesn'\''t have declare typeset
+  local cmd='# dash doesn'\''t have declare typeset
 
 command export c=export
 echo c=$c
@@ -81,9 +77,7 @@ echo $z'
 }
 
 @test '005 builtin declare - ble.sh relies on it' {
-  local cmd='case $SH in dash|mksh|ash) exit ;; esac
-
-x='\''a b'\''
+  local cmd='x='\''a b'\''
 
 builtin declare c=$x
 echo $c
@@ -107,9 +101,7 @@ echo $g'
 }
 
 @test '006 command readonly - similar issue' {
-  local cmd='case $SH in zsh) exit ;; esac
-
-# \command readonly is equivalent to \builtin declare
+  local cmd='# \command readonly is equivalent to \builtin declare
 # except dash implements it
 
 x='\''a b'\''
@@ -134,9 +126,7 @@ echo $e
 }
 
 @test '007 Dynamic c readonly - bash and dash change behavior, mksh bug' {
-  local cmd='case $SH in zsh) exit ;; esac
-
-x='\''a b'\''
+  local cmd='x='\''a b'\''
 
 z=command
 $z readonly c=$x
@@ -151,9 +141,7 @@ echo $d'
 }
 
 @test '008 static builtin command ASSIGN, command builtin ASSIGN' {
-  local cmd='case $SH in dash|ash|zsh) exit ;; esac
-
-# dash doesn'\''t have declare typeset
+  local cmd='# dash doesn'\''t have declare typeset
 
 builtin command export bc=export
 echo bc=$bc
@@ -174,9 +162,7 @@ echo cb=$cb'
 }
 
 @test '009 dynamic builtin command ASSIGN, command builtin ASSIGN' {
-  local cmd='case $SH in dash|ash|zsh) exit ;; esac
-
-b=builtin
+  local cmd='b=builtin
 c=command
 e=export
 r=readonly
@@ -216,9 +202,7 @@ echo cbr=$cbr'
 }
 
 @test '010 builtin typeset, export,readonly' {
-  local cmd='case $SH in dash|ash) exit ;; esac
-
-builtin typeset s=typeset
+  local cmd='builtin typeset s=typeset
 echo s=$s
 
 builtin export s=export
@@ -243,9 +227,7 @@ echo s2=$s2'
 }
 
 @test '011 builtin declare,local' {
-  local cmd='case $SH in dash|ash|mksh) exit ;; esac
-
-builtin declare s=declare
+  local cmd='builtin declare s=declare
 echo s=$s
 
 f() {

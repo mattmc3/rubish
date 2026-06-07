@@ -32,6 +32,7 @@ setup() { cd "$BATS_TEST_TMPDIR" || return 1; export HOME="$BATS_TEST_TMPDIR"; P
 }
 
 @test '004 1 char glob' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='cd $REPO_ROOT
 echo [b]in'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
@@ -61,6 +62,7 @@ echo [b]in'
 }
 
 @test '008 glob can expand to command and arg' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='cd $REPO_ROOT
 spec/testdata/echo.s[hz]'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
@@ -207,6 +209,7 @@ echo -* hello zzzz?'
 }
 
 @test '024 set -o noglob' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='cd $REPO_ROOT
 touch _tmp/spec-tmp/a.zz _tmp/spec-tmp/b.zz
 echo _tmp/spec-tmp/*.zz
@@ -227,6 +230,7 @@ echo $var'
 }
 
 @test '026 Splitting/Globbing doesn'\''t happen on local assignment' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='cd $REPO_ROOT
 
 f() {
@@ -313,8 +317,8 @@ LC_COLLATE=en_US.UTF-8  # en_US is necessary
 echo h*
 
 LC_COLLATE=en_US.UTF-8 $SH -c '\''echo h*'\'''
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -399,9 +403,7 @@ argv.py x/*$v*.txt'
 }
 
 @test '039 shopt -u globskipdots shows . and ..' {
-  local cmd='case $SH in dash|ash|mksh) exit ;; esac
-
-shopt -u globskipdots
+  local cmd='shopt -u globskipdots
 echo hi .*'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
   rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?

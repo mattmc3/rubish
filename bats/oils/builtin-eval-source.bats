@@ -59,9 +59,7 @@ echo status=$?'
 
 @test '005 eval YSH block with '\''break continue return error'\''' {
   skip "YSH syntax not supported"
-  local cmd='case $SH in dash|bash*|mksh|zsh) exit ;; esac
-
-shopt -s ysh:all
+  local cmd='shopt -s ysh:all
 
 proc proc_that_evals(; ; ;b) {
   for i in 1 2; do
@@ -142,6 +140,7 @@ echo status=$?'
 }
 
 @test '012 Source with arguments' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='. $REPO_ROOT/spec/testdata/show-argv.sh foo bar  # dash doesn'\''t have source'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
   rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
@@ -149,6 +148,7 @@ echo status=$?'
 }
 
 @test '013 Source from a function, mutating argv and defining a local var' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='f() {
   . $REPO_ROOT/spec/testdata/source-argv.sh              # no argv
   . $REPO_ROOT/spec/testdata/source-argv.sh args to src  # new argv
@@ -285,8 +285,8 @@ echo status=$?
 # Should fail because hello.sh cannot be found
 PATH="$DIR:$SHELL:$PATH" . hello.sh
 echo status=$?'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 

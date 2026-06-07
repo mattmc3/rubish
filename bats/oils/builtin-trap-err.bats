@@ -184,9 +184,7 @@ echo ok'
 }
 
 @test '011 set -o errtrace: trap ERR runs in subprograms' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-set -o errtrace
+  local cmd='set -o errtrace
 trap '\''echo line=$LINENO'\'' ERR
 
 ( false; echo subshell )
@@ -212,9 +210,7 @@ false & wait
 }
 
 @test '013 set -o errtrace: trap ERR with &' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-set -o errtrace
+  local cmd='set -o errtrace
 trap '\''echo line=$LINENO'\'' ERR
 
 false & wait
@@ -344,9 +340,7 @@ echo ok'
 
 @test '020 trap ERR with YSH proc' {
   skip "YSH syntax not supported"
-  local cmd='case $SH in bash|mksh|ash) exit ;; esac
-
-# seems the same
+  local cmd='# seems the same
 
 shopt -s ysh:upgrade
 
@@ -398,9 +392,7 @@ echo E'
 }
 
 @test '022 trap ERR and pipelines - PIPESTATUS difference' {
-  local cmd='case $SH in ash) exit ;; esac
-
-err() {
+  local cmd='err() {
   echo "err [$@] status=$? [${PIPESTATUS[@]}]"
 }
 trap '\''err'\'' ERR 
@@ -430,9 +422,7 @@ echo ok'
 }
 
 @test '023 error in trap ERR (recursive)' {
-  local cmd='case $SH in dash) exit ;; esac
-
-err() {
+  local cmd='err() {
   echo err status $?
   false
   ( exit 2 )  # not recursively triggered

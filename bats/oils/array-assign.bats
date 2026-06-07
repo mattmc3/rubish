@@ -28,9 +28,7 @@ argv.py "${a[@]}"'
 }
 
 @test '002 Indexed LHS with spaces' {
-  local cmd='case $SH in zsh|ash) exit ;; esac
-
-a[1 * 1]=x
+  local cmd='a[1 * 1]=x
 a[ 1 + 2 ]=z
 echo status=$?
 
@@ -41,9 +39,7 @@ argv.py "${a[@]}"'
 }
 
 @test '003 Nested a[i[0]]=0' {
-  local cmd='case $SH in zsh|ash) exit ;; esac
-
-i=(0 1 2)
+  local cmd='i=(0 1 2)
 
 a[i[0]]=0
 a[ i[1] ]=1
@@ -57,9 +53,7 @@ argv.py "${a[@]}"'
 }
 
 @test '004 Multiple LHS array words' {
-  local cmd='case $SH in zsh|ash) exit ;; esac
-
-a=(0 1 2)
+  local cmd='a=(0 1 2)
 b=(3 4 5)
 
 #declare -p a b
@@ -84,9 +78,7 @@ typeset -p a b'
 }
 
 @test '005 LHS array is protected with shopt -s eval_unsafe_arith, e.g. '\''a[(echo 2)]'\''' {
-  local cmd='case $SH in zsh|ash) exit ;; esac
-
-a=(0 1 2)
+  local cmd='a=(0 1 2)
 b=(3 4 5)
 typeset -p b
 
@@ -104,9 +96,7 @@ typeset -p b'
 }
 
 @test '006 file named a[ is  not executed' {
-  local cmd='case $SH in zsh|ash) exit ;; esac
-
-PATH=".:$PATH"
+  local cmd='PATH=".:$PATH"
 
 for name in '\''a['\'' '\''a[5'\''; do
   echo "echo hi from $name: \$# args: \$@" > "$name"
@@ -158,8 +148,8 @@ echo "a[5 + 3]+= status=$?"
 
 # mksh doesn'\''t issue extra parse errors
 # and it doesn'\''t turn a[5 + 3] and a[5 + 3]+ into commands!'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -183,9 +173,7 @@ echo status=$? len=${#a[@]}'
 }
 
 @test '009 Tricky parsing - a[ a[0]=1 ]=X  a[ a[0]+=1 ]+=X' {
-  local cmd='case $SH in zsh|mksh|ash) exit ;; esac
-
-# the nested [] means we can'\''t use regular language lookahead?
+  local cmd='# the nested [] means we can'\''t use regular language lookahead?
 
 echo assign=$(( z[0] = 42 ))
 
@@ -205,9 +193,7 @@ declare -p a'
 }
 
 @test '010 argv.py a[1 + 2]=' {
-  local cmd='case $SH in zsh|ash) exit ;; esac
-
-# This tests that the worse parser doesn'\''t unconditinoally treat a[ as special
+  local cmd='# This tests that the worse parser doesn'\''t unconditinoally treat a[ as special
 
 a[1 + 2]= argv.py a[1 + 2]=
 echo status=$?
@@ -224,9 +210,7 @@ argv.py a[3 + 4]+='
 }
 
 @test '011 declare builtin doesn'\''t allow spaces' {
-  local cmd='case $SH in zsh|mksh|ash) exit ;; esac
-
-# OSH doesn'\''t allow this
+  local cmd='# OSH doesn'\''t allow this
 declare a[a[0]=1]=X
 declare -p a
 

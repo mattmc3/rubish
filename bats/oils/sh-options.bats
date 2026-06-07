@@ -13,8 +13,8 @@ setup() { cd "$BATS_TEST_TMPDIR" || return 1; export HOME="$BATS_TEST_TMPDIR"; P
 @test '001 - with -c' {
   local cmd='# dash'\''s behavior seems most sensible here?
 $SH -o nounset -c '\''echo $-'\'''
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -41,30 +41,30 @@ o=$-
 @test '004 - with interactive shell' {
   local cmd='$SH -c '\''echo $-'\'' | grep i || echo FALSE
 $SH -i -c '\''echo $-'\'' | grep -q i && echo TRUE'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '005 pass short options like sh -e' {
   local cmd='$SH -e -c '\''false; echo status=$?'\'''
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '006 pass long options like sh -o errexit' {
   local cmd='$SH -o errexit -c '\''false; echo status=$?'\'''
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '007 pass shopt options like sh -O nullglob' {
   local cmd='$SH +O nullglob -c '\''echo foo *.nonexistent bar'\''
 $SH -O nullglob -c '\''echo foo *.nonexistent bar'\'''
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -96,18 +96,15 @@ show'
 }
 
 @test '010 interactive shell starts with emacs mode on' {
-  local cmd='case $SH in dash) exit ;; esac
-case $SH in bash|*osh) flag='\''--rcfile /dev/null'\'' ;; esac
-
-code='\''test -o emacs; echo $?; test -o vi; echo $?'\''
+  local cmd='code='\''test -o emacs; echo $?; test -o vi; echo $?'\''
 
 echo non-interactive
 $SH $flag -c "$code"
 
 echo interactive
 $SH $flag -i -c "$code"'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -158,9 +155,7 @@ echo $?'
 }
 
 @test '015 shopt -p -o prints '\''set'\'' options' {
-  local cmd='case $SH in dash|mksh) exit ;; esac
-
-shopt -po nounset
+  local cmd='shopt -po nounset
 set -o nounset
 shopt -po nounset
 
@@ -173,9 +168,7 @@ shopt -po | egrep -o '\''errexit|noglob|nounset'\'''
 }
 
 @test '016 shopt -o prints '\''set'\'' options' {
-  local cmd='case $SH in dash|mksh) exit ;; esac
-
-shopt -o | egrep -o '\''errexit|noglob|nounset'\''
+  local cmd='shopt -o | egrep -o '\''errexit|noglob|nounset'\''
 echo --'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
   rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
@@ -272,9 +265,7 @@ cat $TMP/no-clobber'
 }
 
 @test '023 noclobber on &> >' {
-  local cmd='case $SH in dash) exit ;; esac
-
-set -C
+  local cmd='set -C
 
 rm -f $TMP/no-clobber
 echo foo > $TMP/no-clobber
@@ -295,9 +286,7 @@ cat $TMP/no-clobber'
 }
 
 @test '024 noclobber on &>> >>' {
-  local cmd='case $SH in dash) echo '\''flaky'\''; exit ;; esac
-
-set -C
+  local cmd='set -C
 
 rm -f $TMP/no-clobber
 echo foo >> $TMP/no-clobber
@@ -451,13 +440,7 @@ done'
 }
 
 @test '035 shopt -s nounset works in YSH, not in bash' {
-  local cmd='case $SH in
-  *dash|*mksh)
-    echo N-I
-    exit
-    ;;
-esac
-shopt -s nounset
+  local cmd='shopt -s nounset
 echo status=$?
 
 # get rid of extra space in bash output
@@ -468,9 +451,7 @@ set -o | grep nounset | sed '\''s/[ \t]\+/ /g'\'''
 }
 
 @test '036 Unimplemented options - print, query, set, unset' {
-  local cmd='case $SH in dash|mksh) exit ;; esac
-
-opt_name=xpg_echo
+  local cmd='opt_name=xpg_echo
 
 shopt -p xpg_echo
 shopt -q xpg_echo; echo q=$?
@@ -493,9 +474,7 @@ echo set=$?'
 }
 
 @test '037 Unimplemented options - OSH shopt -s ignore_shopt_not_impl' {
-  local cmd='case $SH in dash|mksh) exit ;; esac
-
-shopt -s ignore_shopt_not_impl
+  local cmd='shopt -s ignore_shopt_not_impl
 
 opt_name=xpg_echo
 
@@ -520,9 +499,7 @@ echo set=$?'
 }
 
 @test '038 shopt -p exit code (regression)' {
-  local cmd='case $SH in dash|mksh) exit ;; esac
-
-shopt -p > /dev/null
+  local cmd='shopt -p > /dev/null
 echo status=$?'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
   rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?

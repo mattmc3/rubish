@@ -161,9 +161,7 @@ argv.py ${@:2}'
 }
 
 @test '017 {@:offset} and {*:offset}' {
-  local cmd='case $SH in zsh) return ;; esac  # zsh is very different
-
-argv.shell-name-checked () {
+  local cmd='argv.shell-name-checked () {
   argv.py "${@//$0/SHELL}"
 }
 fun() {
@@ -195,9 +193,7 @@ fun "a 1" "b 2" "c 3"'
 }
 
 @test '018 {@:offset:length} and {*:offset:length}' {
-  local cmd='case $SH in zsh) return ;; esac  # zsh is very different
-
-argv.shell-name-checked () {
+  local cmd='argv.shell-name-checked () {
   argv.py "${@//$0/SHELL}"
 }
 fun() {
@@ -277,8 +273,8 @@ $SH -c '\''array=(1 2 3); argv.py space ${array[@]: }'\''
 
 $SH -c '\''s=123; argv.py ${s:}'\''
 $SH -c '\''s=123; argv.py space ${s: }'\'''
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 

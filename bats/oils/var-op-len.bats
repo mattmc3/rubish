@@ -27,6 +27,7 @@ echo ${#v}'
 }
 
 @test '003 Unicode string length (spec/testdata/utf8-chars.txt)' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='v=$(cat $REPO_ROOT/spec/testdata/utf8-chars.txt)
 echo ${#v}'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
@@ -35,6 +36,7 @@ echo ${#v}'
 }
 
 @test '004 String length with incomplete utf-8' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='for num_bytes in 0 1 2 3 4 5 6 7 8 9 10 11 12 13; do
   s=$(head -c $num_bytes $REPO_ROOT/spec/testdata/utf8-chars.txt)
   echo ${#s}
@@ -48,6 +50,7 @@ true  # exit 0'
 }
 
 @test '005 String length with invalid utf-8 continuation bytes' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='for num_bytes in 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14; do
   s=$(head -c $num_bytes $REPO_ROOT/spec/testdata/utf8-chars.txt)$(echo -e "\xFF")
   echo ${#s}
@@ -89,9 +92,7 @@ echo ${#x-default}'
 }
 
 @test '009 {#s} respects LC_ALL - length in bytes or code points' {
-  local cmd='case $SH in dash) exit ;; esac
-
-# This test case is sorta "infected" because spec-common.sh sets LC_ALL=C.UTF-8
+  local cmd='# This test case is sorta "infected" because spec-common.sh sets LC_ALL=C.UTF-8
 #
 # For some reason mksh behaves differently
 #

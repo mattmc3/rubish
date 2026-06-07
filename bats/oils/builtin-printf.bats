@@ -84,8 +84,7 @@ echo "$foo"'
 }
 
 @test '008 printf -v dynamic scope' {
-  local cmd='case $SH in mksh|zsh|dash|ash) echo not implemented; exit ;; esac
-# OK so printf is like assigning to a var.
+  local cmd='# OK so printf is like assigning to a var.
 # printf -v foo %q "$bar" is like
 # foo=${bar@Q}
 dollar='\''dollar'\''
@@ -288,9 +287,7 @@ printf '\''%d\n'\'' \"'
 }
 
 @test '026 Unicode char with '\''' {
-  local cmd='case $SH in mksh) echo '\''weird bug'\''; exit ;; esac
-
-# the mu character is U+03BC
+  local cmd='# the mu character is U+03BC
 
 printf '\''%x\n'\'' \'\''μ
 printf '\''%u\n'\'' \'\''μ
@@ -385,9 +382,7 @@ echo'
 }
 
 @test '028 Too large' {
-  local cmd='case $SH in mksh) echo '\''weird bug'\''; exit ;; esac
-
-echo too large
+  local cmd='echo too large
 too_large=$(python2 -c '\''print("\xF4\x91\x84\x91")'\'')
 printf '\''%x\n'\'' \'\''$too_large
 printf '\''%u\n'\'' \'\''$too_large
@@ -508,7 +503,6 @@ printf '\''%cZ\n'\'' ABC'
 
 @test '039 printf %c unicode - prints the first BYTE of a string - it does not respect UTF-8' {
   local cmd='# TODO: in YSH, this should be deprecated
-case $SH in dash|ash) exit ;; esac
 
 show_bytes() {
   od -A n -t x1
@@ -692,9 +686,7 @@ printf '\''%s\n'\'' z'
 }
 
 @test '052 bash truncates long strftime string at 128' {
-  local cmd='case $SH in ash|dash|mksh|zsh) exit ;; esac
-
-strftime-format() {
+  local cmd='strftime-format() {
   local n=$1
 
   # Prints increasingly long format strings:
@@ -713,21 +705,7 @@ printf $(strftime-format 30) | wc --bytes
 printf $(strftime-format 31) | wc --bytes
 printf $(strftime-format 32) | wc --bytes
 
-case $SH in
-  (*/_bin/cxx-dbg/*)    
-    # Ensure that oils-for-unix detects the truncation of a fixed buffer.
-    # bash has a buffer of 128.
-
-    set +o errexit
-    (
-      printf $(strftime-format 1000)
-    )
-    status=$?
-    if test $status -ne 1; then
-      echo FAIL
-    fi
-    ;;
-esac'
+'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
   rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
@@ -891,9 +869,7 @@ printf '\''%d\n'\'' +0XAB'
 }
 
 @test '062 leading spaces are accepted in value given to %d %X, but not trailing spaces' {
-  local cmd='case $SH in zsh) exit ;; esac
-
-# leading space is allowed
+  local cmd='# leading space is allowed
 printf '\''%d\n'\'' '\'' -123'\''
 echo status=$?
 printf '\''%d\n'\'' '\'' -123 '\''

@@ -77,8 +77,6 @@ cat < <(<foo; echo hi)'
 
 cat <(seq 2; exit 2) <(seq 3; exit 3)
 
-case $SH in bash*|zsh) exit ;; esac
-
 echo status @_process_sub_status
 echo done'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
@@ -87,9 +85,7 @@ echo done'
 }
 
 @test '007 shopt -s process_sub_fail' {
-  local cmd='case $SH in bash*|zsh) exit ;; esac
-
-shopt --set parse_at
+  local cmd='shopt --set parse_at
 
 cat <(echo a; exit 2) <(echo b; exit 3)
 echo status=$? ps @_process_sub_status
@@ -112,7 +108,6 @@ echo status=$? ps @_process_sub_status'
 
 @test '008 process subs and pipelines together' {
   local cmd='# zsh is very similar to bash, but don'\''t bother with the assertions
-case $SH in bash*|zsh) exit ;; esac
 
 shopt --set parse_at
 

@@ -124,9 +124,7 @@ echo status=$?'
 }
 
 @test '008 trap DEBUG with non-compound commands' {
-  local cmd='case $SH in dash|mksh) exit ;; esac
-
-debuglog() {
+  local cmd='debuglog() {
   echo "  [$@]"
 }
 trap '\''debuglog $LINENO'\'' DEBUG
@@ -164,9 +162,7 @@ done'
 }
 
 @test '010 trap DEBUG and command sub / subshell' {
-  local cmd='case $SH in dash|mksh) exit ;; esac
-
-debuglog() {
+  local cmd='debuglog() {
   echo "  [$@]"
 }
 trap '\''debuglog $LINENO'\'' DEBUG
@@ -381,7 +377,6 @@ false || false || false
 
 trap - DEBUG
 
-
 # ONE EACH
 trap '\''echo err $LINENO'\'' ERR
 
@@ -398,9 +393,7 @@ echo ok'
 }
 
 @test '021 Combine DEBUG trap and USR1 trap' {
-  local cmd='case $SH in dash|mksh|ash) exit ;; esac
-
-trap '\''false; echo $LINENO usr1'\'' USR1
+  local cmd='trap '\''false; echo $LINENO usr1'\'' USR1
 trap '\''false; echo $LINENO dbg'\'' DEBUG
 
 sh -c "kill -USR1 $$"
@@ -411,9 +404,7 @@ echo after=$?'
 }
 
 @test '022 Combine ERR trap and USR1 trap' {
-  local cmd='case $SH in dash|mksh|ash) exit ;; esac
-
-trap '\''false; echo $LINENO usr1'\'' USR1
+  local cmd='trap '\''false; echo $LINENO usr1'\'' USR1
 trap '\''false; echo $LINENO err'\'' ERR
 
 sh -c "kill -USR1 $$"
@@ -424,9 +415,7 @@ echo after=$?'
 }
 
 @test '023 Combine DEBUG trap and ERR trap' {
-  local cmd='case $SH in dash|mksh|ash) exit ;; esac
-
-trap '\''false; echo $LINENO err'\'' ERR
+  local cmd='trap '\''false; echo $LINENO err'\'' ERR
 trap '\''false; echo $LINENO debug'\'' DEBUG
 
 false

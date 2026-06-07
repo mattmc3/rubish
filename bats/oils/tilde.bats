@@ -115,9 +115,7 @@ echo foo:~'
 }
 
 @test '010 a[x]=foo:~ has tilde expansion' {
-  local cmd='case $SH in dash|zsh) exit ;; esac
-
-HOME=/home/bar
+  local cmd='HOME=/home/bar
 declare -a a
 a[0]=foo:~
 echo ${a[0]}

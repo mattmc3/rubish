@@ -116,9 +116,7 @@ argv.py "${a[*]#-}"'
 }
 
 @test '011 value.BashArray internal representation - Indexed' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-z=()
+  local cmd='z=()
 declare -a | grep z=
 
 z+=(b c)
@@ -156,9 +154,7 @@ echo status=$?'
 }
 
 @test '012 value.BashArray internal representation - Assoc (ordering is a problem)' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-declare -A A=([k]=v)
+  local cmd='declare -A A=([k]=v)
 declare -A | grep A=
 
 argv.py keys "${!A[@]}"

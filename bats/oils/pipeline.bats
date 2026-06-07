@@ -60,9 +60,7 @@ tr a-z A-Z     # transform'
 }
 
 @test '007 Initial value of PIPESTATUS is empty string' {
-  local cmd='case $SH in dash|zsh) exit ;; esac
-
-echo pipestatus ${PIPESTATUS[@]}'
+  local cmd='echo pipestatus ${PIPESTATUS[@]}'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
   rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
@@ -80,9 +78,7 @@ echo ${PIPESTATUS[@]}'
 }
 
 @test '009 PIPESTATUS is set on simple commands' {
-  local cmd='case $SH in dash|zsh) exit ;; esac
-
-false
+  local cmd='false
 echo pipestatus ${PIPESTATUS[@]}
 
 exit 55 | (exit 44)
@@ -116,15 +112,15 @@ echo ${PIPESTATUS[@]}'
 
 @test '012 ! turns non-zero into zero' {
   local cmd='! $SH -c '\''exit 42'\''; echo $?'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '013 ! turns zero into 1' {
   local cmd='! $SH -c '\''exit 0'\''; echo $?'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -231,9 +227,7 @@ echo ${PIPESTATUS[@]}
 }
 
 @test '026 shopt -s lastpipe and shopt -s no_last_fork interaction' {
-  local cmd='case $SH in dash) exit ;; esac
-
-$SH -c '\''
+  local cmd='$SH -c '\''
 shopt -s lastpipe
 set -o errexit
 set -o pipefail
@@ -251,8 +245,8 @@ set -o pipefail
 
 ls | false | wc -l'\''
 echo status=$?'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 

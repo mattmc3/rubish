@@ -122,6 +122,7 @@ cat foo-bar'
 }
 
 @test '010 Extended glob that doesn'\''t match anything' {
+  skip 'YSH-only mode (shopt -s ysh:); not bash-applicable'
   local cmd='shopt -s extglob
 rm bad_*
 

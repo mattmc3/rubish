@@ -380,8 +380,7 @@ echo -{e..a..2}-'
 }
 
 @test '043 Mixed case char expansion is invalid' {
-  local cmd='case $SH in *zsh) echo BUG; exit ;; esac
-echo -{z..A}-
+  local cmd='echo -{z..A}-
 echo -{z..A..2}-'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
   rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
@@ -480,7 +479,6 @@ echo {1__3}'
 
 @test '055 Invalid brace expansions mixing characters and numbers' {
   local cmd='# zsh does something crazy like : ; < = > that I'\''m not writing
-case $SH in *zsh) echo BUG; exit ;; esac
 echo {1..a}
 echo {z..3}'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?

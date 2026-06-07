@@ -105,9 +105,7 @@ argv.py "$char"'
 }
 
 @test '010 read -n doesn'\''t strip whitespace (bug fix)' {
-  local cmd='case $SH in dash|zsh) exit ;; esac
-
-echo '\''  a b  '\'' | (read -n 4; echo "[$REPLY]")
+  local cmd='echo '\''  a b  '\'' | (read -n 4; echo "[$REPLY]")
 echo '\''  a b  '\'' | (read -n 5; echo "[$REPLY]")
 echo '\''  a b  '\'' | (read -n 6; echo "[$REPLY]")
 echo
@@ -128,9 +126,7 @@ echo '\''  a b  '\'' | (read -n 6 x y z; echo "[$x] [$y] [$z]")'
 }
 
 @test '011 read -d -n - respects delimiter and splits' {
-  local cmd='case $SH in dash|zsh|ash) exit ;; esac
-
-echo '\''delim c'\''
+  local cmd='echo '\''delim c'\''
 echo '\''  a b c '\'' | (read -d '\''c'\'' -n 3; echo "[$REPLY]")
 echo '\''  a b c '\'' | (read -d '\''c'\'' -n 4; echo "[$REPLY]")
 echo '\''  a b c '\'' | (read -d '\''c'\'' -n 5; echo "[$REPLY]")
@@ -160,9 +156,7 @@ echo status=$?'
 }
 
 @test '013 read -n from pipe' {
-  local cmd='case $SH in dash|ash|zsh) exit ;; esac
-
-echo abcxyz | { read -n 3; echo reply=$REPLY; }'
+  local cmd='echo abcxyz | { read -n 3; echo reply=$REPLY; }'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
   rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
@@ -192,7 +186,6 @@ echo '\''  a b  \
 @test '015 read -n vs. -N' {
   local cmd='# dash, ash and zsh do not implement read -N
 # mksh treats -N exactly the same as -n
-case $SH in dash|ash|zsh) exit ;; esac
 
 # bash docs: https://www.gnu.org/software/bash/manual/html_node/Bash-Builtins.html
 
@@ -212,9 +205,7 @@ read -N 4 A B C < $TMP/readn.txt; echo "'\''$A'\'' '\''$B'\'' '\''$C'\''"'
 }
 
 @test '016 read -N ignores delimiters' {
-  local cmd='case $SH in dash|ash|zsh) exit ;; esac
-
-echo $'\''a\nb\nc'\'' > $TMP/read-lines.txt
+  local cmd='echo $'\''a\nb\nc'\'' > $TMP/read-lines.txt
 
 read -N 3 out < $TMP/read-lines.txt
 echo "$out"'
@@ -229,8 +220,6 @@ echo "$out"'
 c='\''some value'\''
 read a b c < $TMP/read-few.txt
 echo "'\''$a'\'' '\''$b'\'' '\''$c'\''"
-
-case $SH in dash) exit ;; esac # dash does not implement -n
 
 c='\''some value'\''
 read -n 3 a b c < $TMP/read-few.txt
@@ -268,8 +257,8 @@ echo -e '\''one\\\ntwo\n'\'' > $tmp
 read escaped < $tmp
 read -r raw < $tmp
 argv.py "$escaped" "$raw"'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -299,9 +288,7 @@ argv.py "$escaped" "$raw"
 }
 
 @test '023 read -s from pipe, not a terminal' {
-  local cmd='case $SH in dash|zsh) exit ;; esac
-
-# It'\''s hard to really test this because it requires a terminal.  We hit a
+  local cmd='# It'\''s hard to really test this because it requires a terminal.  We hit a
 # different code path when reading through a pipe.  There can be bugs there
 # too!
 
@@ -341,8 +328,8 @@ read a b c d < $tmp
 # Use printf because echo in dash/mksh interprets escapes, while it doesn'\''t in
 # bash.
 printf "%s\n" "[$a|$b|$c|$d]"'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -384,11 +371,6 @@ echo $head'
 @test '029 read -a reads into array' {
   local cmd='# read -a is used in bash-completion
 # none of these shells implement it
-case $SH in
-  *mksh|*dash|*zsh|*/ash)
-    exit 2;
-    ;;
-esac
 
 read -a myarray <<'\''EOF'\''
 a b c\ d
@@ -462,9 +444,7 @@ EOF'
 }
 
 @test '034 read -t 0 tests if input is available' {
-  local cmd='case $SH in dash|zsh|mksh) exit ;; esac
-
-# is there input available?
+  local cmd='# is there input available?
 read -t 0 < /dev/null
 echo $?
 
@@ -481,9 +461,7 @@ echo $?'
 }
 
 @test '035 read -t 0.5' {
-  local cmd='case $SH in dash) exit ;; esac
-
-read -t 0.5 < /dev/null
+  local cmd='read -t 0.5 < /dev/null
 echo $?'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
   rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
@@ -501,9 +479,7 @@ echo $?'
 }
 
 @test '037 read -u' {
-  local cmd='case $SH in dash|mksh) exit ;; esac
-
-# file descriptor
+  local cmd='# file descriptor
 read -u 3 3<<EOF
 hi
 EOF
@@ -522,9 +498,7 @@ echo status=$?'
 }
 
 @test '039 read -u -s' {
-  local cmd='case $SH in dash|mksh) exit ;; esac
-
-# file descriptor
+  local cmd='# file descriptor
 read -s -u 3 3<<EOF
 hi
 EOF
@@ -535,9 +509,7 @@ echo reply=$REPLY'
 }
 
 @test '040 read -u 3 -d 5' {
-  local cmd='case $SH in dash|mksh) exit ;; esac
-
-# file descriptor
+  local cmd='# file descriptor
 read -u 3 -d 5 3<<EOF
 123456789
 EOF
@@ -548,9 +520,7 @@ echo reply=$REPLY'
 }
 
 @test '041 read -u 3 -d b -N 6' {
-  local cmd='case $SH in ash|zsh) exit ;; esac
-
-# file descriptor
+  local cmd='# file descriptor
 read -u 3 -d b -N 4 3<<EOF
 ababababa
 EOF
@@ -566,9 +536,7 @@ echo reply=$REPLY'
 }
 
 @test '042 read -N doesn'\''t respect delimiter, while read -n does' {
-  local cmd='case $SH in dash|zsh|ash) exit ;; esac
-
-echo foobar | { read -n 5 -d b; echo $REPLY; }
+  local cmd='echo foobar | { read -n 5 -d b; echo $REPLY; }
 echo foobar | { read -N 5 -d b; echo $REPLY; }'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
   rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
@@ -578,8 +546,6 @@ echo foobar | { read -N 5 -d b; echo $REPLY; }'
 @test '043 read -p (not fully tested)' {
   local cmd='# hm DISABLED if we'\''re not going to the terminal
 # so we'\''re only testing that it accepts the flag here
-
-case $SH in dash|mksh|zsh) exit ;; esac
 
 echo hi | { read -p '\''P'\''; echo $REPLY; }
 echo hi | { read -p '\''P'\'' -n 1; echo $REPLY; }'
@@ -604,9 +570,7 @@ echo status=$?'
 }
 
 @test '046 read -r -d '\'''\'' for NUL strings, e.g. find -print0' {
-  local cmd='case $SH in dash|zsh|mksh) exit ;; esac  # NOT IMPLEMENTED
-
-mkdir -p read0
+  local cmd='mkdir -p read0
 cd read0
 rm -f *
 
@@ -621,7 +585,6 @@ find . -type f -a -print0 | { read -r -d '\'''\''; echo "[$REPLY]"; }'
 @test '047 read from redirected directory is non-fatal error' {
   local cmd='# This tickles an infinite loop bug in our version of mksh!  TODO: upgrade the
 # version and enable this
-case $SH in mksh) return ;; esac
 
 cd $TMP
 mkdir -p dir
@@ -633,10 +596,7 @@ echo status=$?'
 }
 
 @test '048 read -n from directory' {
-  local cmd='case $SH in dash|ash) return ;; esac  # not implemented
-
-# same hanging bug
-case $SH in mksh) return ;; esac
+  local cmd='# same hanging bug
 
 mkdir -p dir
 read -n 3 x < ./dir
@@ -647,9 +607,7 @@ echo status=$?'
 }
 
 @test '049 mapfile from directory (bash doesn'\''t handle errors)' {
-  local cmd='case $SH in dash|ash|mksh|zsh) return ;; esac  # not implemented
-
-mkdir -p dir
+  local cmd='mkdir -p dir
 mapfile $x < ./dir
 echo status=$?'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
@@ -658,18 +616,14 @@ echo status=$?'
 }
 
 @test '050 read -n 0' {
-  local cmd='case $SH in zsh) exit 99;; esac  # read -n not implemented
-
-echo '\''a\b\c\d\e\f'\'' | (read -n 0; argv.py "$REPLY")'
+  local cmd='echo '\''a\b\c\d\e\f'\'' | (read -n 0; argv.py "$REPLY")'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
   rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '051 read -n and backslash escape' {
-  local cmd='case $SH in zsh) exit 99;; esac  # read -n not implemented
-
-echo '\''a\b\c\d\e\f'\'' | (read -n 5; argv.py "$REPLY")
+  local cmd='echo '\''a\b\c\d\e\f'\'' | (read -n 5; argv.py "$REPLY")
 echo '\''a\ \ \ \ \ '\'' | (read -n 5; argv.py "$REPLY")'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
   rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
@@ -677,9 +631,7 @@ echo '\''a\ \ \ \ \ '\'' | (read -n 5; argv.py "$REPLY")'
 }
 
 @test '052 read -n 4 with incomplete backslash' {
-  local cmd='case $SH in zsh) exit 99;; esac  # read -n not implemented
-
-echo '\''abc\def\ghijklmn'\'' | (read -n 4; argv.py "$REPLY")
+  local cmd='echo '\''abc\def\ghijklmn'\'' | (read -n 4; argv.py "$REPLY")
 echo '\''   \xxx\xxxxxxxx'\'' | (read -n 4; argv.py "$REPLY")
 
 # bash implements "-n NUM" as number of characters'
@@ -689,9 +641,7 @@ echo '\''   \xxx\xxxxxxxx'\'' | (read -n 4; argv.py "$REPLY")
 }
 
 @test '053 read -n 4 with backslash + delim' {
-  local cmd='case $SH in zsh) exit 99;; esac  # read -n not implemented
-
-echo $'\''abc\\\ndefg'\'' | (read -n 4; argv.py "$REPLY")'
+  local cmd='echo $'\''abc\\\ndefg'\'' | (read -n 4; argv.py "$REPLY")'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
   rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
@@ -708,8 +658,7 @@ printf '\''%s\n'\'' '\''a b\,c d'\''   | (read -d ,; argv.py "$REPLY")'
 }
 
 @test '055 empty input and splitting' {
-  local cmd='case $SH in mksh|ash|dash|zsh) exit 99; esac
-echo '\'''\'' | (read -a a; argv.py "${a[@]}")
+  local cmd='echo '\'''\'' | (read -a a; argv.py "${a[@]}")
 IFS=x
 echo '\'''\'' | (read -a a; argv.py "${a[@]}")
 IFS=
@@ -720,8 +669,7 @@ echo '\'''\'' | (read -a a; argv.py "${a[@]}")'
 }
 
 @test '056 IFS='\''x '\'' read -a: trailing spaces (unlimited split)' {
-  local cmd='case $SH in mksh|ash|dash|zsh) exit 99; esac
-IFS='\''x '\''
+  local cmd='IFS='\''x '\''
 echo '\''a b'\''     | (read -a a; argv.py "${a[@]}")
 echo '\''a b '\''    | (read -a a; argv.py "${a[@]}")
 echo '\''a bx'\''    | (read -a a; argv.py "${a[@]}")
@@ -748,8 +696,7 @@ echo '\''a ax  x  x  a'\'' | (read a b; argv.py "$a" "$b")'
 }
 
 @test '058 IFS='\''x '\'' read -a: intermediate spaces (unlimited split)' {
-  local cmd='case $SH in mksh|ash|dash|zsh) exit 99; esac
-IFS='\''x '\''
+  local cmd='IFS='\''x '\''
 echo '\''a x b'\''   | (read -a a; argv.py "${a[@]}")
 echo '\''a xx b'\''  | (read -a a; argv.py "${a[@]}")
 echo '\''a xxx b'\'' | (read -a a; argv.py "${a[@]}")

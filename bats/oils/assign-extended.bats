@@ -62,9 +62,8 @@ declare -F'
 }
 
 @test '005 declare -F with shopt -s extdebug prints more info' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-source $REPO_ROOT/spec/testdata/bash-source-2.sh
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
+  local cmd='source $REPO_ROOT/spec/testdata/bash-source-2.sh
 
 shopt -s extdebug
 
@@ -82,11 +81,10 @@ declare -F g | sed "s;$REPO_ROOT;ROOT;g"'
 }
 
 @test '006 declare -F with shopt -s extdebug and main file' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-$SH $REPO_ROOT/spec/testdata/extdebug.sh | sed "s;$REPO_ROOT;ROOT;g"'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
+  local cmd='$SH $REPO_ROOT/spec/testdata/extdebug.sh | sed "s;$REPO_ROOT;ROOT;g"'
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -159,7 +157,6 @@ f1'
 
 @test '010 declare -p doesn'\''t print binary data, but can be loaded into bash' {
   local cmd='# bash prints binary data!
-case $SH in bash*|mksh) exit ;; esac
 
 unquoted='\''foo'\''
 sq='\''foo bar'\''
@@ -230,9 +227,7 @@ declare -p test_arr{1..7}'
 }
 
 @test '013 declare -p foo=bar doesn'\''t make sense' {
-  local cmd='case $SH in mksh) exit 0 ;; esac
-
-declare -p foo=bar
+  local cmd='declare -p foo=bar
 echo status=$?
 
 a=b

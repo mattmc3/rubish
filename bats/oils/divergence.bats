@@ -19,7 +19,6 @@ setup() { cd "$BATS_TEST_TMPDIR" || return 1; export HOME="$BATS_TEST_TMPDIR"; P
 
 shopt -s extglob
 
-
 dirprefix="${line##*([}"
 echo "-$dirprefix-"
 

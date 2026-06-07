@@ -11,9 +11,8 @@ setup_file() { export BATS_TEST_TIMEOUT=2; }
 setup() { cd "$BATS_TEST_TMPDIR" || return 1; export HOME="$BATS_TEST_TMPDIR"; PATH="$BATS_TEST_DIRNAME/bin:$PATH"; }
 
 @test '001 Performance demo' {
-  local cmd='case $SH in bash|mksh) exit ;; esac
-
-shopt -s ysh:upgrade
+  skip 'YSH-only mode (shopt -s ysh:); not bash-applicable'
+  local cmd='shopt -s ysh:upgrade
 
 #pp test_ (a)
 
@@ -77,12 +76,6 @@ a=(x y z w)
 a[500]=100
 a[1000]=100
 
-case $SH in
-bash|mksh)
-  typeset -p a0 a1 a2 a
-  exit ;;
-esac
-
 declare -p a0 a1 a2 a'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
   rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
@@ -116,9 +109,7 @@ typeset -p sp1 | sed '\''s/"//g'\'''
 }
 
 @test '006 Negative index with a[i]=v' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-sp1[9]=x
+  local cmd='sp1[9]=x
 typeset -p sp1 | sed '\''s/"//g'\''
 
 sp1[-1]=A
@@ -132,9 +123,7 @@ typeset -p sp1 | sed '\''s/"//g'\'''
 }
 
 @test '007 a[i]=v with BigInt' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-sp1[1]=x
+  local cmd='sp1[1]=x
 sp1[5]=y
 sp1[9]=z
 
@@ -151,9 +140,7 @@ echo "${#sp1[@]}"'
 }
 
 @test '008 Negative out-of-bound index with a[i]=v (1/2)' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-sp1[9]=x
+  local cmd='sp1[9]=x
 sp1[-11]=E
 declare -p sp1'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
@@ -162,9 +149,7 @@ declare -p sp1'
 }
 
 @test '009 Negative out-of-bound index with a[i]=v (2/2)' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-sp1[9]=x
+  local cmd='sp1[9]=x
 
 sp1[-21]=F
 declare -p sp1'
@@ -174,8 +159,7 @@ declare -p sp1'
 }
 
 @test '010 xtrace a+=()' {
-  local cmd='#case $SH in mksh) exit ;; esac
-
+  local cmd='#
 sp1=(1)
 set -x
 sp1+=(2)'
@@ -199,9 +183,7 @@ typeset -p a'
 }
 
 @test '012 unset -v a[i] with out-of-bound negative index' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-a=(1)
+  local cmd='a=(1)
 
 unset -v "a[-2]"
 unset -v "a[-3]"'
@@ -211,9 +193,7 @@ unset -v "a[-3]"'
 }
 
 @test '013 unset -v a[i] for max index' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-a=({1..9})
+  local cmd='a=({1..9})
 unset -v '\''a[-1]'\''
 a[-1]=x
 declare -p a
@@ -226,9 +206,7 @@ declare -p a'
 }
 
 @test '014 [[ -v a[i] ]]' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-sp1=()
+  local cmd='sp1=()
 [[ -v sp1[0] ]]; echo "$? (expect 1)"
 [[ -v sp1[9] ]]; echo "$? (expect 1)"
 
@@ -256,9 +234,7 @@ unset -v '\''sp3[4]'\''
 }
 
 @test '015 [[ -v a[i] ]] with invalid negative index' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-sp1=()
+  local cmd='sp1=()
 ([[ -v sp1[-1] ]]; echo "$? (expect 1)")
 sp2=({1..9})
 ([[ -v sp2[-10] ]]; echo "$? (expect 1)")
@@ -300,9 +276,7 @@ echo $((a[7] = 100, a[7]))'
 }
 
 @test '017 ((sp[i])) and ((sp[i]++)) with invalid negative index' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-a=({1..9})
+  local cmd='a=({1..9})
 unset -v '\''a[2]'\'' '\''a[3]'\'' '\''a[7]'\''
 
 echo $((a[-10]))'
@@ -312,9 +286,7 @@ echo $((a[-10]))'
 }
 
 @test '018 {sp[i]}' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-sp=({1..9})
+  local cmd='sp=({1..9})
 unset -v '\''sp[2]'\''
 unset -v '\''sp[3]'\''
 unset -v '\''sp[7]'\''
@@ -337,9 +309,7 @@ echo "sp[-9]: '\''${sp[-9]}'\''."'
 }
 
 @test '019 {sp[i]} with negative invalid index' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-sp=({1..9})
+  local cmd='sp=({1..9})
 unset -v '\''sp[2]'\''
 unset -v '\''sp[3]'\''
 unset -v '\''sp[7]'\''
@@ -353,9 +323,7 @@ echo "sp[-19]: '\''${sp[-19]}'\''."'
 }
 
 @test '020 {a[@]:offset:length}' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-a=(v{0..9})
+  local cmd='a=(v{0..9})
 unset -v '\''a[2]'\'' '\''a[3]'\'' '\''a[4]'\'' '\''a[7]'\''
 
 echo '\''==== ${a[@]:offset} ===='\''
@@ -394,9 +362,7 @@ echo "[${a[@]:10:1}][${a[*]:10:1}]"'
 }
 
 @test '021 {@:offset:length}' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-set -- v{1..9}
+  local cmd='set -- v{1..9}
 
 {
   echo '\''==== ${@:offset:length} ===='\''
@@ -416,43 +382,13 @@ set -- v{1..9}
   echo "[${*: -10:4}][${*: -10:4}]"
   echo "[${*: -11:4}][${*: -11:4}]"
 } | sed "s:$SH:\$SH:g;s:${SH##*/}:\$SH:g"'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '022 {a[@]:BigInt}' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-case $SH in
-  bash)
-    # disabled with soil-ovm-tarball image 2025-04-30b - the CI runs on Debian 12
-    # now
-    exit
-
-    # Work around bash integer overflow bug that only happens on say Debian 10,
-    # but NOT Debian 12.  The bug exists in bash 5.2.  It'\''s unclear why it
-    # depends on the OS version.
-    v='\''/etc/debian_version'\''
-    # debian version 10 / debian buster
-    if test -f $v && grep -E '\''buster/sid|^10'\'' $v >/dev/null; then
-      cat << '\''EOF'\''
-[x][x]
-[y x][y x]
-[z y x][z y x]
-[z y x][z y x]
-EOF
-      exit
-    fi
-    # Actual STDOUT of buggy bash builds:
-    # [][]
-    # [][]
-    # [][]
-    # [][]
-    ;;
-esac
-
-a=(1 2 3)
+  local cmd='a=(1 2 3)
 a[0x7FFFFFFFFFFFFFFF]=x
 a[0x7FFFFFFFFFFFFFFE]=y
 a[0x7FFFFFFFFFFFFFFD]=z
@@ -478,9 +414,7 @@ argv.py "abc${a[@]}xyz"'
 }
 
 @test '024 {a[@]#...}' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-a=(v{0..9})
+  local cmd='a=(v{0..9})
 unset -v '\''a[2]'\'' '\''a[3]'\'' '\''a[4]'\'' '\''a[7]'\''
 
 argv.py "${a[@]#v}"
@@ -494,9 +428,7 @@ argv.py "${a[@]#v?}"'
 }
 
 @test '025 {a[@]/pat/rep}' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-a=(v{0..9})
+  local cmd='a=(v{0..9})
 unset -v '\''a[2]'\'' '\''a[3]'\'' '\''a[4]'\'' '\''a[7]'\''
 
 argv.py "${a[@]/?}"
@@ -514,9 +446,7 @@ argv.py "${a[@]//[!0-5]/_}"'
 }
 
 @test '026 {a[@]@P}, {a[@]@Q}, and {a[@]@a}' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-a=(v{0..9})
+  local cmd='a=(v{0..9})
 unset -v '\''a[2]'\'' '\''a[3]'\'' '\''a[4]'\'' '\''a[7]'\''
 
 argv.py "${a[@]@P}"
@@ -560,9 +490,7 @@ echo "$a3, ${a3-(unset)}, ${a3:-(empty)};"'
 }
 
 @test '029 {!a[0]}' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-v1=hello v2=world
+  local cmd='v1=hello v2=world
 a=(v1 v2)
 
 echo "${!a[0]}, ${!a[1]}"'
@@ -572,9 +500,7 @@ echo "${!a[0]}, ${!a[1]}"'
 }
 
 @test '030 {!a[@]}' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-a=(v{0..9})
+  local cmd='a=(v{0..9})
 unset -v '\''a[3]'\'' '\''a[4]'\'' '\''a[7]'\'' '\''a[9]'\''
 
 argv.py "${!a[@]}"'
@@ -598,9 +524,7 @@ echo "${a[*]}"'
 }
 
 @test '032 compgen -F _set_COMPREPLY' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-_set_COMPREPLY() {
+  local cmd='_set_COMPREPLY() {
   COMPREPLY=({0..9})
   unset -v '\''COMPREPLY[2]'\'' '\''COMPREPLY[4]'\'' '\''COMPREPLY[6]'\''
 }
@@ -612,9 +536,7 @@ compgen -F _set_COMPREPLY'
 }
 
 @test '033 compadjust' {
-  local cmd='case $SH in bash|mksh) exit ;; esac
-
-COMP_ARGV=(echo '\''Hello,'\'' '\''Bash'\'' '\''world!'\'')
+  local cmd='COMP_ARGV=(echo '\''Hello,'\'' '\''Bash'\'' '\''world!'\'')
 compadjust cur prev words cword
 argv.py "$cur" "$prev" "$cword"
 argv.py "${words[@]}"'
@@ -624,9 +546,7 @@ argv.py "${words[@]}"'
 }
 
 @test '034 (YSH) @[sp] and @sp' {
-  local cmd='case $SH in bash|mksh) exit ;; esac
-
-a=({0..5})
+  local cmd='a=({0..5})
 unset -v '\''a[1]'\'' '\''a[2]'\'' '\''a[4]'\''
 
 shopt -s parse_at
@@ -638,9 +558,8 @@ argv.py @a'
 }
 
 @test '035 (YSH) [a1 === a2]' {
-  local cmd='case $SH in bash|mksh) exit ;; esac
-
-a1=(1 2 3)
+  skip 'YSH-only mode (shopt -s ysh:); not bash-applicable'
+  local cmd='a1=(1 2 3)
 unset -v '\''a1[1]'\''
 a2=(1 2 3)
 unset -v '\''a2[1]'\''
@@ -663,9 +582,7 @@ echo $[a4 === a1]'
 }
 
 @test '036 (YSH) append v1 v2... (a)' {
-  local cmd='case $SH in bash|mksh) exit ;; esac
-
-a=(1 2 3)
+  local cmd='a=(1 2 3)
 unset -v '\''a[1]'\''
 append '\''x'\'' '\''y'\'' '\''z'\'' (a)
 = a'
@@ -676,9 +593,7 @@ append '\''x'\'' '\''y'\'' '\''z'\'' (a)
 
 @test '037 (YSH) [bool(a)]' {
   skip "YSH syntax not supported"
-  local cmd='case $SH in bash|mksh) exit ;; esac
-
-a1=()
+  local cmd='a1=()
 a2=(0)
 a3=(0 1 2)
 a4=(0 0)
@@ -696,28 +611,23 @@ echo $[bool(a4)]'
 }
 
 @test '038 crash dump' {
-  local cmd='case $SH in bash|mksh) exit ;; esac
-
-OILS_CRASH_DUMP_DIR=$TMP $SH -ec '\''a=({0..3}); unset -v "a[2]"; false'\''
+  local cmd='OILS_CRASH_DUMP_DIR=$TMP $SH -ec '\''a=({0..3}); unset -v "a[2]"; false'\''
 json read (&crash_dump) < $TMP/*.json
 json write (crash_dump.var_stack[0].a)'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '039 Regression: a[-1]=1' {
-  local cmd='case $SH in mksh) exit 99 ;; esac
-
-a[-1]=1'
+  local cmd='a[-1]=1'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
   rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '040 Initializing indexed array with ([index]=value)' {
-  local cmd='case $SH in mksh) exit 99 ;; esac
-declare -a a=([xx]=1 [yy]=2 [zz]=3)
+  local cmd='declare -a a=([xx]=1 [yy]=2 [zz]=3)
 echo status=$?
 argv.py "${a[@]}"'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?

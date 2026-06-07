@@ -388,9 +388,7 @@ printf '\''[%s]\n'\'' $*'
 }
 
 @test '039 IFS='\'''\'' with {a[@]} and {a[*]} (bug #627)' {
-  local cmd='case $SH in dash | ash) exit 0 ;; esac
-
-myarray=(a '\''b c'\'')
+  local cmd='myarray=(a '\''b c'\'')
 IFS='\'''\''
 argv.py at ${myarray[@]}
 argv.py star ${myarray[*]}'
@@ -400,9 +398,7 @@ argv.py star ${myarray[*]}'
 }
 
 @test '040 IFS='\'''\'' with {!prefix@} and {!prefix*} (bug #627)' {
-  local cmd='case $SH in dash | mksh | ash | yash) exit 0 ;; esac
-
-gLwbmGzS_var1=1
+  local cmd='gLwbmGzS_var1=1
 gLwbmGzS_var2=2
 IFS='\'''\''
 argv.py at ${!gLwbmGzS_@}
@@ -413,9 +409,7 @@ argv.py star ${!gLwbmGzS_*}'
 }
 
 @test '041 IFS='\'''\'' with {!a[@]} and {!a[*]} (bug #627)' {
-  local cmd='case $SH in dash | mksh | ash | yash) exit 0 ;; esac
-
-IFS='\'''\''
+  local cmd='IFS='\'''\''
 a=(v1 v2 v3)
 argv.py at ${!a[@]}
 argv.py star ${!a[*]}'
@@ -560,9 +554,7 @@ argv.py '\'' "$@" '\'' "$@"'
 }
 
 @test '048 4 x 3 table - with for loop' {
-  local cmd='case $SH in yash) exit ;; esac  # no echo -n
-
-setopt SH_WORD_SPLIT  # for zsh
+  local cmd='setopt SH_WORD_SPLIT  # for zsh
 
 set -- '\''a b'\'' c '\'''\''
 
@@ -591,9 +583,7 @@ echo -n '\'' "$@" '\'';  for i in "$@"; do echo -n '\'' '\''; echo -n -$i-; done
 }
 
 @test '049 IFS=x and '\'''\'' and @ - same bug as spec/toysh-posix case #12' {
-  local cmd='case $SH in yash) exit ;; esac  # no echo -n
-
-setopt SH_WORD_SPLIT  # for zsh
+  local cmd='setopt SH_WORD_SPLIT  # for zsh
 
 set -- one '\'''\'' two
 
@@ -686,8 +676,7 @@ for i in ""$A""; do echo =$i=; done'
 }
 
 @test '053 Regression: {!v*}x should not be split' {
-  local cmd='case $SH in dash|mksh|ash|yash) exit 99;; esac
-IFS=x
+  local cmd='IFS=x
 axb=1
 echo "${!axb*}"
 echo "${!axb*}"x'

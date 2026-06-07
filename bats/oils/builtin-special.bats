@@ -25,11 +25,7 @@ echo foo=$foo'
 }
 
 @test '002 Prefix assignments persist after special builtins, like : (set -o posix)' {
-  local cmd='case $SH in
-  bash) set -o posix ;;
-esac
-
-foo=bar :
+  local cmd='foo=bar :
 echo foo=$foo
 
 # Not true when you use '\''builtin'\''
@@ -42,9 +38,6 @@ echo z=$Z'
 
 @test '003 Prefix assignments persist after readonly, but NOT exported (set -o posix)' {
   local cmd='# Bash only implements it behind the posix option
-case $SH in
-  bash) set -o posix ;;
-esac
 foo=bar readonly spam=eggs
 echo foo=$foo
 echo spam=$spam
@@ -87,11 +80,7 @@ eval '\''echo hi'\''
 }
 
 @test '007 Special builtins can'\''t be redefined as shell functions (set -o posix)' {
-  local cmd='case $SH in
-  bash) set -o posix ;;
-esac
-
-eval '\''echo hi'\''
+  local cmd='eval '\''echo hi'\''
 
 eval() {
   echo '\''sh func'\'' "$@"
@@ -135,8 +124,8 @@ echo status=$?
 if test "$?" != 0; then
   echo '\''non-zero status'\''
 fi'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -154,15 +143,13 @@ echo should not get here
 if test "$?" != 0; then
   echo '\''non-zero status'\''
 fi'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '011 bash '\''type'\'' gets confused - says '\''function'\'', but runs builtin' {
-  local cmd='case $SH in dash|mksh|zsh|ash|yash) exit ;; esac
-
-echo TRUE
+  local cmd='echo TRUE
 type -t true  # builtin
 true() { echo true func; }
 type -t true  # now a function
@@ -194,9 +181,7 @@ type -t eval
 }
 
 @test '012 command, builtin - both can be redefined, not special (regression)' {
-  local cmd='case $SH in dash|ash|yash) exit ;; esac
-
-builtin echo b
+  local cmd='builtin echo b
 command echo c
 
 builtin() {

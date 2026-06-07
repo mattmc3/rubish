@@ -500,11 +500,6 @@ a $((1 + 2))'
 
 @test '046 Alias and PS4' {
   local cmd='# dash enters an infinite loop!
-case $SH in
-  dash)
-    exit 1
-    ;;
-esac
 
 set -x
 PS4='\''+$(echo trace) '\''

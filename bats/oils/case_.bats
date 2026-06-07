@@ -138,9 +138,7 @@ done'
 }
 
 @test '010 matching the byte 0xff against empty string - DISABLED - CI only bug?' {
-  local cmd='case $SH in *osh) echo soil-ci-buster-slim-bug; exit ;; esac
-
-# This doesn'\''t make a difference on my local machine?
+  local cmd='# This doesn'\''t make a difference on my local machine?
 # Is the underlying issue how libc fnmatch() respects Unicode?
 
 #LC_ALL=C
@@ -200,8 +198,6 @@ echo sum=$sum'
 case $s in
   *\(\)) echo '\''match'\''
 esac
-
-case $SH in dash) exit ;; esac  # not implemented
 
 shopt -s extglob
 

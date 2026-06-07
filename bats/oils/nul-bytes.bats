@@ -11,9 +11,7 @@ setup_file() { export BATS_TEST_TIMEOUT=2; }
 setup() { cd "$BATS_TEST_TMPDIR" || return 1; export HOME="$BATS_TEST_TMPDIR"; PATH="$BATS_TEST_DIRNAME/bin:$PATH"; }
 
 @test '001 NUL bytes with echo -e' {
-  local cmd='case $SH in dash) exit ;; esac
-
-show_hex() { od -A n -t c -t x1; }
+  local cmd='show_hex() { od -A n -t c -t x1; }
 
 echo -e '\''\0-'\'' | show_hex
 #echo -e '\''\x00-'\''
@@ -24,9 +22,7 @@ echo -e '\''\0-'\'' | show_hex
 }
 
 @test '002 printf - literal NUL in format string' {
-  local cmd='case $SH in dash|ash) return ;; esac
-
-# Show both printable and hex
+  local cmd='# Show both printable and hex
 show_hex() { od -A n -t c -t x1; }
 
 printf $'\''x\U0z'\'' | show_hex
@@ -51,8 +47,7 @@ printf '\''\0\n'\'' | show_hex'
 }
 
 @test '004 printf - NUL byte in value (OSH and zsh agree)' {
-  local cmd='case $SH in dash) exit ;; esac
-show_hex() { od -A n -t c -t x1; }
+  local cmd='show_hex() { od -A n -t c -t x1; }
 
 nul=$'\''\0'\''
 echo "$nul" | show_hex
@@ -63,8 +58,7 @@ printf '\''%s\n'\'' "$nul" | show_hex'
 }
 
 @test '005 NUL bytes with echo '\''0'\'' (OSH and zsh agree)' {
-  local cmd='case $SH in dash) exit ;; esac
-show_hex() { od -A n -t c -t x1; }
+  local cmd='show_hex() { od -A n -t c -t x1; }
 
 # OSH agrees with ZSH -- so you have the ability to print NUL bytes without
 # legacy echo -e
@@ -76,9 +70,7 @@ echo $'\''\0'\'' | show_hex'
 }
 
 @test '006 NUL bytes and IFS splitting' {
-  local cmd='case $SH in dash) exit ;; esac
-
-argv.py $(echo -e '\''\0'\'')
+  local cmd='argv.py $(echo -e '\''\0'\'')
 argv.py "$(echo -e '\''\0'\'')"
 argv.py $(echo -e '\''a\0b'\'')
 argv.py "$(echo -e '\''a\0b'\'')"'
@@ -88,9 +80,7 @@ argv.py "$(echo -e '\''a\0b'\'')"'
 }
 
 @test '007 NUL bytes with test -n' {
-  local cmd='case $SH in dash) exit ;; esac
-
-# zsh is buggy here, weird
+  local cmd='# zsh is buggy here, weird
 test -n $'\'''\''
 echo status=$?
 
@@ -102,10 +92,7 @@ echo status=$?'
 }
 
 @test '008 NUL bytes with test -f' {
-  local cmd='case $SH in dash) exit ;; esac
-
-
-test -f $'\''\0'\''
+  local cmd='test -f $'\''\0'\''
 echo status=$?
 
 touch foo
@@ -123,9 +110,7 @@ echo status=$?'
 }
 
 @test '009 NUL bytes with {#s} (OSH and zsh agree)' {
-  local cmd='case $SH in dash) exit ;; esac
-
-empty=$'\'''\''
+  local cmd='empty=$'\'''\''
 nul=$'\''\0'\''
 
 echo empty=${#empty}
@@ -179,14 +164,11 @@ printf '\''\000'\'' | show_string'
 }
 
 @test '012 Compare x00 byte versus x01 byte - read -n' {
-  local cmd='case $SH in dash) exit ;; esac
-
-show_string() {
+  local cmd='show_string() {
   read -n 3 s
   echo len=${#s}
   echo -n "$s" | od -A n -t x1
 }
-
 
 printf '\''.\001.'\'' | show_string
 
@@ -199,9 +181,7 @@ printf '\''\000'\'' | show_string'
 }
 
 @test '013 Compare x00 byte versus x01 byte - mapfile builtin' {
-  local cmd='case $SH in dash|mksh|zsh|ash) exit ;; esac
-
-{ 
+  local cmd='{ 
   printf '\''.\000.\n'\''
   printf '\''.\000.\n'\''
 } |
@@ -308,10 +288,6 @@ echo ---
 arg="$(printf '\'':\000:'\'')" 
 #echo "arg=$arg"
 
-case $SH in
-  zsh) echo '\''writes binary data'\'' ;;
-  *) echo escaped "$(escape_arg "$arg")" ;;
-esac
 #echo "arg=$arg"'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
   rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?

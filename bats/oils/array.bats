@@ -493,8 +493,8 @@ echo status=$?
 
 $SH -c '\''shopt -s strict_array; s="abc"; echo ${s[*]}'\''
 echo status=$?'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -813,9 +813,7 @@ a[10]=z
 }
 
 @test '073 a+=() modifies existing instance of BashArray' {
-  local cmd='case $SH in mksh|bash) exit ;; esac
-
-a=(1 2 3)
+  local cmd='a=(1 2 3)
 var b = a
 a+=(4 5)
 echo "a=(${a[*]})"
@@ -826,9 +824,7 @@ echo "b=(${b[*]})"'
 }
 
 @test '074 Regression: unset a[-2]: out-of-bound negative index should cause error' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-a=(1)
+  local cmd='a=(1)
 unset -v '\''a[-2]'\'''
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
   rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
@@ -836,9 +832,7 @@ unset -v '\''a[-2]'\'''
 }
 
 @test '075 Regression: Out-of-bound negative offset for {a[@]:offset}' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-a=(1 2 3 4)
+  local cmd='a=(1 2 3 4)
 echo "a=(${a[*]})"
 echo "begin=-1 -> (${a[*]: -1})"
 echo "begin=-2 -> (${a[*]: -2})"
@@ -851,9 +845,7 @@ echo "begin=-5 -> (${a[*]: -5})"'
 }
 
 @test '076 Regression: Array length after unset' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-a=(x)
+  local cmd='a=(x)
 a[9]=y
 echo "len ${#a[@]};"
 
@@ -866,9 +858,7 @@ echo "last ${a[@]: -1};"'
 }
 
 @test '077 Regression: {a[@]@Q} crash with a[0]=x a[2]=y' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-a[0]=x
+  local cmd='a[0]=x
 a[2]=y
 echo "quoted = (${a[@]@Q})"'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
@@ -877,9 +867,7 @@ echo "quoted = (${a[@]@Q})"'
 }
 
 @test '078 Regression: silent out-of-bound negative index in {a[-2]} and ((a[-2]))' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-a=(x)
+  local cmd='a=(x)
 echo "[${a[-2]}]"
 echo $?
 echo "[$((a[-2]))]"

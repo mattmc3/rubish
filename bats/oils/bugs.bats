@@ -107,15 +107,13 @@ foo $x() {
 @test '011 file with NUL byte' {
   local cmd='echo -e '\''echo one \0 echo two'\'' > tmp.sh
 $SH tmp.sh'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '012 fastlex: PS1 format string that'\''s incomplete / with NUL byte' {
-  local cmd='case $SH in bash) exit ;; esac
-
-x=$'\''\\D{%H:%M'\''  # leave off trailing }
+  local cmd='x=$'\''\\D{%H:%M'\''  # leave off trailing }
 echo x=${x@P}'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
   rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
@@ -156,25 +154,20 @@ echo start
 echo end
 EOF
 $SH tmp.sh'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '016 for loop (issue #1446)' {
-  local cmd='case $SH in dash|mksh|ash) exit ;; esac
-
-for (( n=0; n<(3-(1)); n++ )) ; do echo $n; done'
+  local cmd='for (( n=0; n<(3-(1)); n++ )) ; do echo $n; done'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
   rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '017 for loop 2 (issue #1446)' {
-  local cmd='case $SH in dash|mksh|ash) exit ;; esac
-
-
-for (( n=0; n<(3- (1)); n++ )) ; do echo $n; done'
+  local cmd='for (( n=0; n<(3- (1)); n++ )) ; do echo $n; done'
   bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
   rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
@@ -201,7 +194,6 @@ echo "$x"
 x=`eval "mysed -n \"\$sedscript\" $sedinputs"`
 echo '\''--- backticks'\''
 echo "$x"
-
 
 # Test it in a case statement
 
@@ -289,9 +281,7 @@ printf '\''%u\n'\'' 2147483648'
 }
 
 @test '024 (( status bug' {
-  local cmd='case $SH in dash|ash) exit ;; esac
-
-# from Koiche on Zulip
+  local cmd='# from Koiche on Zulip
 
 (( 1 << 32 ))
 echo status=$?
@@ -318,9 +308,7 @@ echo as_val=$as_val'
 }
 
 @test '026 OSH can use ARGV name' {
-  local cmd='case $SH in dash|ash) exit ;; esac
-
-foo() {
+  local cmd='foo() {
   if test -v ARGV; then
     echo '\''BUG local'\''
   fi
@@ -370,8 +358,8 @@ printf '\''\0\0\0\0\0\0\0'\'' > tmp.txt
 $SH -c '\''cat </dev/zero | head -c 5 | tr \\0 0; echo'\''
 $SH -c '\''cat /dev/zero | head -c 5 | tr \\0 0; echo'\''
 $SH -c '\''cat tmp.txt | cat | head -c 5 | tr \\0 0; echo'\'''
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 

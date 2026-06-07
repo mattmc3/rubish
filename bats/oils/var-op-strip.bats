@@ -299,9 +299,7 @@ echo 4 ${x##*\(\)}'
 }
 
 @test '029 extglob in pattern' {
-  local cmd='case $SH in dash|zsh|ash) exit ;; esac
-
-shopt -s extglob
+  local cmd='shopt -s extglob
 
 x='\''foo()'\'' 
 echo 1 ${x%*(foo|bar)'\''()'\''}

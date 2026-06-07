@@ -36,15 +36,13 @@ sed '\''s/\xce//g'\'' unicode.sh > not-unicode.sh
 
 echo --
 $SH not-unicode.sh | od -A n -t x1'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '002 Unicode escapes u03bc U000003bc in '\'''\'', echo -e, printf' {
-  local cmd='case $SH in dash|ash) exit ;; esac
-
-echo $'\''\u03bc \U000003bc'\''
+  local cmd='echo $'\''\u03bc \U000003bc'\''
 
 echo -e '\''\u03bc \U000003bc'\''
 
@@ -55,9 +53,7 @@ printf '\''\u03bc \U000003bc\n'\'''
 }
 
 @test '003 Max code point U+10ffff can escaped with '\'''\''  printf  echo -e' {
-  local cmd='case $SH in dash|ash) exit ;; esac
-
-py-repr() {
+  local cmd='py-repr() {
   python2 -c '\''import sys; print repr(sys.argv[1])'\''  "$@"
 }
 
@@ -94,9 +90,7 @@ py-repr $'\''\U0000dc00'\'' '
 }
 
 @test '006 printf / echo -e do NOT check max code point at runtime' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-py-repr() {
+  local cmd='py-repr() {
   python2 -c '\''import sys; print repr(sys.argv[1])'\''  "$@"
 }
 
@@ -113,9 +107,7 @@ py-repr "$p"'
 }
 
 @test '007 printf / echo -e do NOT check surrogates at runtime' {
-  local cmd='case $SH in mksh) exit ;; esac
-
-py-repr() {
+  local cmd='py-repr() {
   python2 -c '\''import sys; print repr(sys.argv[1])'\''  "$@"
 }
 

@@ -88,9 +88,7 @@ type export'
 }
 
 @test '006 more special builtins' {
-  local cmd='case $SH in bash|zsh|dash) exit ;; esac
-
-type .
+  local cmd='type .
 type source
 
 # no agreement here!

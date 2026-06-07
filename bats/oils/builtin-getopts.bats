@@ -346,16 +346,18 @@ echo status=$?'
 }
 
 @test '024 getopts bug #1523' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='$SH $REPO_ROOT/spec/testdata/getopts-1523.sh -abcdef -abcde'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '025 More regression for #1523' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='$SH $REPO_ROOT/spec/testdata/getopts-1523.sh -abcdef -xyz'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 

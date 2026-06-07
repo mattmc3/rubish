@@ -138,7 +138,6 @@ cat "$TMP/fd.txt"'
 @test '014 : 3>&3 (OSH regression)' {
   local cmd='# mksh started being flaky on the continuous build and during release.  We
 # don'\''t care!  Related to issue #330.
-case $SH in mksh) exit ;; esac
 
 : 3>&3
 echo hello'
@@ -279,14 +278,13 @@ stdout_stderr.py &> $tmp
 # order is indeterminate
 grep STDOUT $tmp
 grep STDERR $tmp'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '025 >&word redirects stdout and stderr when word is not a number or -' {
   local cmd='# dash, mksh don'\''t implement this bash behaviour.
-case $SH in dash|mksh) exit 1 ;; esac
 
 tmp="$(basename $SH)-$$.txt"  # unique name for shell and test case
 
@@ -295,8 +293,8 @@ stdout_stderr.py >&$tmp
 # order is indeterminate
 grep STDOUT $tmp
 grep STDERR $tmp'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -385,11 +383,6 @@ echo line1=$line1 line2=$line2'
 @test '031 &>> appends stdout and stderr' {
   local cmd='# Fix for flaky tests: dash behaves non-deterministically under load!  It
 # doesn'\''t implement the behavior anyway so I don'\''t care why.
-case $SH in
-  *dash)
-    exit 1
-    ;;
-esac
 
 echo "ok" > $TMP/f.txt
 stdout_stderr.py &>> $TMP/f.txt
@@ -472,7 +465,6 @@ echo foo54 >&$fd'
 
 @test '037 exec {fd}>&- (OSH regression: fails to close fd)' {
   local cmd='# mksh, dash do not implement {fd} redirections.
-case $SH in mksh|dash) exit 1 ;; esac
 # oil 0.8.pre4 fails to close fd by {fd}&-.
 exec {fd}>file1
 echo foo55 >&$fd
@@ -515,9 +507,7 @@ echo a1>/dev/stdout'
 }
 
 @test '040 Parsing of x={myvar} and related cases' {
-  local cmd='case $SH in dash) exit ;; esac
-
-echo {myvar}>/dev/stdout
+  local cmd='echo {myvar}>/dev/stdout
 # Bash chooses fds starting with 10 here, osh with 100, and there can already
 # be some open fds, so compare further fds against this one
 starting_fd=$myvar

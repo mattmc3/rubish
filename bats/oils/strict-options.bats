@@ -18,6 +18,7 @@ setup() { cd "$BATS_TEST_TMPDIR" || return 1; export HOME="$BATS_TEST_TMPDIR"; P
 }
 
 @test '002 Sourcing a script that returns at the top level' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='echo one
 . $REPO_ROOT/spec/testdata/return-helper.sh
 echo $?
@@ -28,16 +29,18 @@ echo two'
 }
 
 @test '003 top level control flow' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='$SH $REPO_ROOT/spec/testdata/top-level-control-flow.sh'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '004 errexit and top-level control flow' {
+  skip 'references oils repo paths ($REPO_ROOT); not available here'
   local cmd='$SH -o errexit $REPO_ROOT/spec/testdata/top-level-control-flow.sh'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
@@ -176,9 +179,7 @@ done'
 }
 
 @test '015 strict_parse_slice means you need explicit  length' {
-  local cmd='case $SH in bash*|dash|mksh) exit ;; esac
-
-$SH -c '\''
+  local cmd='$SH -c '\''
 a=(1 2 3); echo /${a[@]::}/
 '\''
 echo status=$?
@@ -189,15 +190,13 @@ shopt --set strict_parse_slice
 a=(1 2 3); echo /${a[@]::}/
 '\''
 echo status=$?'
-  bash_out=$(bash -c "$cmd" 2>&1); bash_exit=$?
-  rubish_out=$($RUBISH -c "$cmd" 2>&1); rubish_exit=$?
+  bash_out=$(SH=bash bash -c "$cmd" 2>&1); bash_exit=$?
+  rubish_out=$(SH="$_repo/exe/rubish" $RUBISH -c "$cmd" 2>&1); rubish_exit=$?
   [ "$bash_exit" = "$rubish_exit" ] && [ "$bash_out" = "$rubish_out" ]
 }
 
 @test '016 Control flow must be static in YSH (strict_control_flow)' {
-  local cmd='case $SH in bash*|dash|mksh) exit ;; esac
-
-shopt --set ysh:all
+  local cmd='shopt --set ysh:all
 
 for x in a b c { 
   echo $x
