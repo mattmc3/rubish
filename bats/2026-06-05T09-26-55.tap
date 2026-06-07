@@ -1,0 +1,1762 @@
+# rubish bash-compat bats suite
+# date: 2026-06-05T09-26-55
+# rubish: master @ c5ad4d5
+# bash:   GNU bash, version 5.3.12(1)-release
+# result: 965 tests, 689 ok, 276 not ok (71% pass)
+1..965
+ok 1 test_appendop_string
+ok 2 test_appendop_in_env
+ok 3 test_appendop_array
+not ok 4 test_appendop_export
+# (in test file /tmp/allbats/test_bash_suite_appendop.bats, line 40)
+#   `[ "$actual" = "$expected" ]' failed
+ok 5 test_appendop_array_element_string
+not ok 6 test_appendop_command_env_prefix
+# (in test file /tmp/allbats/test_bash_suite_appendop.bats, line 53)
+#   `actual=$($RUBISH -c "$cmd")' failed
+ok 7 test_appendop_command_env_prefix_unchanged
+ok 8 test_appendop_integer_empty
+ok 9 test_appendop_integer_arith
+ok 10 test_appendop_integer_array_element
+not ok 11 test_appendop_integer_array_arith_init
+# (in test file /tmp/allbats/test_bash_suite_appendop.bats, line 89)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 12 test_appendop_integer_array_index_arith
+# (in test file /tmp/allbats/test_bash_suite_appendop.bats, line 96)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 13 test_appendop_array_literal_pluseq
+# (in test file /tmp/allbats/test_bash_suite_appendop.bats, line 103)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 14 test_appendop_array_sparse_append
+# (in test file /tmp/allbats/test_bash_suite_appendop.bats, line 110)
+#   `[ "$actual" = "$expected" ]' failed
+ok 15 test_appendop_typeset_integer_init
+not ok 16 test_appendop_typeset_unset_pluseq
+# (in test file /tmp/allbats/test_bash_suite_appendop.bats, line 124)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 17 test_appendop_typeset_integer_pluseq
+# (in test file /tmp/allbats/test_bash_suite_appendop.bats, line 131)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 18 test_appendop_readonly_pluseq
+# (in test file /tmp/allbats/test_bash_suite_appendop.bats, line 138)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 19 test_appendop_readonly_error
+# (in test file /tmp/allbats/test_bash_suite_appendop.bats, line 143)
+#   `expected=$(bash -c "$cmd")' failed
+# bash: line 1: x: readonly variable
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (67783) - No such process
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (67958) - No such process
+ok 20 test_arith_for_basic
+ok 21 test_arith_for_count_3
+ok 22 test_arith_for_increment_in_body
+ok 23 test_arith_for_break
+ok 24 test_arith_for_continue
+ok 25 test_arith_for_descend
+ok 26 test_arith_for_final_value
+ok 27 test_arith_for_nested
+ok 28 test_arith_for_sum
+ok 29 test_arith_for_infinite_break
+ok 30 test_arith_for_missing_init
+not ok 31 test_arith_for_quoted_string_condition
+# (in test file /tmp/allbats/test_bash_suite_arith_for.bats, line 94)
+#   `expected=$(bash -c "$cmd")' failed
+# bash: line 1: ((: "i < 3": arithmetic syntax error: operand expected (error token is ""i < 3"")
+ok 32 test_arith_for_continue_double_increment
+ok 33 test_arith_for_oneliner_do
+not ok 34 test_arith_for_brace_body
+# (in test file /tmp/allbats/test_bash_suite_arith_for.bats, line 117)
+#   `[ "$actual" = "$expected" ]' failed
+ok 35 test_arith_for_descend_semicolon_before_do
+ok 36 test_arith_for_no_init_no_cond_decrement
+not ok 37 test_arith_for_error_in_step
+# (in test file /tmp/allbats/test_bash_suite_arith_for.bats, line 136)
+#   `expected=$(bash -c "$cmd")' failed
+# bash: line 1: ((: 7++ : arithmetic syntax error: operand expected (error token is "+ ")
+not ok 38 test_arith_for_bad_init_continues
+# (in test file /tmp/allbats/test_bash_suite_arith_for.bats, line 144)
+#   `actual=$($RUBISH -c "$cmd")' failed
+# bash: line 1: ((: j=: arithmetic syntax error: operand expected (error token is "=")
+# /Users/matt/Projects/mattmc3/rubish/lib/rubish/arithmetic.rb:209:in 'Kernel.eval': (eval at /Users/matt/Projects/mattmc3/rubish/lib/rubish/arithmetic.rb:209):1: syntax error found (SyntaxError)
+# > 1 | 0=
+#     |  ^ unexpected '='; target cannot be written
+#
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/arithmetic.rb:209:in 'Rubish::Arithmetic#eval_single_arithmetic'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/arithmetic.rb:17:in 'block in Rubish::Arithmetic#eval_arithmetic_expr'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/arithmetic.rb:13:in 'Array#each'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/arithmetic.rb:13:in 'Rubish::Arithmetic#eval_arithmetic_expr'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/runtime.rb:13:in 'Rubish::Runtime#__arith_for_loop'
+# 	from (eval at /Users/matt/Projects/mattmc3/rubish/lib/rubish/repl.rb:1286):2:in 'block (2 levels) in Rubish::REPL#eval_in_context'
+# 	from (eval at /Users/matt/Projects/mattmc3/rubish/lib/rubish/repl.rb:1286):1:in 'Kernel#catch'
+# 	from (eval at /Users/matt/Projects/mattmc3/rubish/lib/rubish/repl.rb:1286):1:in 'block in Rubish::REPL#eval_in_context'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/runtime.rb:1165:in 'Rubish::Runtime#__run_cmd'
+# 	from (eval at /Users/matt/Projects/mattmc3/rubish/lib/rubish/repl.rb:1286):1:in 'Rubish::REPL#eval_in_context'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/repl.rb:1286:in 'BasicObject#instance_eval'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/repl.rb:1286:in 'Rubish::REPL#eval_in_context'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/repl.rb:1075:in 'Rubish::REPL#execute'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in 'block in <main>'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in 'Kernel#catch'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in '<main>'
+not ok 39 test_break_outside_loop_continues
+# (in test file /tmp/allbats/test_bash_suite_arith_for.bats, line 151)
+#   `actual=$($RUBISH -c "$cmd")' failed
+# bash: line 1: break: only meaningful in a `for', `while', or `until' loop
+# /Users/matt/Projects/mattmc3/rubish/lib/rubish/runtime/builtins.rb:2601:in 'Kernel#throw': uncaught throw :break_loop (UncaughtThrowError)
+#
+#       throw :break_loop, levels
+#             ^^^^^^^^^^^^^^^^^^^
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/runtime/builtins.rb:2601:in 'Rubish::Builtins#break_'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/runtime/builtins.rb:609:in 'Rubish::Builtins#run'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/runtime/builtins.rb:73:in 'Rubish::Builtins.method_missing'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/runtime.rb:1176:in 'Rubish::Runtime#__run_cmd'
+# 	from (eval at /Users/matt/Projects/mattmc3/rubish/lib/rubish/repl.rb:1286):1:in 'Rubish::REPL#eval_in_context'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/repl.rb:1286:in 'BasicObject#instance_eval'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/repl.rb:1286:in 'Rubish::REPL#eval_in_context'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/repl.rb:1075:in 'Rubish::REPL#execute'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in 'block in <main>'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in 'Kernel#catch'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in '<main>'
+ok 40 test_arith_precedence_mul_before_add
+ok 41 test_arith_bitwise_and
+ok 42 test_arith_bitwise_or
+ok 43 test_arith_bitwise_xor
+ok 44 test_arith_bitwise_not
+ok 45 test_arith_logical_not
+ok 46 test_arith_ternary_true
+ok 47 test_arith_ternary_false
+ok 48 test_arith_ternary_grouped_false
+ok 49 test_arith_ternary_grouped_true
+ok 50 test_arith_ternary_both_grouped_true
+ok 51 test_arith_ternary_both_grouped_false
+ok 52 test_arith_ternary_unevaluated_branch
+ok 53 test_arith_exponent
+ok 54 test_arith_exponent_in_expr
+ok 55 test_arith_exponent_multiply
+ok 56 test_arith_max_signed_32
+ok 57 test_arith_exponent_zero
+ok 58 test_arith_hex_literal
+ok 59 test_arith_hex_or_octal
+ok 60 test_arith_large_int
+ok 61 test_arith_left_shift
+ok 62 test_arith_right_shift
+ok 63 test_arith_var_in_expr
+ok 64 test_arith_two_vars
+ok 65 test_arith_modulo
+ok 66 test_arith_compound_plus_eq
+ok 67 test_arith_compound_minus_eq
+ok 68 test_arith_compound_mul_eq
+ok 69 test_arith_compound_div_eq
+ok 70 test_arith_compound_mod_eq
+ok 71 test_arith_equality_true
+ok 72 test_arith_equality_false
+ok 73 test_arith_not_equal
+ok 74 test_arith_post_increment
+ok 75 test_arith_post_decrement
+ok 76 test_arith_pre_increment
+ok 77 test_arith_pre_decrement
+ok 78 test_arith_unary_plus
+ok 79 test_arith_unary_minus
+ok 80 test_arith_nested_ternary
+ok 81 test_arith_until_loop
+ok 82 test_arith_if_cond
+not ok 83 test_arith_null_expr
+# (in test file /tmp/allbats/test_bash_suite_arith.bats, line 320)
+#   `[ "$actual" = "$expected" ]' failed
+ok 84 test_arith_power_10
+ok 85 test_arith_pythagorean
+ok 86 test_arith_integer_division
+ok 87 test_arith_post_increment_return
+ok 88 test_arith_post_decrement_return
+ok 89 test_arith_double_post_inc
+ok 90 test_arith_cond_gt_true
+ok 91 test_arith_cond_gt_false
+ok 92 test_arith_cond_ge
+ok 93 test_arith_cond_le
+ok 94 test_arith_ternary_var
+ok 95 test_arith_bitand
+ok 96 test_arith_bitor
+ok 97 test_arith_bitxor
+ok 98 test_arith_bitnot_zero
+ok 99 test_arith_lshift_8
+ok 100 test_arith_rshift
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (12011) - No such process
+ok 101 test_array_index_zero
+ok 102 test_array_index_two
+ok 103 test_array_length
+ok 104 test_array_all_elements
+ok 105 test_array_set_element
+ok 106 test_array_unset_element
+ok 107 test_array_for_loop
+ok 108 test_array_star_expansion
+ok 109 test_array_append
+not ok 110 test_array_slice
+# (in test file /tmp/allbats/test_bash_suite_array.bats, line 82)
+#   `[ "$actual" = "$expected" ]' failed
+ok 111 test_empty_array_expansion
+not ok 112 test_declare_a_converts_scalar
+# (in test file /tmp/allbats/test_bash_suite_array.bats, line 96)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 113 test_sparse_array_access
+# (in test file /tmp/allbats/test_bash_suite_array.bats, line 103)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 114 test_sparse_array_all_elements
+# (in test file /tmp/allbats/test_bash_suite_array.bats, line 110)
+#   `[ "$actual" = "$expected" ]' failed
+ok 115 test_count_after_sparse_with_empty
+ok 116 test_arithmetic_subscript
+not ok 117 test_indexed_compound_assignment
+# (in test file /tmp/allbats/test_bash_suite_array.bats, line 131)
+#   `[ "$actual" = "$expected" ]' failed
+ok 118 test_compound_assignment_replaces_old_elements
+not ok 119 test_integer_array_arithmetic
+# (in test file /tmp/allbats/test_bash_suite_array.bats, line 145)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 120 test_array_first_element_length
+# (in test file /tmp/allbats/test_bash_suite_array.bats, line 152)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 121 test_array_element_zero_length
+# (in test file /tmp/allbats/test_bash_suite_array.bats, line 159)
+#   `[ "$actual" = "$expected" ]' failed
+ok 122 test_array_element_count
+not ok 123 test_array_pattern_removal_all
+# (in test file /tmp/allbats/test_bash_suite_array.bats, line 173)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 124 test_array_pattern_removal_single
+# (in test file /tmp/allbats/test_bash_suite_array.bats, line 180)
+#   `[ "$actual" = "$expected" ]' failed
+ok 125 test_array_index_keys
+ok 126 test_array_quoted_reserved_words
+ok 127 test_array_number_elements
+ok 128 test_array_large_number_element
+not ok 129 test_declare_a_compound_literal
+# (in test file /tmp/allbats/test_bash_suite_array.bats, line 215)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 130 test_scalar_as_array_element_zero
+# (in test file /tmp/allbats/test_bash_suite_array.bats, line 222)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 131 test_scalar_as_array_unset_index_length
+# (in test file /tmp/allbats/test_bash_suite_array.bats, line 229)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 132 test_scalar_as_array_all_and_count
+# (in test file /tmp/allbats/test_bash_suite_array.bats, line 236)
+#   `[ "$actual" = "$expected" ]' failed
+ok 133 test_sparse_array_count
+not ok 134 test_sparse_array_keys_with_gaps
+# (in test file /tmp/allbats/test_bash_suite_array.bats, line 250)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 135 test_declare_a_with_compound_assignment
+# (in test file /tmp/allbats/test_bash_suite_array.bats, line 257)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 136 test_scalar_assignment_overrides_array
+# (in test file /tmp/allbats/test_bash_suite_array.bats, line 263)
+#   `actual=$($RUBISH -c "$cmd")' failed
+# /Users/matt/Projects/mattmc3/rubish/lib/rubish/runtime.rb:737:in 'Array#reject': undefined method 'empty?' for nil (NoMethodError)
+#
+#         return arr.reject(&:empty?)
+#                   ^^^^^^^
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/runtime.rb:737:in 'Rubish::Runtime#__fetch_var_for_arg_unquoted'
+# 	from (eval at /Users/matt/Projects/mattmc3/rubish/lib/rubish/repl.rb:1286):1:in 'block in Rubish::REPL#eval_in_context'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/runtime.rb:1165:in 'Rubish::Runtime#__run_cmd'
+# 	from (eval at /Users/matt/Projects/mattmc3/rubish/lib/rubish/repl.rb:1286):1:in 'Rubish::REPL#eval_in_context'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/repl.rb:1286:in 'BasicObject#instance_eval'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/repl.rb:1286:in 'Rubish::REPL#eval_in_context'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/repl.rb:1075:in 'Rubish::REPL#execute'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in 'block in <main>'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in 'Kernel#catch'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in '<main>'
+ok 137 test_array_element_persists_after_scalar_assign
+not ok 138 test_unset_whole_array
+# (in test file /tmp/allbats/test_bash_suite_array.bats, line 278)
+#   `[ "$actual" = "$expected" ]' failed
+ok 139 test_array_element_with_spaces
+not ok 140 test_bare_array_name_is_index_zero
+# (in test file /tmp/allbats/test_bash_suite_array.bats, line 292)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 141 test_array_substitution_all_elements
+# (in test file /tmp/allbats/test_bash_suite_array.bats, line 299)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 142 test_array_global_substitution_all_elements
+# (in test file /tmp/allbats/test_bash_suite_array.bats, line 306)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 143 test_mixed_indexed_compound_assignment
+# (in test file /tmp/allbats/test_bash_suite_array.bats, line 313)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 144 test_array_brace_expansion
+# (in test file /tmp/allbats/test_bash_suite_array.bats, line 320)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 145 test_sparse_slice_with_null_element
+# (in test file /tmp/allbats/test_bash_suite_array.bats, line 327)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 146 test_sparse_slice_skips_unset_element
+# (in test file /tmp/allbats/test_bash_suite_array.bats, line 334)
+#   `[ "$actual" = "$expected" ]' failed
+ok 147 test_array_star_expansion_with_ifs
+ok 148 test_brace_basic_suffix
+ok 149 test_brace_basic_infix
+ok 150 test_brace_basic_prefix
+not ok 151 test_brace_single_element_no_expand
+# (in test file /tmp/allbats/test_bash_suite_braces.bats, line 40)
+#   `[ "$actual" = "$expected" ]' failed
+ok 152 test_brace_escaped_open
+not ok 153 test_brace_empty
+# (in test file /tmp/allbats/test_bash_suite_braces.bats, line 54)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 154 test_brace_close_only
+# (in test file /tmp/allbats/test_bash_suite_braces.bats, line 61)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 155 test_brace_unclosed
+# (in test file /tmp/allbats/test_bash_suite_braces.bats, line 68)
+#   `[ "$actual" = "$expected" ]' failed
+ok 156 test_brace_in_word_list
+not ok 157 test_brace_with_var_expansion
+# (in test file /tmp/allbats/test_bash_suite_braces.bats, line 82)
+#   `[ "$actual" = "$expected" ]' failed
+ok 158 test_brace_nested
+ok 159 test_brace_seq_ascending
+ok 160 test_brace_seq_descending
+ok 161 test_brace_seq_with_prefix_suffix
+ok 162 test_brace_seq_alpha_ascending
+ok 163 test_brace_seq_alpha_descending
+ok 164 test_brace_seq_single
+ok 165 test_brace_seq_negative
+ok 166 test_brace_seq_step
+ok 167 test_brace_seq_descending_step
+ok 168 test_brace_seq_alpha_step
+ok 169 test_brace_seq_with_word
+ok 170 test_brace_seq_zero_padded
+ok 171 test_brace_seq_invalid_mixed
+ok 172 test_brace_escaped_comma
+not ok 173 test_brace_space_inside
+# (in test file /tmp/allbats/test_bash_suite_braces.bats, line 194)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 174 test_brace_lone_open
+# (in test file /tmp/allbats/test_bash_suite_braces.bats, line 201)
+#   `[ "$actual" = "$expected" ]' failed
+ok 175 test_brace_escaped_open_in_list
+ok 176 test_brace_escaped_comma_and_brace
+ok 177 test_brace_dotdot_in_list_not_seq
+ok 178 test_brace_seq_and_word_with_prefix_suffix
+ok 179 test_brace_seq_single_with_prefix_suffix
+ok 180 test_brace_seq_descending_with_suffix
+not ok 181 test_brace_seq_lower_to_upper_cross
+# (in test file /tmp/allbats/test_bash_suite_braces.bats, line 250)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 182 test_brace_seq_upper_to_lower_cross
+# (in test file /tmp/allbats/test_bash_suite_braces.bats, line 257)
+#   `[ "$actual" = "$expected" ]' failed
+ok 183 test_brace_seq_alpha_single_same
+ok 184 test_brace_seq_invalid_alpha_to_num
+ok 185 test_brace_seq_prefix_and_adjacent
+ok 186 test_brace_seq_negative_to_zero
+not ok 187 test_brace_nested_unmatched_outer
+# (in test file /tmp/allbats/test_bash_suite_braces.bats, line 292)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 188 test_brace_unclosed_with_inner_expansion
+# (in test file /tmp/allbats/test_bash_suite_braces.bats, line 299)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 189 test_brace_quoted_single_element_with_list
+# (in test file /tmp/allbats/test_bash_suite_braces.bats, line 306)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 190 test_brace_quoted_comma_literal
+# (in test file /tmp/allbats/test_bash_suite_braces.bats, line 313)
+#   `[ "$actual" = "$expected" ]' failed
+ok 191 test_brace_seq_neg_descend_pos_step
+ok 192 test_brace_seq_neg_descend_neg_step
+ok 193 test_brace_seq_descend_pos_step
+ok 194 test_brace_seq_ascend_step2
+ok 195 test_brace_seq_step_exceeds_range
+ok 196 test_brace_seq_descend_step5
+ok 197 test_brace_seq_descend_neg_step5
+ok 198 test_brace_seq_full_alpha
+ok 199 test_brace_seq_alpha_neg_step
+ok 200 test_brace_seq_large_ints
+ok 201 test_brace_seq_zero_padded_step
+ok 202 test_brace_seq_no_pad_descend_step2
+ok 203 test_brace_seq_no_pad_descend_neg_step2
+ok 204 test_brace_seq_neg_to_neg_zero
+not ok 205 test_brace_outer_invalid_inner_num_seqs
+# (in test file /tmp/allbats/test_bash_suite_braces.bats, line 418)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 206 test_brace_outer_invalid_alpha_seq_num_seq
+# (in test file /tmp/allbats/test_bash_suite_braces.bats, line 425)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 207 test_brace_outer_invalid_alpha_seq_num_list
+# (in test file /tmp/allbats/test_bash_suite_braces.bats, line 432)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 208 test_brace_outer_invalid_list_num_seq
+# (in test file /tmp/allbats/test_bash_suite_braces.bats, line 439)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 209 test_brace_outer_invalid_list_single_num
+# (in test file /tmp/allbats/test_bash_suite_braces.bats, line 446)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 210 test_brace_outer_invalid_single_num_list
+# (in test file /tmp/allbats/test_bash_suite_braces.bats, line 453)
+#   `[ "$actual" = "$expected" ]' failed
+ok 211 test_brace_dotdot_as_path
+ok 212 test_brace_dotdot_trailing_in_item
+ok 213 test_brace_invalid_seq_valid_brace_with_path
+ok 214 test_brace_dotdot_in_second_item
+ok 215 test_brace_two_dotdot_items
+ok 216 test_brace_dotdot_item_and_num
+ok 217 test_brace_num_and_dotdot_item
+not ok 218 test_brace_invalid_single_with_dot
+# (in test file /tmp/allbats/test_bash_suite_braces.bats, line 509)
+#   `[ "$actual" = "$expected" ]' failed
+ok 219 test_brace_invalid_empty_start_seq
+ok 220 test_brace_invalid_empty_end_seq
+ok 221 test_brace_invalid_alpha_to_num_step
+not ok 222 test_brace_invalid_seq_within_valid_expansion
+# (in test file /tmp/allbats/test_bash_suite_braces.bats, line 537)
+#   `[ "$actual" = "$expected" ]' failed
+ok 223 test_brace_invalid_bad_dotf
+ok 224 test_brace_invalid_bad_ff
+ok 225 test_brace_invalid_bad_step_ff
+ok 226 test_brace_invalid_bad_1dot20
+ok 227 test_brace_invalid_bad_step_f2
+ok 228 test_brace_invalid_bad_step_2f
+ok 229 test_brace_invalid_bad_2f_range
+ok 230 test_brace_invalid_bad_ff_range
+ok 231 test_brace_invalid_bad_0f
+ok 232 test_brace_invalid_bad_10f
+not ok 233 test_brace_var_expand_with_trailing_dot
+# (in test file /tmp/allbats/test_bash_suite_braces.bats, line 614)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 234 test_brace_quoted_var_as_prefix
+# (in test file /tmp/allbats/test_bash_suite_braces.bats, line 621)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 235 test_brace_var_name_suffix_expansion
+# (in test file /tmp/allbats/test_bash_suite_braces.bats, line 628)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 236 test_brace_param_expand_as_prefix
+# (in test file /tmp/allbats/test_bash_suite_braces.bats, line 635)
+#   `[ "$actual" = "$expected" ]' failed
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (71067) - No such process
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (71117) - No such process
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (88820) - No such process
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (92125) - No such process
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (92263) - No such process
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (92309) - No such process
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (8922) - No such process
+ok 237 test_echo_n
+ok 238 test_read_basic_herestr
+ok 239 test_read_two_vars
+ok 240 test_read_r_backslash
+ok 241 test_true_exit_code
+ok 242 test_false_exit_code
+ok 243 test_colon_noop
+not ok 244 test_exit_code_in_subshell
+# (in test file /tmp/allbats/test_bash_suite_builtins.bats, line 68)
+#   `[ "$actual" = "$expected" ]' failed
+# /Users/matt/Projects/mattmc3/rubish/lib/rubish/runtime/command.rb:1034:in 'fork': unexpected throw
+ok 245 test_if_true
+ok 246 test_if_false
+ok 247 test_if_elif
+ok 248 test_if_nested
+ok 249 test_if_bracket_test
+ok 250 test_break_stops_loop
+ok 251 test_break_1_stops_loop
+ok 252 test_continue_skips_rest
+ok 253 test_continue_1_skips_rest
+ok 254 test_eval_double_expands
+ok 255 test_builtin_no_double_expand
+ok 256 test_command_no_double_expand
+ok 257 test_eval_escaped_var
+ok 258 test_eval_temp_env
+ok 259 test_umask_print_octal
+ok 260 test_umask_symbolic
+ok 261 test_umask_p_reusable
+ok 262 test_umask_p_symbolic
+ok 263 test_umask_zero
+ok 264 test_unset_v_removes_var
+ok 265 test_unset_removes_var
+ok 266 test_shift_zero
+ok 267 test_shift_one
+ok 268 test_shift_n
+ok 269 test_export_sets_env
+not ok 270 test_readonly_marks_var
+# (in test file /tmp/allbats/test_bash_suite_builtins.bats, line 248)
+#   `expected=$(bash -c "$cmd")' failed
+# bash: line 1: RO: readonly variable
+not ok 271 test_exit_non_numeric_arg
+# (in test file /tmp/allbats/test_bash_suite_builtins.bats, line 257)
+#   `[ "$actual" = "$expected" ]' failed
+# bash: line 1: exit: status: numeric argument required
+# /Users/matt/Projects/mattmc3/rubish/lib/rubish/runtime/command.rb:1034:in 'fork': unexpected throw
+ok 272 test_declare_p_shows_var
+ok 273 test_declare_x_exports_var
+ok 274 test_pwd_prints_cwd
+ok 275 test_alias_define_and_list
+not ok 276 test_unalias_removes_alias
+# (in test file /tmp/allbats/test_bash_suite_builtins.bats, line 290)
+#   `expected=$(bash -c "$cmd")' failed
+# bash: line 1: alias: foo: not found
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (89101) - No such process
+ok 277 test_case_simple_match
+not ok 278 test_case_fallthrough_semi_amp
+# (in test file /tmp/allbats/test_bash_suite_case.bats, line 26)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 279 test_case_continue_match_double_semi_amp
+# (in test file /tmp/allbats/test_bash_suite_case.bats, line 33)
+#   `[ "$actual" = "$expected" ]' failed
+ok 280 test_case_fallthrough_at_end
+ok 281 test_case_leading_paren_match
+ok 282 test_case_leading_paren_multi_branch
+ok 283 test_case_leading_paren_multi_pattern
+ok 284 test_case_leading_paren_wildcard
+not ok 285 test_case_esac_as_pattern_word
+# (in test file /tmp/allbats/test_bash_suite_case.bats, line 74)
+#   `actual=$($RUBISH -c "$cmd")' failed
+# /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:811:in 'Rubish::Parser#parse_case': Expected word or { expression } after "case" (RuntimeError)
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:244:in 'Rubish::Parser#parse_command'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:96:in 'Rubish::Parser#parse_pipeline'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:65:in 'Rubish::Parser#parse_conditional'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:45:in 'Rubish::Parser#parse_list'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:13:in 'Rubish::Parser#parse'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/repl.rb:959:in 'Rubish::REPL#execute'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in 'block in <main>'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in 'Kernel#catch'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in '<main>'
+not ok 286 test_case_bracket_with_empty_var
+# (in test file /tmp/allbats/test_bash_suite_case.bats, line 82)
+#   `[ "$actual" = "$expected" ]' failed
+ok 287 test_case_pipe_pattern
+ok 288 test_case_glob_pattern
+not ok 289 test_case_no_match
+# (in test file /tmp/allbats/test_bash_suite_case.bats, line 103)
+#   `[ "$actual" = "$expected" ]' failed
+ok 290 test_case_question_wildcard
+ok 291 test_case_var_match
+ok 292 test_case_catchall
+not ok 293 test_case_fallthrough_multi_chain
+# (in test file /tmp/allbats/test_bash_suite_case.bats, line 131)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 294 test_case_arith_side_effects_in_pattern
+# (in test file /tmp/allbats/test_bash_suite_case.bats, line 136)
+#   `expected=$(bash -c "$cmd")' failed with status 2
+# bash: -c: line 1: syntax error near unexpected token `('
+# bash: -c: line 1: `x=0; y=1; case 1 in \$((y=0)) ) ;; \$((x=1)) ) echo \$x.\$y ;; esac'
+not ok 295 test_case_readonly_var_mutation_in_pattern
+# (in test file /tmp/allbats/test_bash_suite_case.bats, line 143)
+#   `expected=$(bash -c "$cmd")' failed with status 2
+# bash: -c: line 1: syntax error near unexpected token `('
+# bash: -c: line 1: `readonly xx=1; case 1 in \$((xx++)) ) echo hi1 ;; *) echo hi2; esac; echo \${xx}.\$?'
+ok 296 test_case_bracket_empty_var_matches_bracket_char
+ok 297 test_case_empty_bracket_no_match
+not ok 298 test_case_quoted_empty_var_bracket_no_match
+# (in test file /tmp/allbats/test_bash_suite_case.bats, line 165)
+#   `actual=$($RUBISH -c "$cmd")' failed
+# /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:865:in 'Rubish::Parser#parse_case': Expected ")" after case pattern (RuntimeError)
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:244:in 'Rubish::Parser#parse_command'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:96:in 'Rubish::Parser#parse_pipeline'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:65:in 'Rubish::Parser#parse_conditional'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:56:in 'Rubish::Parser#parse_list'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:13:in 'Rubish::Parser#parse'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/repl.rb:959:in 'Rubish::REPL#execute'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in 'block in <main>'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in 'Kernel#catch'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in '<main>'
+ok 299 test_case_empty_bracket_in_alternation_no_match
+not ok 300 test_case_quoted_empty_var_in_alternation_no_match
+# (in test file /tmp/allbats/test_bash_suite_case.bats, line 179)
+#   `actual=$($RUBISH -c "$cmd")' failed
+# /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:865:in 'Rubish::Parser#parse_case': Expected ")" after case pattern (RuntimeError)
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:244:in 'Rubish::Parser#parse_command'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:96:in 'Rubish::Parser#parse_pipeline'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:65:in 'Rubish::Parser#parse_conditional'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:56:in 'Rubish::Parser#parse_list'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:13:in 'Rubish::Parser#parse'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/repl.rb:959:in 'Rubish::REPL#execute'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in 'block in <main>'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in 'Kernel#catch'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in '<main>'
+not ok 301 test_case_quoted_empty_var_alternation_nospace_no_match
+# (in test file /tmp/allbats/test_bash_suite_case.bats, line 186)
+#   `actual=$($RUBISH -c "$cmd")' failed
+# /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:865:in 'Rubish::Parser#parse_case': Expected ")" after case pattern (RuntimeError)
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:244:in 'Rubish::Parser#parse_command'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:96:in 'Rubish::Parser#parse_pipeline'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:65:in 'Rubish::Parser#parse_conditional'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:56:in 'Rubish::Parser#parse_list'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:13:in 'Rubish::Parser#parse'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/repl.rb:959:in 'Rubish::REPL#execute'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in 'block in <main>'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in 'Kernel#catch'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in '<main>'
+not ok 302 test_case_bracket_with_quoted_space_match
+# (in test file /tmp/allbats/test_bash_suite_case.bats, line 192)
+#   `expected=$(bash -c "$cmd")' failed with status 2
+# bash: -c: line 1: syntax error near unexpected token `\"'
+# bash: -c: line 1: `case \" \" in ( [\" \"] ) echo ok ;; ( * ) echo no ;; esac'
+not ok 303 test_case_reserved_words_as_patterns
+# (in test file /tmp/allbats/test_bash_suite_case.bats, line 201)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 304 test_case_unset_var_matches_empty_pattern
+# (in test file /tmp/allbats/test_bash_suite_case.bats, line 208)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 305 test_case_unset_var_matches_pipe_with_other_var
+# (in test file /tmp/allbats/test_bash_suite_case.bats, line 215)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 306 test_case_unset_null_word_continue_test
+# (in test file /tmp/allbats/test_bash_suite_case.bats, line 222)
+#   `[ "$actual" = "$expected" ]' failed
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (76202) - No such process
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (76245) - No such process
+ok 307 test_comsub_basic
+not ok 308 test_comsub_multiline
+# (in test file /tmp/allbats/test_bash_suite_comsub.bats, line 26)
+#   `[ "$actual" = "$expected" ]' failed
+ok 309 test_comsub_nested
+not ok 310 test_comsub_in_arith
+# (in test file /tmp/allbats/test_bash_suite_comsub.bats, line 39)
+#   `actual=$($RUBISH -c "$cmd")' failed
+# /Users/matt/Projects/mattmc3/rubish/lib/rubish/arithmetic.rb:209:in 'Kernel.eval': (eval at /Users/matt/Projects/mattmc3/rubish/lib/rubish/arithmetic.rb:209):1: syntax errors found (SyntaxError)
+# > 1 | $(0 3) + 4
+#     | ^~ '$(' is not allowed as a global variable name
+#     |  ^ unexpected '(', expecting end-of-input
+#     |     ^ unexpected integer, expecting end-of-input
+#
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/arithmetic.rb:209:in 'Rubish::Arithmetic#eval_single_arithmetic'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/arithmetic.rb:17:in 'block in Rubish::Arithmetic#eval_arithmetic_expr'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/arithmetic.rb:13:in 'Array#each'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/arithmetic.rb:13:in 'Rubish::Arithmetic#eval_arithmetic_expr'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/runtime.rb:33:in 'Rubish::Runtime#__arith'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/expansion.rb:292:in 'Rubish::Expansion#expand_variable_at'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/expansion.rb:221:in 'Rubish::Expansion#expand_string_content'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/expansion.rb:157:in 'block in Rubish::Expansion#expand_single_arg_with_brace_and_glob'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/expansion.rb:156:in 'Array#each'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/expansion.rb:156:in 'Enumerable#flat_map'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/expansion.rb:156:in 'Rubish::Expansion#expand_single_arg_with_brace_and_glob'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/expansion.rb:27:in 'block in Rubish::Expansion#expand_args_for_builtin'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/expansion.rb:27:in 'Array#each'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/expansion.rb:27:in 'Enumerable#flat_map'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/expansion.rb:27:in 'Rubish::Expansion#expand_args_for_builtin'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/repl.rb:1007:in 'Rubish::REPL#execute'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in 'block in <main>'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in 'Kernel#catch'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in '<main>'
+ok 311 test_comsub_pipeline
+ok 312 test_comsub_strips_trailing_newline
+ok 313 test_comsub_empty
+ok 314 test_comsub_assigns
+not ok 315 test_comsub_quoted_spaces_preserved
+# (in test file /tmp/allbats/test_bash_suite_comsub.bats, line 75)
+#   `[ "$actual" = "$expected" ]' failed
+ok 316 test_comsub_backtick
+ok 317 test_comsub_inline_concat
+ok 318 test_comsub_pipeline_grep_assign
+not ok 319 test_comsub_empty_multiline
+# (in test file /tmp/allbats/test_bash_suite_comsub.bats, line 103)
+#   `[ "$actual" = "$expected" ]' failed
+ok 320 test_comsub_deeply_nested
+not ok 321 test_comsub_strips_multiple_trailing_newlines
+# (in test file /tmp/allbats/test_bash_suite_comsub.bats, line 117)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 322 test_comsub_strips_trailing_preserves_internal
+# (in test file /tmp/allbats/test_bash_suite_comsub.bats, line 124)
+#   `[ "$actual" = "$expected" ]' failed
+ok 323 test_comsub_word_split_unquoted
+not ok 324 test_comsub_no_word_split_quoted
+# (in test file /tmp/allbats/test_bash_suite_comsub.bats, line 138)
+#   `[ "$actual" = "$expected" ]' failed
+ok 325 test_comsub_backtick_chained
+not ok 326 test_comsub_in_param_default
+# (in test file /tmp/allbats/test_bash_suite_comsub.bats, line 152)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 327 test_comsub_return_aborts_comsub
+# (in test file /tmp/allbats/test_bash_suite_comsub.bats, line 159)
+#   `[ "$actual" = "$expected" ]' failed
+# /Users/matt/Projects/mattmc3/rubish/lib/rubish/runtime.rb:54:in 'fork': unexpected throw
+ok 328 test_comsub_prefix_suffix_inline
+not ok 329 test_comsub_backtick_escaped_dollar
+# (in test file /tmp/allbats/test_bash_suite_comsub.bats, line 173)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 330 test_comsub_backtick_escaped_backslash
+# (in test file /tmp/allbats/test_bash_suite_comsub.bats, line 180)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 331 test_comsub_exit_status
+# (in test file /tmp/allbats/test_bash_suite_comsub.bats, line 187)
+#   `[ "$actual" = "$expected" ]' failed
+# rubish: : command not found
+ok 332 test_cond_nonempty_string
+ok 333 test_cond_negated_nonempty_string
+ok 334 test_cond_not_or
+ok 335 test_cond_n_nonempty
+ok 336 test_cond_z_unset
+ok 337 test_cond_n_unset
+ok 338 test_cond_glob_match
+not ok 339 test_cond_quoted_pattern_no_glob
+# (in test file /tmp/allbats/test_bash_suite_cond.bats, line 68)
+#   `[ "$actual" = "$expected" ]' failed
+ok 340 test_cond_numeric_lt
+ok 341 test_cond_numeric_gt
+ok 342 test_cond_numeric_eq
+ok 343 test_cond_numeric_ne
+ok 344 test_cond_numeric_le
+ok 345 test_cond_numeric_ge
+ok 346 test_cond_string_lt
+ok 347 test_cond_string_gt
+ok 348 test_cond_and_short_circuits
+ok 349 test_cond_or_true
+ok 350 test_cond_d_root
+ok 351 test_cond_f_passwd
+ok 352 test_cond_e_exists
+ok 353 test_cond_double_negation
+ok 354 test_cond_glob_extension
+ok 355 test_cond_string_gt_and_ef
+ok 356 test_cond_single_negation_arith
+ok 357 test_cond_triple_negation
+ok 358 test_cond_quadruple_negation
+ok 359 test_cond_paren_term
+ok 360 test_cond_paren_unary
+not ok 361 test_cond_t_bad_arg
+# (in test file /tmp/allbats/test_bash_suite_cond.bats, line 222)
+#   `[ "$actual" = "$expected" ]' failed
+# bash: line 1: [[: X: integer expected
+ok 362 test_cond_backslash_quoted_glob
+ok 363 test_cond_and_empty_ne_foo
+ok 364 test_cond_or_short_circuits_true
+ok 365 test_cond_and_or_precedence_short_circuit
+ok 366 test_cond_and_higher_precedence_than_or
+ok 367 test_cond_or_short_circuits_and
+ok 368 test_cond_parens_override_precedence
+ok 369 test_cond_arith_unset_var_as_zero_rhs
+ok 370 test_cond_arith_unset_var_as_zero_lhs
+ok 371 test_cond_arith_expr_rhs
+ok 372 test_cond_arith_expr_in_var
+ok 373 test_cond_arith_varname_operand
+ok 374 test_cond_arith_quoted_operands
+ok 375 test_cond_glob_unset_var
+ok 376 test_cond_null_pattern_no_match
+ok 377 test_cond_null_pattern_matches_null
+ok 378 test_cond_extglob_plus_digits_match
+ok 379 test_cond_extglob_plus_digits_no_match
+ok 380 test_cond_extglob_leading_plus
+ok 381 test_cond_reserved_word_after_cond
+ok 382 test_cond_ctlesc_self_match
+ok 383 test_cond_ctlesc_glob_match
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (79089) - No such process
+ok 384 test_param_length
+ok 385 test_param_length_empty
+ok 386 test_param_substring_offset_len
+ok 387 test_param_substring_offset_only
+ok 388 test_param_default_when_set
+ok 389 test_param_default_when_unset
+ok 390 test_param_default_when_empty
+ok 391 test_param_alternate_when_set
+ok 392 test_param_alternate_when_unset
+ok 393 test_param_assign_if_unset
+ok 394 test_param_strip_prefix_shortest
+ok 395 test_param_strip_prefix_longest
+ok 396 test_param_strip_suffix_shortest
+ok 397 test_param_strip_suffix_longest
+ok 398 test_param_strip_path_prefix
+ok 399 test_param_strip_extension
+ok 400 test_param_replace_first
+ok 401 test_param_replace_all
+ok 402 test_param_upcase_first
+ok 403 test_param_upcase_all
+ok 404 test_param_downcase_first
+ok 405 test_param_downcase_all
+ok 406 test_param_strip_trailing_spaces_trim_greedy
+ok 407 test_param_default_set_no_colon
+ok 408 test_param_assign_already_set
+ok 409 test_param_alternate_use_alternate
+ok 410 test_param_substring_long
+ok 411 test_param_substring_from_zero
+not ok 412 test_param_length_of_env_var
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 215)
+#   `[ "$actual" = "$expected" ]' failed
+ok 413 test_param_replace_whole_word
+ok 414 test_param_replace_glob_pattern
+ok 415 test_param_replace_anchor_start
+ok 416 test_param_replace_anchor_end
+ok 417 test_param_default_no_colon_unset
+ok 418 test_param_default_no_colon_empty_is_set
+ok 419 test_newexp_substr_zero_four
+ok 420 test_newexp_substr_four_three
+ok 421 test_newexp_substr_past_end
+ok 422 test_newexp_substr_len_exceeds
+not ok 423 test_newexp_substr_using_length
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 292)
+#   `[ "$actual" = "$expected" ]' failed
+ok 424 test_newexp_replace_char_class
+ok 425 test_newexp_replace_glob_3chars
+ok 426 test_newexp_replace_glob_mid
+ok 427 test_newexp_replace_anchor_start
+ok 428 test_newexp_replace_anchor_start_no_match
+ok 429 test_newexp_replace_single
+ok 430 test_newexp_replace_anchor_end
+ok 431 test_newexp_replace_anchor_end_no_match
+ok 432 test_newexp_strip_trailing_spaces_greedy
+not ok 433 test_newexp_strip_from_match
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 362)
+#   `[ "$actual" = "$expected" ]' failed
+ok 434 test_newexp_replace_single_char
+ok 435 test_newexp_replace_all_char
+ok 436 test_newexp_replace_glob_first_only
+ok 437 test_newexp_replace_empty_replacement
+not ok 438 test_newexp_substr_negative_offset
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 397)
+#   `[ "$actual" = "$expected" ]' failed
+ok 439 test_param_length_spaces
+not ok 440 test_param_error_if_unset
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 411)
+#   `[ "$actual" = "$expected" ]' failed
+ok 441 test_param_substr_offset3
+ok 442 test_param_substr_offset1_len3
+ok 443 test_param_downcase_first_mixed
+ok 444 test_param_assign_if_unset_stores
+ok 445 test_param_alternate_nonempty
+ok 446 test_param_alternate_empty
+ok 447 test_arith_expansion_basic
+not ok 448 test_arith_expansion_bracket
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 467)
+#   `[ "$actual" = "$expected" ]' failed
+ok 449 test_param_strip_suffix_then_append
+ok 450 test_param_strip_suffix_longest_slash
+ok 451 test_param_strip_prefix_var_pattern
+ok 452 test_param_strip_prefix_no_match
+ok 453 test_param_strip_prefix_longest_no_match
+ok 454 test_param_strip_suffix_no_match
+ok 455 test_param_strip_suffix_longest_no_match
+ok 456 test_param_count_positional
+not ok 457 test_param_count_positional_braces
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 530)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 458 test_param_length_of_positional
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 537)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 459 test_param_count_via_hash_at
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 544)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 460 test_positional_params_select
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 551)
+#   `[ "$actual" = "$expected" ]' failed
+ok 461 test_declare_no_wordsplit_in_assignment
+not ok 462 test_null_string_concat_quoted
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 565)
+#   `[ "$actual" = "$expected" ]' failed
+ok 463 test_null_string_concat_single_quoted
+not ok 464 test_param_default_comsub
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 579)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 465 test_backslash_escape
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 586)
+#   `[ "$actual" = "$expected" ]' failed
+ok 466 test_tilde_single_quotes_literal
+not ok 467 test_dollar_star_unquoted
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 600)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 468 test_dollar_star_quoted
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 607)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 469 test_dollar_at_quoted
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 614)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 470 test_dollar_star_quoted_custom_ifs
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 621)
+#   `[ "$actual" = "$expected" ]' failed
+ok 471 test_param_length_known_value
+ok 472 test_param_strip_prefix_longest_path
+not ok 473 test_param_default_quoted_spaces
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 642)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 474 test_newexp_substr_negative_offset_nop
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 649)
+#   `[ "$actual" = "$expected" ]' failed
+ok 475 test_param_substr_out_of_range_empty
+ok 476 test_param_substr_negative_length
+not ok 477 test_param_replace_var_pattern
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 670)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 478 test_param_replace_all_var_pattern
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 677)
+#   `[ "$actual" = "$expected" ]' failed
+ok 479 test_param_replace_unset_var_pattern
+not ok 480 test_param_replace_prefix_insert_empty
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 691)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 481 test_param_replace_star_empty_var
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 698)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 482 test_param_replace_prefix_insert_nonempty
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 705)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 483 test_param_replace_star_pattern_nonempty
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 712)
+#   `[ "$actual" = "$expected" ]' failed
+ok 484 test_param_strip_suffix_quoted_literal_star
+ok 485 test_param_strip_suffix_empty_pattern
+ok 486 test_param_strip_prefix_empty_pattern
+not ok 487 test_declare_preserves_spaces_in_value
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 740)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 488 test_nested_param_expansion
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 746)
+#   `actual=$($RUBISH -c "$cmd")' failed with status 127
+# rubish: yyy: command not found
+ok 489 test_param_replace_escaped_question
+ok 490 test_param_replace_double_backslash_question
+not ok 491 test_param_bang_default_when_unset
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 768)
+#   `[ "$actual" = "$expected" ]' failed
+ok 492 test_param_bang_empty_no_bg_job
+not ok 493 test_param_unset_quoted_empty_line
+# (in test file /tmp/allbats/test_bash_suite_exp.bats, line 782)
+#   `[ "$actual" = "$expected" ]' failed
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (96739) - No such process
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (96802) - No such process
+ok 494 test_func_define_and_call
+ok 495 test_func_return_value
+ok 496 test_func_local_var
+ok 497 test_func_local_var_unset_after_return
+ok 498 test_func_chained_return_codes
+ok 499 test_func_with_args
+ok 500 test_func_sees_global_var
+ok 501 test_func_modifies_global_var
+ok 502 test_func_nested_calls
+ok 503 test_func_subshell_isolation
+ok 504 test_func_recursive
+not ok 505 test_func_unset
+# (in test file /tmp/allbats/test_bash_suite_func.bats, line 96)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 506 test_func_subshell_return_code
+# (in test file /tmp/allbats/test_bash_suite_func.bats, line 103)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 507 test_func_temp_env_prefix
+# (in test file /tmp/allbats/test_bash_suite_func.bats, line 110)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 508 test_func_subshell_return_inside_body
+# (in test file /tmp/allbats/test_bash_suite_func.bats, line 117)
+#   `[ "$actual" = "$expected" ]' failed
+# /Users/matt/Projects/mattmc3/rubish/lib/rubish/runtime/command.rb:1034:in 'fork': unexpected throw
+not ok 509 test_func_declare_capital_f
+# (in test file /tmp/allbats/test_bash_suite_func.bats, line 124)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 510 test_func_declare_lowercase_f
+# (in test file /tmp/allbats/test_bash_suite_func.bats, line 131)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 511 test_funcname_array_tracks_current_function
+# (in test file /tmp/allbats/test_bash_suite_func.bats, line 138)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 512 test_funcname_empty_outside_function
+# (in test file /tmp/allbats/test_bash_suite_func.bats, line 145)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 513 test_func_body_redirect
+# (in test file /tmp/allbats/test_bash_suite_func.bats, line 151)
+#   `actual=$($RUBISH -c "$cmd")' failed
+# /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:486:in 'Rubish::Parser#parse_function_body': Expected "{" for function body (RuntimeError)
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:351:in 'Rubish::Parser#parse_function_keyword'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:246:in 'Rubish::Parser#parse_command'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:96:in 'Rubish::Parser#parse_pipeline'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:65:in 'Rubish::Parser#parse_conditional'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:498:in 'Rubish::Parser#parse_function_body_commands'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:487:in 'Rubish::Parser#parse_function_body'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:320:in 'Rubish::Parser#parse_command'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:96:in 'Rubish::Parser#parse_pipeline'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:65:in 'Rubish::Parser#parse_conditional'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:45:in 'Rubish::Parser#parse_list'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/parser.rb:13:in 'Rubish::Parser#parse'
+# 	from /Users/matt/Projects/mattmc3/rubish/lib/rubish/repl.rb:959:in 'Rubish::REPL#execute'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in 'block in <main>'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in 'Kernel#catch'
+# 	from /Users/matt/Projects/mattmc3/rubish/exe/rubish:176:in '<main>'
+not ok 514 test_func_return_in_pipeline
+# (in test file /tmp/allbats/test_bash_suite_func.bats, line 159)
+#   `[ "$actual" = "$expected" ]' failed
+# /Users/matt/Projects/mattmc3/rubish/lib/rubish/runtime/command.rb:740:in 'fork': unexpected throw
+not ok 515 test_func_readonly_f
+# (in test file /tmp/allbats/test_bash_suite_func.bats, line 166)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 516 test_heredoc_basic
+# (in test file /tmp/allbats/test_bash_suite_heredoc.bats, line 19)
+#   `[ "$actual" = "$expected" ]' failed
+# bash: line 1: warning: here-document at line 1 delimited by end-of-file (wanted `EOFnanbncnEOF')
+not ok 517 test_heredoc_quoted_no_expansion
+# (in test file /tmp/allbats/test_bash_suite_heredoc.bats, line 26)
+#   `[ "$actual" = "$expected" ]' failed
+# bash: line 1: warning: here-document at line 1 delimited by end-of-file (wanted `EOFnthere$anstuffnEOF')
+not ok 518 test_heredoc_unquoted_expansion
+# (in test file /tmp/allbats/test_bash_suite_heredoc.bats, line 33)
+#   `[ "$actual" = "$expected" ]' failed
+# bash: line 1: warning: here-document at line 1 delimited by end-of-file (wanted `EOFnthere$anEOF')
+not ok 519 test_heredoc_tab_strip
+# (in test file /tmp/allbats/test_bash_suite_heredoc.bats, line 40)
+#   `[ "$actual" = "$expected" ]' failed
+# bash: line 1: warning: here-document at line 1 delimited by end-of-file (wanted `EOFnttab1nttab2ntEOF')
+not ok 520 test_heredoc_empty
+# (in test file /tmp/allbats/test_bash_suite_heredoc.bats, line 47)
+#   `[ "$actual" = "$expected" ]' failed
+# bash: line 1: warning: here-document at line 1 delimited by end-of-file (wanted `EOFnEOF')
+not ok 521 test_heredoc_var_in_body
+# (in test file /tmp/allbats/test_bash_suite_heredoc.bats, line 52)
+#   `expected=$(bash -c "$cmd")' failed
+# bash: line 1: warning: here-document at line 1 delimited by end-of-file (wanted `EOFn$x')
+# cat: worldnEOF: No such file or directory
+ok 522 test_herestr_basic_read
+ok 523 test_herestr_cat
+not ok 524 test_herestr_var
+# (in test file /tmp/allbats/test_bash_suite_heredoc.bats, line 73)
+#   `expected=$(bash -c "$cmd")' failed
+# cat: world": No such file or directory
+ok 525 test_herestr_read_spaces
+not ok 526 test_heredoc_read_first_line_only
+# (in test file /tmp/allbats/test_bash_suite_heredoc.bats, line 87)
+#   `expected=$(bash -c "$cmd")' failed
+# bash: line 1: warning: here-document at line 1 delimited by end-of-file (wanted `EOFnanbncnEOFnecho')
+not ok 527 test_heredoc_quoted_delimiter_no_var_expansion
+# (in test file /tmp/allbats/test_bash_suite_heredoc.bats, line 96)
+#   `[ "$actual" = "$expected" ]' failed
+# bash: line 1: warning: here-document at line 1 delimited by end-of-file (wanted `EOFn$PS4nEOF')
+not ok 528 test_heredoc_empty_read
+# (in test file /tmp/allbats/test_bash_suite_heredoc.bats, line 101)
+#   `expected=$(bash -c "$cmd")' failed
+# bash: line 1: warning: here-document at line 1 delimited by end-of-file (wanted `EOFnEOFnecho')
+# bash: line 1: read: `"[]"': not a valid identifier
+not ok 529 test_heredoc_empty_var_expansion
+# (in test file /tmp/allbats/test_bash_suite_heredoc.bats, line 108)
+#   `expected=$(bash -c "$cmd")' failed
+# bash: line 1: warning: here-document at line 1 delimited by end-of-file (wanted `EOFn$emptynEOFnecho')
+# bash: line 1: read: `"[]"': not a valid identifier
+not ok 530 test_heredoc_multiple_second_wins
+# (in test file /tmp/allbats/test_bash_suite_heredoc.bats, line 117)
+#   `[ "$actual" = "$expected" ]' failed
+# bash: line 1: warning: here-document at line 1 delimited by end-of-file (wanted `EOF1')
+# bash: line 1: warning: here-document at line 1 delimited by end-of-file (wanted `EOF2nhinEOF1ntherenEOF2')
+not ok 531 test_heredoc_quoted_backslash_literal
+# (in test file /tmp/allbats/test_bash_suite_heredoc.bats, line 124)
+#   `[ "$actual" = "$expected" ]' failed
+# bash: line 1: warning: here-document at line 1 delimited by end-of-file (wanted `EOFnhi\nthere$anstuffnEOF')
+not ok 532 test_heredoc_unquoted_backslash_newline_join
+# (in test file /tmp/allbats/test_bash_suite_heredoc.bats, line 129)
+#   `expected=$(bash -c "$cmd")' failed
+# bash: line 1: warning: here-document at line 1 delimited by end-of-file (wanted `EOFnline')
+# cat: 1\nline: No such file or directory
+# cat: 2nEOF: No such file or directory
+not ok 533 test_heredoc_backslash_newline_in_delimiter
+# (in test file /tmp/allbats/test_bash_suite_heredoc.bats, line 138)
+#   `[ "$actual" = "$expected" ]' failed
+# bash: line 1: warning: here-document at line 1 delimited by end-of-file (wanted `EO\nFnhinEOF')
+not ok 534 test_heredoc_backslash_newline_terminator
+# (in test file /tmp/allbats/test_bash_suite_heredoc.bats, line 145)
+#   `[ "$actual" = "$expected" ]' failed
+# bash: line 1: warning: here-document at line 1 delimited by end-of-file (wanted `EOFnhinEO\nF')
+not ok 535 test_heredoc_continuation_then_delimiter
+# (in test file /tmp/allbats/test_bash_suite_heredoc.bats, line 152)
+#   `[ "$actual" = "$expected" ]' failed
+# bash: line 1: warning: here-document at line 1 delimited by end-of-file (wanted `EOFnnext\nEOFnEOF')
+not ok 536 test_heredoc_double_quote_in_body
+# (in test file /tmp/allbats/test_bash_suite_heredoc.bats, line 157)
+#   `expected=$(bash -c "$cmd")' failed
+# bash: line 1: warning: here-document at line 1 delimited by end-of-file (wanted `EOFnecho')
+# cat: "nEOF: No such file or directory
+not ok 537 test_heredoc_escaped_double_quote_in_body
+# (in test file /tmp/allbats/test_bash_suite_heredoc.bats, line 164)
+#   `expected=$(bash -c "$cmd")' failed
+# bash: line 1: warning: here-document at line 1 delimited by end-of-file (wanted `EOFnecho')
+# cat: \"nEOF: No such file or directory
+not ok 538 test_heredoc_comsub_herestring
+# (in test file /tmp/allbats/test_bash_suite_heredoc.bats, line 173)
+#   `[ "$actual" = "$expected" ]' failed
+# cat: here-string": No such file or directory
+ok 539 test_herestr_bare_word
+ok 540 test_herestr_var_unquoted
+not ok 541 test_herestr_var_double_quoted
+# (in test file /tmp/allbats/test_bash_suite_heredoc.bats, line 194)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 542 test_herestr_empty_double_quoted
+# (in test file /tmp/allbats/test_bash_suite_heredoc.bats, line 201)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 543 test_herestr_empty_unset_var
+# (in test file /tmp/allbats/test_bash_suite_heredoc.bats, line 208)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 544 test_herestr_two_vars
+# (in test file /tmp/allbats/test_bash_suite_heredoc.bats, line 213)
+#   `expected=$(bash -c "$cmd")' failed
+# cat: damn": No such file or directory
+ok 545 test_herestr_single_quoted
+ok 546 test_herestr_single_quoted_double_quote
+ok 547 test_herestr_single_quoted_no_comsub
+not ok 548 test_herestr_double_quoted_literal
+# (in test file /tmp/allbats/test_bash_suite_heredoc.bats, line 241)
+#   `expected=$(bash -c "$cmd")' failed
+# cat: ho": No such file or directory
+not ok 549 test_herestr_double_quoted_comsub
+# (in test file /tmp/allbats/test_bash_suite_heredoc.bats, line 248)
+#   `expected=$(bash -c "$cmd")' failed
+# cat: off: No such file or directory
+# cat: to: No such file or directory
+# cat: work: No such file or directory
+# cat: we: No such file or directory
+# cat: go": No such file or directory
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (71328) - No such process
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (84053) - No such process
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (84106) - No such process
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (84155) - No such process
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (84201) - No such process
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (84244) - No such process
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (1969) - No such process
+ok 550 test_ifs_colon_split_var_in_for
+ok 551 test_ifs_colon_cmd_sub_split_in_for
+ok 552 test_ifs_default_splits_spaces_in_for
+ok 553 test_ifs_empty_suppresses_split
+not ok 554 test_ifs_quoted_var_no_split
+# (in test file /tmp/allbats/test_bash_suite_ifs.bats, line 47)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 555 test_ifs_eval_assign_no_split_after_restore
+# (in test file /tmp/allbats/test_bash_suite_ifs.bats, line 54)
+#   `[ "$actual" = "$expected" ]' failed
+ok 556 test_ifs_comsub_captured_with_colon_ifs_then_default_for
+ok 557 test_ifs_backtick_comsub_captured_with_colon_ifs_then_default_for
+not ok 558 test_ifs_typeset_local_in_function_splits_echo
+# (in test file /tmp/allbats/test_bash_suite_ifs.bats, line 75)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 559 test_ifs_env_prefix_for_function_splits_inside
+# (in test file /tmp/allbats/test_bash_suite_ifs.bats, line 82)
+#   `[ "$actual" = "$expected" ]' failed
+ok 560 test_ifs_env_prefix_function_does_not_change_global_ifs
+ok 561 test_ifs_env_prefix_simple_cmd_no_split
+not ok 562 test_ifs_env_prefix_eval_splits
+# (in test file /tmp/allbats/test_bash_suite_ifs.bats, line 103)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 563 test_ifs_posix_assignment_before_export_is_global
+# (in test file /tmp/allbats/test_bash_suite_ifs.bats, line 110)
+#   `[ "$actual" = "$expected" ]' failed
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (69587) - No such process
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (69658) - No such process
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (85871) - No such process
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (85929) - No such process
+ok 564 test_invert_true
+ok 565 test_invert_false
+ok 566 test_invert_subshell_false
+ok 567 test_invert_subshell_true
+ok 568 test_invert_pipeline_true_false
+ok 569 test_invert_pipeline_false_true
+ok 570 test_while_countdown
+ok 571 test_while_false_no_output
+ok 572 test_until_count_to_3
+ok 573 test_while_break
+ok 574 test_while_continue
+ok 575 test_while_nested
+ok 576 test_until_false_runs_once
+ok 577 test_nquote_basic_string
+ok 578 test_nquote_newlines
+not ok 579 test_nquote_newline_in_var
+# (in test file /tmp/allbats/test_bash_suite_nquote.bats, line 33)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 580 test_nquote_empty_string
+# (in test file /tmp/allbats/test_bash_suite_nquote.bats, line 40)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 581 test_nquote_combined
+# (in test file /tmp/allbats/test_bash_suite_nquote.bats, line 47)
+#   `[ "$actual" = "$expected" ]' failed
+ok 582 test_nquote_in_case
+not ok 583 test_nquote_escaped_single_quotes
+# (in test file /tmp/allbats/test_bash_suite_nquote.bats, line 61)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 584 test_nquote_octal_escape
+# (in test file /tmp/allbats/test_bash_suite_nquote.bats, line 68)
+#   `[ "$actual" = "$expected" ]' failed
+ok 585 test_nquote_cr_esc_bel
+ok 586 test_nquote_dollar_literal
+ok 587 test_nquote_dollar_dquote_literal
+ok 588 test_nquote_escaped_dollar_literal
+ok 589 test_nquote_escaped_dquote_in_ansi
+not ok 590 test_nquote_semicolon_literal
+# (in test file /tmp/allbats/test_bash_suite_nquote.bats, line 110)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 591 test_nquote_no_expand_in_dquotes
+# (in test file /tmp/allbats/test_bash_suite_nquote.bats, line 117)
+#   `[ "$actual" = "$expected" ]' failed
+ok 592 test_nquote_in_command_substitution
+not ok 593 test_nquote_tab_no_word_split
+# (in test file /tmp/allbats/test_bash_suite_nquote.bats, line 131)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 594 test_nquote_in_default_value
+# (in test file /tmp/allbats/test_bash_suite_nquote.bats, line 138)
+#   `[ "$actual" = "$expected" ]' failed
+ok 595 test_posixpat_xdigit_matches_e
+ok 596 test_posixpat_alpha_with_literals_matches_a
+ok 597 test_posixpat_alpha_with_literals_matches_1
+ok 598 test_posixpat_not_alpha_matches_9
+ok 599 test_posixpat_not_alpha_no_match_a
+ok 600 test_posixpat_invalid_class_no_match
+ok 601 test_posixpat_punct_matches_bang
+ok 602 test_posixpat_alpha_star_matches_PATH
+ok 603 test_posixpat_alpha_alnum_star_matches_PATH
+ok 604 test_posixpat_not_cntrl_matches_A
+ok 605 test_posixpat_digit_matches_9
+ok 606 test_posixpat_digit_no_match_X
+ok 607 test_posixpat_lower_upper_pair
+ok 608 test_posixpat_alpha_or_digit
+ok 609 test_posixpat_identifier_prefix
+ok 610 test_posixpat_literal_bracket_matches_a
+ok 611 test_posixpat_cntrl_matches_ctrl_c
+ok 612 test_posixpat_graph_no_match_esc
+ok 613 test_posixpat_graph_no_match_space_oct
+ok 614 test_posixpat_graph_no_match_space
+ok 615 test_posixpat_print_matches_space_oct
+ok 616 test_posixpat_dangling_backslash_in_bracket
+ok 617 test_posixpat_newline_is_space_not_blank
+ok 618 test_posixpat_tab_is_blank
+ok 619 test_posixpat_high_byte_not_ascii
+ok 620 test_posixpat_9_not_in_alpha_1_2_3
+ok 621 test_posixpat_unterminated_bracket_no_match
+ok 622 test_posixpat_backspace_not_graph
+ok 623 test_posixpat_backspace_not_print
+ok 624 test_posixpat_space_not_punct
+not ok 625 test_posixpat_collating_a_matches_a
+# (in test file /tmp/allbats/test_bash_suite_posixpat.bats, line 229)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 626 test_posixpat_collating_hyphen_range
+# (in test file /tmp/allbats/test_bash_suite_posixpat.bats, line 236)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 627 test_posixpat_collating_a_to_z_range
+# (in test file /tmp/allbats/test_bash_suite_posixpat.bats, line 243)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 628 test_posixpat_collating_dash
+# (in test file /tmp/allbats/test_bash_suite_posixpat.bats, line 250)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 629 test_posixpat_collating_space
+# (in test file /tmp/allbats/test_bash_suite_posixpat.bats, line 257)
+#   `[ "$actual" = "$expected" ]' failed
+ok 630 test_posixpat_collating_grave_no_match_space
+not ok 631 test_posixpat_collating_dash_to_9
+# (in test file /tmp/allbats/test_bash_suite_posixpat.bats, line 271)
+#   `[ "$actual" = "$expected" ]' failed
+ok 632 test_posixpat_collating_invalid_range_no_match
+not ok 633 test_posixpat_collating_invalid_sym_with_valid_range
+# (in test file /tmp/allbats/test_bash_suite_posixpat.bats, line 285)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 634 test_posixpat_collating_invalid_sym_with_az_range
+# (in test file /tmp/allbats/test_bash_suite_posixpat.bats, line 292)
+#   `[ "$actual" = "$expected" ]' failed
+ok 635 test_posixpat_collating_bad_range_a_Z
+not ok 636 test_posixpat_collating_invalid_end_sym_literal_p
+# (in test file /tmp/allbats/test_bash_suite_posixpat.bats, line 306)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 637 test_posixpat_collating_invalid_start_sym_literal_p
+# (in test file /tmp/allbats/test_bash_suite_posixpat.bats, line 313)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 638 test_posixpat_collating_invalid_sym_with_literal_c
+# (in test file /tmp/allbats/test_bash_suite_posixpat.bats, line 320)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 639 test_posixpat_collating_multichar_sym_with_range
+# (in test file /tmp/allbats/test_bash_suite_posixpat.bats, line 327)
+#   `[ "$actual" = "$expected" ]' failed
+ok 640 test_posixpat_collating_tab_in_whitespace_set
+not ok 641 test_posixpat_equiv_class_b_matches_b
+# (in test file /tmp/allbats/test_bash_suite_posixpat.bats, line 341)
+#   `[ "$actual" = "$expected" ]' failed
+ok 642 test_posixpat_equiv_class_B_no_match_b
+ok 643 test_posixpat_incomplete_equiv_class_no_match
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (83730) - No such process
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (83783) - No such process
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (83887) - No such process
+ok 644 test_pipe_basic
+ok 645 test_pipe_tr
+not ok 646 test_pipe_grep
+# (in test file /tmp/allbats/test_bash_suite_posixpipe.bats, line 32)
+#   `actual=$($RUBISH -c "$cmd")' failed
+ok 647 test_pipe_wc
+ok 648 test_pipe_three_stage
+ok 649 test_pipe_exit_status_last
+ok 650 test_pipe_exit_status_last_false
+ok 651 test_bang_negates_true
+ok 652 test_bang_negates_false
+ok 653 test_bang_double_negation
+not ok 654 test_bang_triple_negation
+# (in test file /tmp/allbats/test_bash_suite_posixpipe.bats, line 89)
+#   `[ "$actual" = "$expected" ]' failed
+# rubish: !: command not found
+ok 655 test_bang_pipeline_last_false
+ok 656 test_bang_pipeline_last_true
+ok 657 test_pipe_three_stage_exit_last_false
+ok 658 test_pipe_three_stage_exit_last_true
+ok 659 test_bang_echo_exit_status
+ok 660 test_printf_tab
+ok 661 test_printf_literal_percent
+ok 662 test_printf_c_format
+ok 663 test_printf_s_format
+ok 664 test_printf_d_format
+ok 665 test_printf_d_zero_pad
+ok 666 test_printf_x_format
+ok 667 test_printf_o_format
+ok 668 test_printf_e_format
+ok 669 test_printf_f_format
+ok 670 test_printf_right_justify
+ok 671 test_printf_left_justify
+ok 672 test_printf_multiple_args
+not ok 673 test_printf_repeats_format
+# (in test file /tmp/allbats/test_bash_suite_printf.bats, line 110)
+#   `[ "$actual" = "$expected" ]' failed
+ok 674 test_printf_v_assigns_var
+ok 675 test_printf_b_escape
+ok 676 test_printf_d_four_zero_pad
+ok 677 test_printf_f_precision
+ok 678 test_printf_d_sign
+ok 679 test_printf_no_newline
+ok 680 test_printf_c_escape_stops_output
+ok 681 test_printf_unrecognized_backslash_preserved
+ok 682 test_printf_no_newline_concat
+ok 683 test_printf_octal_045
+ok 684 test_printf_octal_045d
+ok 685 test_printf_q_format
+not ok 686 test_printf_q_special_chars
+# (in test file /tmp/allbats/test_bash_suite_printf.bats, line 201)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 687 test_printf_d_format_reused
+# (in test file /tmp/allbats/test_bash_suite_printf.bats, line 208)
+#   `[ "$actual" = "$expected" ]' failed
+ok 688 test_printf_missing_args_zero
+ok 689 test_printf_missing_args_float
+ok 690 test_printf_double_dash
+ok 691 test_printf_double_dash_missing_arg
+ok 692 test_printf_b_octal_101
+ok 693 test_printf_b_octal_101_short
+ok 694 test_printf_b_hex_two_digits
+not ok 695 test_printf_b_double_quote_escape
+# (in test file /tmp/allbats/test_bash_suite_printf.bats, line 264)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 696 test_printf_b_single_quote_escape
+# (in test file /tmp/allbats/test_bash_suite_printf.bats, line 271)
+#   `[ "$actual" = "$expected" ]' failed
+ok 697 test_printf_b_backslash_x
+ok 698 test_printf_b_empty_arg
+ok 699 test_printf_b_c_stops_output
+ok 700 test_printf_b_unrecognized_escape_preserved
+ok 701 test_printf_b_bare_backslash
+ok 702 test_printf_extra_args_ignored
+ok 703 test_printf_s_width_precision
+ok 704 test_printf_s_dynamic_width_precision
+ok 705 test_printf_b_width
+ok 706 test_printf_b_dynamic_width
+ok 707 test_printf_b_right_justify
+ok 708 test_printf_b_left_justify
+not ok 709 test_printf_b_width_and_precision
+# (in test file /tmp/allbats/test_bash_suite_printf.bats, line 362)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 710 test_printf_b_precision_only
+# (in test file /tmp/allbats/test_bash_suite_printf.bats, line 369)
+#   `[ "$actual" = "$expected" ]' failed
+ok 711 test_printf_b_left_justify_width
+ok 712 test_printf_numeric_conversions
+ok 713 test_printf_numeric_alternate_form
+ok 714 test_printf_d_width_negative
+ok 715 test_printf_d_dynamic_width
+ok 716 test_printf_d_dynamic_width_negative
+ok 717 test_printf_f_width_precision
+ok 718 test_printf_f_alternate_form
+ok 719 test_printf_f_alternate_one_decimal
+ok 720 test_printf_f_dynamic_width_precision
+ok 721 test_printf_E_format
+ok 722 test_printf_E_width_precision
+ok 723 test_printf_e_width_precision
+ok 724 test_printf_G_format
+ok 725 test_printf_g_format
+ok 726 test_printf_G_width_precision
+ok 727 test_printf_g_width_precision
+not ok 728 test_printf_d_char_value
+# (in test file /tmp/allbats/test_bash_suite_printf.bats, line 495)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 729 test_printf_o_char_value
+# (in test file /tmp/allbats/test_bash_suite_printf.bats, line 502)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 730 test_printf_x_char_value
+# (in test file /tmp/allbats/test_bash_suite_printf.bats, line 509)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 731 test_printf_X_char_value
+# (in test file /tmp/allbats/test_bash_suite_printf.bats, line 514)
+#   `expected=$(bash -c "$cmd")' failed
+# bash: line 1: printf: \"string\": invalid number
+not ok 732 test_printf_f_char_value
+# (in test file /tmp/allbats/test_bash_suite_printf.bats, line 523)
+#   `[ "$actual" = "$expected" ]' failed
+ok 733 test_printf_s_width_precision_long
+not ok 734 test_printf_b_width_precision_long
+# (in test file /tmp/allbats/test_bash_suite_printf.bats, line 537)
+#   `[ "$actual" = "$expected" ]' failed
+ok 735 test_printf_s_width_precision_long2
+not ok 736 test_printf_b_width_precision_long2
+# (in test file /tmp/allbats/test_bash_suite_printf.bats, line 551)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 737 test_printf_format_single_quote_escape
+# (in test file /tmp/allbats/test_bash_suite_printf.bats, line 558)
+#   `[ "$actual" = "$expected" ]' failed
+ok 738 test_printf_b_no_single_quote_translation
+ok 739 test_printf_format_backslash_escape
+ok 740 test_printf_b_backslash_escape
+not ok 741 test_printf_d_hex_input
+# (in test file /tmp/allbats/test_bash_suite_printf.bats, line 586)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 742 test_printf_d_octal_input
+# (in test file /tmp/allbats/test_bash_suite_printf.bats, line 593)
+#   `[ "$actual" = "$expected" ]' failed
+ok 743 test_printf_s_zero_precision
+ok 744 test_printf_s_dynamic_zero_precision
+not ok 745 test_printf_b_s_zero_precision
+# (in test file /tmp/allbats/test_bash_suite_printf.bats, line 614)
+#   `[ "$actual" = "$expected" ]' failed
+ok 746 test_printf_b_s_negative_width
+ok 747 test_printf_b_octal_7
+ok 748 test_printf_b_octal_0007
+ok 749 test_printf_format_nul_then_7
+ok 750 test_printf_format_hex_stops_at_two_digits
+ok 751 test_printf_format_quote_question_escape
+ok 752 test_printf_d_zero_dot_precision
+ok 753 test_printf_d_width_no_pad
+ok 754 test_printf_d_zero_flag_no_width
+ok 755 test_printf_G_zero
+ok 756 test_printf_g_zero
+ok 757 test_printf_G_zero_width_precision
+ok 758 test_printf_g_zero_width_precision
+ok 759 test_printf_G_four
+ok 760 test_printf_g_four
+ok 761 test_printf_G_four_width_precision
+ok 762 test_printf_g_four_width_precision
+ok 763 test_printf_F_zero
+ok 764 test_printf_f_zero
+ok 765 test_printf_F_zero_precision
+ok 766 test_printf_f_zero_precision
+ok 767 test_printf_F_four
+ok 768 test_printf_f_four
+ok 769 test_printf_F_four_precision
+ok 770 test_printf_f_four_precision
+ok 771 test_printf_E_zero
+ok 772 test_printf_e_zero
+ok 773 test_printf_E_zero_precision
+ok 774 test_printf_e_zero_precision
+ok 775 test_printf_E_four
+ok 776 test_printf_e_four
+ok 777 test_printf_E_four_precision
+ok 778 test_printf_e_four_precision
+ok 779 test_printf_X_zero_pad_hex
+ok 780 test_printf_q_empty_string
+ok 781 test_printf_s_empty_string
+ok 782 test_printf_b_empty_string_newline
+ok 783 test_printf_missing_args_string_b
+ok 784 test_printf_missing_int_arg
+ok 785 test_printf_missing_char_arg
+ok 786 test_printf_missing_x_arg
+ok 787 test_printf_missing_f_arg
+ok 788 test_printf_missing_q_arg
+ok 789 test_printf_q_with_width
+ok 790 test_printf_q_width_precision
+ok 791 test_printf_q_dynamic_width_precision
+ok 792 test_quote_single_literal_backslash_n
+ok 793 test_quote_single_literal_backslash
+not ok 794 test_quote_double_interpolates_var
+# (in test file /tmp/allbats/test_bash_suite_quote.bats, line 33)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 795 test_quote_double_preserves_spaces
+# (in test file /tmp/allbats/test_bash_suite_quote.bats, line 40)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 796 test_quote_cmd_sub_strips_trailing_newline
+# (in test file /tmp/allbats/test_bash_suite_quote.bats, line 47)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 797 test_quote_backtick_strips_trailing_newline
+# (in test file /tmp/allbats/test_bash_suite_quote.bats, line 54)
+#   `[ "$actual" = "$expected" ]' failed
+ok 798 test_quote_unquoted_cmd_sub_splits
+not ok 799 test_quote_double_cmd_sub_preserves_spaces
+# (in test file /tmp/allbats/test_bash_suite_quote.bats, line 68)
+#   `[ "$actual" = "$expected" ]' failed
+ok 800 test_quote_string_ending_backslash
+not ok 801 test_quote_cmd_sub_multiple_trailing_newlines_stripped
+# (in test file /tmp/allbats/test_bash_suite_quote.bats, line 82)
+#   `[ "$actual" = "$expected" ]' failed
+ok 802 test_quote_single_embedded_newline
+ok 803 test_quote_single_backslash_newline_literal
+not ok 804 test_quote_double_embedded_newline
+# (in test file /tmp/allbats/test_bash_suite_quote.bats, line 103)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 805 test_quote_double_backslash_newline_continuation
+# (in test file /tmp/allbats/test_bash_suite_quote.bats, line 110)
+#   `[ "$actual" = "$expected" ]' failed
+ok 806 test_quote_backtick_newline_word_splits
+ok 807 test_quote_dollar_paren_newline_word_splits
+not ok 808 test_quote_dollar_paren_double_backslash_newline_continuation
+# (in test file /tmp/allbats/test_bash_suite_quote.bats, line 131)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 809 test_quote_double_backtick_preserves_newline
+# (in test file /tmp/allbats/test_bash_suite_quote.bats, line 138)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 810 test_quote_double_dollar_paren_preserves_newline
+# (in test file /tmp/allbats/test_bash_suite_quote.bats, line 145)
+#   `[ "$actual" = "$expected" ]' failed
+ok 811 test_quote_dollar_paren_single_backslash_newline_literal
+not ok 812 test_quote_double_dollar_paren_single_backslash_newline
+# (in test file /tmp/allbats/test_bash_suite_quote.bats, line 159)
+#   `[ "$actual" = "$expected" ]' failed
+ok 813 test_quote_unquoted_backslash_escape
+not ok 814 test_quote_param_default_single_quoted_backslash
+# (in test file /tmp/allbats/test_bash_suite_quote.bats, line 173)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 815 test_quote_param_default_unquoted_backslash_brace
+# (in test file /tmp/allbats/test_bash_suite_quote.bats, line 180)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 816 test_read_strips_leading_trailing_whitespace
+# (in test file /tmp/allbats/test_bash_suite_read.bats, line 19)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 817 test_read_two_vars_strips_whitespace
+# (in test file /tmp/allbats/test_bash_suite_read.bats, line 26)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 818 test_read_one_var_captures_rest
+# (in test file /tmp/allbats/test_bash_suite_read.bats, line 33)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 819 test_read_ifs_empty_preserves_spaces
+# (in test file /tmp/allbats/test_bash_suite_read.bats, line 40)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 820 test_read_heredoc
+# (in test file /tmp/allbats/test_bash_suite_read.bats, line 45)
+#   `expected=$(bash -c "$cmd")' failed
+# bash: line 1: warning: here-document at line 1 delimited by end-of-file (wanted `EOFna')
+# bash: line 1: read: `"a=': not a valid identifier
+not ok 821 test_read_backslash_in_second_var
+# (in test file /tmp/allbats/test_bash_suite_read.bats, line 54)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 822 test_read_one_var_trailing_backslash_dropped
+# (in test file /tmp/allbats/test_bash_suite_read.bats, line 61)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 823 test_read_raw_two_vars_preserves_backslash
+# (in test file /tmp/allbats/test_bash_suite_read.bats, line 68)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 824 test_read_raw_one_var_preserves_backslash
+# (in test file /tmp/allbats/test_bash_suite_read.bats, line 75)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 825 test_read_raw_leading_backslash_two_vars
+# (in test file /tmp/allbats/test_bash_suite_read.bats, line 82)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 826 test_read_raw_leading_backslash_one_var
+# (in test file /tmp/allbats/test_bash_suite_read.bats, line 89)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 827 test_read_raw_space_backslash_two_vars
+# (in test file /tmp/allbats/test_bash_suite_read.bats, line 96)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 828 test_read_raw_space_backslash_one_var
+# (in test file /tmp/allbats/test_bash_suite_read.bats, line 103)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 829 test_read_ifs_empty_var_preserves_spaces
+# (in test file /tmp/allbats/test_bash_suite_read.bats, line 110)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 830 test_read_ifs_unset_strips_leading_space
+# (in test file /tmp/allbats/test_bash_suite_read.bats, line 117)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 831 test_read_ifs_newline_preserves_spaces
+# (in test file /tmp/allbats/test_bash_suite_read.bats, line 124)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 832 test_read_ifs_colon_preserves_spaces
+# (in test file /tmp/allbats/test_bash_suite_read.bats, line 131)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 833 test_read_readonly_var_error
+# (in test file /tmp/allbats/test_bash_suite_read.bats, line 136)
+#   `expected=$(bash -c "$cmd")' failed with status 2
+# bash: line 1: warning: here-document at line 1 delimited by end-of-file (wanted `EOFna')
+# bash: line 1: b: readonly variable
+ok 834 test_redir_write
+ok 835 test_redir_append
+ok 836 test_redir_noclobber
+ok 837 test_redir_clobber_override
+not ok 838 test_redir_while_read_heredoc
+# (in test file /tmp/allbats/test_bash_suite_redir.bats, line 47)
+#   `[ "$actual" = "$expected" ]' failed
+# bash: line 1: warning: here-document at line 1 delimited by end-of-file (wanted `EOFnabncdnEOF')
+not ok 839 test_redir_while_read_heredoc_var_persists
+# (in test file /tmp/allbats/test_bash_suite_redir.bats, line 52)
+#   `expected=$(bash -c "$cmd")' failed with status 2
+# bash: line 1: warning: here-document at line 1 delimited by end-of-file (wanted `EOFnabncdnEOFnecho')
+# bash: -c: line 1: syntax error near unexpected token `$l2'
+# bash: -c: line 1: `while read line; do l2=$line; done <<EOF\nab\ncd\nEOF\necho $l2'
+not ok 840 test_strip_all_blank_lines
+# (in test file /tmp/allbats/test_bash_suite_strip.bats, line 19)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 841 test_strip_no_newline_spaces_preserved
+# (in test file /tmp/allbats/test_bash_suite_strip.bats, line 26)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 842 test_strip_no_newline_space
+# (in test file /tmp/allbats/test_bash_suite_strip.bats, line 33)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 843 test_strip_no_newline_empty
+# (in test file /tmp/allbats/test_bash_suite_strip.bats, line 40)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 844 test_strip_single_blank_line
+# (in test file /tmp/allbats/test_bash_suite_strip.bats, line 47)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 845 test_strip_bare_echo
+# (in test file /tmp/allbats/test_bash_suite_strip.bats, line 54)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 846 test_strip_content_stripped_newline
+# (in test file /tmp/allbats/test_bash_suite_strip.bats, line 61)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 847 test_strip_trailing_spaces_in_content
+# (in test file /tmp/allbats/test_bash_suite_strip.bats, line 68)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 848 test_strip_no_newline_content_spaces
+# (in test file /tmp/allbats/test_bash_suite_strip.bats, line 75)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 849 test_strip_internal_newline_preserved
+# (in test file /tmp/allbats/test_bash_suite_strip.bats, line 82)
+#   `[ "$actual" = "$expected" ]' failed
+ok 850 test_subshell_basic
+ok 851 test_subshell_var_isolation
+ok 852 test_subshell_multiple_commands
+ok 853 test_subshell_in_comsub
+not ok 854 test_subshell_exit_code
+# (in test file /tmp/allbats/test_bash_suite_subshell.bats, line 47)
+#   `[ "$actual" = "$expected" ]' failed
+# /Users/matt/Projects/mattmc3/rubish/lib/rubish/runtime/command.rb:1034:in 'fork': unexpected throw
+ok 855 test_subshell_pipeline
+ok 856 test_bracket_d_dir
+ok 857 test_bracket_d_not_dir
+ok 858 test_bracket_f_regular_file
+ok 859 test_bracket_f_directory
+ok 860 test_bracket_e_exists
+ok 861 test_bracket_e_nonexist
+ok 862 test_bracket_r_readable
+ok 863 test_bracket_w_writable
+ok 864 test_bracket_x_executable
+ok 865 test_bracket_z_empty_string
+ok 866 test_bracket_z_nonempty_string
+ok 867 test_bracket_n_nonempty_string
+ok 868 test_bracket_n_empty_string
+ok 869 test_bracket_str_eq_true
+ok 870 test_bracket_str_eq_false
+ok 871 test_bracket_str_ne_true
+ok 872 test_bracket_str_ne_false
+ok 873 test_bracket_string_nonempty
+ok 874 test_bracket_string_empty
+ok 875 test_bracket_eq_true
+ok 876 test_bracket_eq_false
+ok 877 test_bracket_ne_true
+ok 878 test_bracket_ne_false
+ok 879 test_bracket_gt_true
+ok 880 test_bracket_gt_false
+ok 881 test_bracket_lt_true
+ok 882 test_bracket_lt_false
+ok 883 test_bracket_ge_equal
+ok 884 test_bracket_ge_false
+ok 885 test_bracket_le_equal
+ok 886 test_bracket_le_false
+ok 887 test_bracket_not
+ok 888 test_bracket_and_true
+ok 889 test_bracket_and_false
+ok 890 test_bracket_or_true
+ok 891 test_bracket_or_both_false
+ok 892 test_bracket_double_not
+ok 893 test_bracket_compound_and
+ok 894 test_bracket_eq_unequal
+ok 895 test_bracket_not_eq_unequal
+not ok 896 test_bracket_parens
+# (in test file /tmp/allbats/test_bash_suite_test.bats, line 297)
+#   `expected=$(bash -c "$cmd")' failed with status 2
+# bash: -c: line 1: syntax error near unexpected token `('
+# bash: -c: line 1: `[ \\( -n 'x' \\) ]; echo $?'
+ok 897 test_no_args
+ok 898 test_bracket_no_args
+ok 899 test_bracket_c_char_device
+ok 900 test_bracket_c_not_char_device
+ok 901 test_bracket_d_empty_string
+ok 902 test_bracket_str_double_eq_true
+ok 903 test_bracket_str_double_eq_false
+not ok 904 test_bracket_str_gt_true
+# (in test file /tmp/allbats/test_bash_suite_test.bats, line 354)
+#   `actual=$($RUBISH -c "$cmd")' failed with status 2
+# bash: line 1: [: hello: unary operator expected
+# [: missing ]
+not ok 905 test_bracket_str_lt_false
+# (in test file /tmp/allbats/test_bash_suite_test.bats, line 361)
+#   `actual=$($RUBISH -c "$cmd")' failed
+# bash: line 1: goodbye: No such file or directory
+# rubish: goodbye: No such file or directory
+ok 906 test_bracket_t_non_terminal_fd
+ok 907 test_bracket_eq_negative_vs_positive
+ok 908 test_bracket_eq_negative_equal
+not ok 909 test_bracket_eq_non_numeric
+# (in test file /tmp/allbats/test_bash_suite_test.bats, line 390)
+#   `[ "$actual" = "$expected" ]' failed
+# bash: line 1: [: 4+3: integer expected
+ok 910 test_bracket_or_with_bare_string
+ok 911 test_bracket_or_first_true
+ok 912 test_bracket_and_with_bare_string
+ok 913 test_bracket_and_second_false
+ok 914 test_bracket_bare_and_both_nonempty
+ok 915 test_bracket_bare_or_first_nonempty
+ok 916 test_bracket_bare_and_second_empty
+not ok 917 test_bracket_not_parens_compound
+# (in test file /tmp/allbats/test_bash_suite_test.bats, line 444)
+#   `expected=$(bash -c "$cmd")' failed with status 2
+# bash: -c: line 1: syntax error near unexpected token `('
+# bash: -c: line 1: `[ ! \\( 700 -le 1000 -a -n 1 -a 20 = 20 \\) ]; echo $?'
+ok 918 test_bracket_r_fd0
+ok 919 test_bracket_w_fd1
+ok 920 test_tilde_expands_to_home
+not ok 921 test_tilde_quoted_no_expand
+# (in test file /tmp/allbats/test_bash_suite_tilde.bats, line 26)
+#   `[ "$actual" = "$expected" ]' failed
+ok 922 test_tilde_not_at_start_no_expand
+ok 923 test_tilde_in_assignment
+ok 924 test_tilde_in_colon_path
+ok 925 test_tilde_mid_word_no_expand
+ok 926 test_tilde_in_case
+ok 927 test_tilde_in_export
+ok 928 test_tilde_backslash_mid_username
+ok 929 test_escaped_tilde_no_expand
+not ok 930 test_tilde_backslash_after_tilde
+# (in test file /tmp/allbats/test_bash_suite_tilde.bats, line 89)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 931 test_tilde_empty_string_suffix
+# (in test file /tmp/allbats/test_bash_suite_tilde.bats, line 96)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 932 test_quoted_string_with_tilde
+# (in test file /tmp/allbats/test_bash_suite_tilde.bats, line 103)
+#   `[ "$actual" = "$expected" ]' failed
+ok 933 test_tilde_after_colon_in_arg
+ok 934 test_tilde_minus_oldpwd
+ok 935 test_tilde_plus_pwd
+not ok 936 test_printf_q_formats_tilde
+# (in test file /tmp/allbats/test_bash_suite_tilde.bats, line 131)
+#   `[ "$actual" = "$expected" ]' failed
+ok 937 test_tilde_in_case_pattern
+not ok 938 test_case_unset_var_empty
+# (in test file /tmp/allbats/test_bash_suite_tilde.bats, line 145)
+#   `[ "$actual" = "$expected" ]' failed
+not ok 939 test_tilde_dollar_var_no_expand
+# (in test file /tmp/allbats/test_bash_suite_tilde.bats, line 152)
+#   `[ "$actual" = "$expected" ]' failed
+ok 940 test_tilde_in_assignment_like_arg
+not ok 941 test_tilde_posix_mode_no_expand_in_arg
+# (in test file /tmp/allbats/test_bash_suite_tilde.bats, line 166)
+#   `[ "$actual" = "$expected" ]' failed
+/opt/homebrew/Cellar/bats-core/1.13.0/libexec/bats-core/bats-exec-test: line 263: kill: (97784) - No such process
+ok 942 test_varenv_swap_not_atomic
+ok 943 test_varenv_unset_default
+ok 944 test_varenv_length
+ok 945 test_varenv_export_visible
+ok 946 test_varenv_local_env_assign
+ok 947 test_varenv_basic_assign
+ok 948 test_varenv_readonly
+ok 949 test_varenv_export_child
+ok 950 test_varenv_unset
+ok 951 test_varenv_subshell_not_affect_parent
+ok 952 test_varenv_string_append
+ok 953 test_varenv_multiple_assign
+ok 954 test_varenv_command_local
+not ok 955 test_varenv_same_line_assign_propagates
+# (in test file /tmp/allbats/test_bash_suite_varenv.bats, line 110)
+#   `[ "$actual" = "$expected" ]' failed
+ok 956 test_varenv_temp_env_no_affect_expansion
+ok 957 test_varenv_function_local_var
+not ok 958 test_varenv_temp_env_for_function
+# (in test file /tmp/allbats/test_bash_suite_varenv.bats, line 131)
+#   `[ "$actual" = "$expected" ]' failed
+ok 959 test_varenv_no_expansion_from_builtin_prefix_assign
+not ok 960 test_varenv_local_array_in_function
+# (in test file /tmp/allbats/test_bash_suite_varenv.bats, line 145)
+#   `[ "$actual" = "$expected" ]' failed
+# local: -a: invalid option
+ok 961 test_varenv_declare_integer
+ok 962 test_varenv_export_unset_then_assign
+ok 963 test_varenv_export_attr_persists
+not ok 964 test_varenv_set_a_typeset_export
+# (in test file /tmp/allbats/test_bash_suite_varenv.bats, line 172)
+#   `actual=$($RUBISH -c "$cmd")' failed
+ok 965 test_varenv_typeset_function_scope
